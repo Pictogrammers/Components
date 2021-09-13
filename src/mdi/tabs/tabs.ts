@@ -39,7 +39,9 @@ export default class MdiTabs extends HTMLElement {
         const button = n.querySelector<HTMLDivElement>('[part="tab"]');
         button?.addEventListener('click', (e) => {
           this.selectTab(tab.id);
+          this.dispatchEvent(new CustomEvent<any>('select', { detail: tab }));
         });
+        button?.addEventListener('keydown', this.handleTabKeypress.bind(this));
         if (this.tabs[0].id === tab.id) {
           button?.classList.add('active');
         }
@@ -50,6 +52,34 @@ export default class MdiTabs extends HTMLElement {
       }
     );
     e.stopPropagation();
+  }
+
+  handleTabKeypress(e) {
+    const tabs = Array.from(this.$tabset.children, x => x.children[0]);
+    if (tabs.length === 1) {
+      return;
+    }
+    const index = tabs.findIndex(x => x === e.target);
+    const previousIndex = index === 0 ? tabs.length - 1 : index - 1;
+    const nextIndex = index === tabs.length - 1 ? 0 : index + 1;
+    const previousTab = this.tabs[previousIndex];
+    const previousButton = tabs[previousIndex] as HTMLButtonElement;
+    const nextTab = this.tabs[nextIndex];
+    const nextButton = tabs[nextIndex] as HTMLButtonElement;
+    switch(e.key) {
+      case 'ArrowLeft':
+        if (previousTab) {
+          previousButton.focus();
+          this.selectTab(previousTab.id);
+        }
+        break;
+      case 'ArrowRight':
+        if (nextTab) {
+          nextButton.focus();
+          this.selectTab(nextTab.id);
+        }
+        break;
+    }
   }
 
   handleSlotChange(e) {
