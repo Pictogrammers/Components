@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  font-family: var(--pg-font-family);
+}
+
+[part="wrapper"] {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 100% 0;
+}
+
+[part="select"] {
+  grid-row: 1;
+  grid-column: 1;
+  border: 1px solid var(--pg-input-select-border-color, #453C4F);
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  font-size: 1rem;
+  outline: 0;
+  -webkit-appearance: none;
+}
+
+[part="select"]:focus {
+  box-shadow: 0 0 0 3px rgba(79, 143, 249, 0.5);
+}
+
+[part="chevron"] {
+  grid-row: 1;
+  grid-column: 2;
+  pointer-events: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-self: center;
+  transform: translate(-2rem, 0);
+}

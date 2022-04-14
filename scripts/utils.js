@@ -138,11 +138,11 @@ exports.eachComponent = (srcDir, callback) => {
 
 /*
   [{
-    input,            ./src/mdi/grid/grid.ts
-    name,             mdiGrid
-    namespace,        mdi
+    input,            ./src/pg/grid/grid.ts
+    name,             pgGrid
+    namespace,        pg
     examples: {
-      exampleInput,   ./src/mdi/grid/__examples/basic/basic.ts
+      exampleInput,   ./src/pg/grid/__examples/basic/basic.ts
       example         basic
     }
   }]

@@ -1,0 +1,9 @@
+:host {
+  display: inline-flex;
+  color: var(--pg-icon-color, #453C4F);
+}
+
+[part="svg"] {
+  width: var(--pg-icon-width, 1.5rem);
+  height: var(--pg-icon-height, 1.5rem);
+}

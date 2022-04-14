@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+[part="body"] {
+  padding: var(--pg-card-padding, 0);
+  border-radius: var(--pg-card-padding, 0.5rem);
+  background: var(--pg-card-background, #fff);
+  box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.3);
+}

@@ -7,16 +7,16 @@
   <title>Website Components</title>
   <style>
     :root {
-      --mdi-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-      --mdi-icon-color: #453C4F;
-      --mdi-header-color: #453C4F;
-      --mdi-header-background: #fff;
-      --mdi-search-border-color: #453C4F;
-      --mdi-dropdown-border-color: #453C4F;
+      --pg-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      --pg-icon-color: #453C4F;
+      --pg-header-color: #453C4F;
+      --pg-header-background: #fff;
+      --pg-search-border-color: #453C4F;
+      --pg-dropdown-border-color: #453C4F;
     }
     body {
       margin: 0;
-      font-family: var(--mdi-font-family);
+      font-family: var(--pg-font-family);
     }
     .wrapper {
       display: grid;
@@ -245,7 +245,7 @@
       readme.addEventListener('click', function () {
         // Create
         if (!(name in markdownCache)) {
-          var element = document.createElement('mdi-markdown');
+          var element = document.createElement('pg-markdown');
           container.appendChild(element);
           element.text = text;
           markdownCache[name] = false;
@@ -263,7 +263,7 @@
       <svg viewBox="0 0 24 24">
         <path fill="currentColor" d="M2,2H8V4H16V2H22V8H20V16H22V22H16V20H8V22H2V16H4V8H2V2M16,8V6H8V8H6V16H8V18H16V16H18V8H16M4,4V6H6V4H4M18,4V6H20V4H18M4,18V20H6V18H4M18,18V20H20V18H18Z" />
       </svg>
-      <h1>MDI Components</h1>
+      <h1>Pictogrammers Components</h1>
     </header>
     <aside>
       <div>Components</div>
@@ -280,7 +280,7 @@
       </ul>
     </aside>
     <main>
-      <p>This page is generated from <code>npm start</code>. To render only specific components use <code>npm start mdi-button</code>.</p>
+      <p>This page is generated from <code>npm start</code>. To render only specific components use <code>npm start pg-button</code>.</p>
 
       <!-- [Examples] -->
     </main>

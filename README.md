@@ -5,9 +5,9 @@
 > - [React](https://github.com/Templarian/MaterialDesign-React/)
 > - [Web Component](https://github.com/Templarian/MaterialDesign-WebComponent/)
 
-The website is made of many components, view the `src/mdi` folder to see the source.
+The website is made of many components, view the `src/pg` folder to see the source.
 
-- [View the Components](https://templarian.github.io/@mdi/components/)
+- [View the Components](https://templarian.github.io/@pictogrammers/components/)
 
 ## Contribute to this Project
 
@@ -17,7 +17,7 @@ To run the demo application locally use the following NPM commands.
 npm install
 npm test
 npm start
-# npm start [mdiButton|mdi-button]
+# npm start [pgButton|pg-button]
 ```
 
 Open http://localhost:8080 (port could vary)
