@@ -1,6 +1,6 @@
 import { Icon } from './icon';
 import { User } from './user';
-import { ModificationType } from './../enums/modificationType';
+import { ModificationType } from '../enums/modificationType';
 
 export class Modification {
 
