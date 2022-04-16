@@ -61,22 +61,22 @@ exports.createIndex = function(components, mode) {
     switch(type) {
       case 'Shared':
         listSharedHtml.push(`<li><a href="#${camelToDash(name)}">`);
-        listSharedHtml.push(`${camelToDash(name).replace('mdi-', '')}`);
+        listSharedHtml.push(`${camelToDash(name).replace('pg-', '')}`);
         listSharedHtml.push(`</a></li>`);
         break;
-      case 'MdiOverlay':
+      case 'PgOverlay':
         listOverlaysHtml.push(`<li><a href="#${camelToDash(name)}">`);
-        listOverlaysHtml.push(`${camelToDash(name).replace('mdi-', '')}`);
+        listOverlaysHtml.push(`${camelToDash(name).replace('pg-', '')}`);
         listOverlaysHtml.push(`</a></li>`);
         break;
       default:
         listComponentsHtml.push(`<li><a href="#${camelToDash(name)}">`);
-        listComponentsHtml.push(`${camelToDash(name).replace('mdi-', '')}`);
+        listComponentsHtml.push(`${camelToDash(name).replace('pg-', '')}`);
         listComponentsHtml.push(`</a></li>`);
     }
 
     examples.forEach(({ example }) => {
-      // ex x-[mdiButton]-[basicTest] = x-mdi-button-basic-test
+      // ex x-[pgButton]-[basicTest] = x-pg-button-basic-test
       const tag = `x-${camelToDash(name)}-${camelToDash(example)}`;
       contentHtml.push('<section>');
       contentHtml.push(`<h3><span>${example}</span></h3>`);

@@ -1,0 +1,91 @@
+:host {
+  display: flex;
+}
+
+[part="button"] {
+  display: inline-flex;
+  align-items: center;
+  align-content: center;
+  font-family: var(--pg-font-family);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  border: 1px solid var(--pg-button-border-color, #453C4F);
+  background-color: var(--pg-button-background-color, #fff);
+  color: var(--pg-button-color, #453C4F);
+  padding: var(--pg-button-padding, 0.25rem 0.5rem);
+  border-radius: 0.25rem;
+  outline: none;
+  --pg-icon-color: var(--pg-button-color, #453C4F);
+}
+
+[part="button"]:hover {
+  border: 1px solid var(--pg-button-hover-border-color, #453C4F);
+  background-color: var(--pg-button-hover-background-color, #453C4F);
+  color: var(--pg-button-hover-color, #fff);
+  --pg-icon-color: var(--pg-button-hover-color, #fff);
+}
+
+[part="button"]:active {
+  box-shadow: 0 1px 0.25rem rgba(0, 0, 0, 0.5) inset;
+  position: relative;
+}
+
+[part="button"]:focus {
+  position: relative;
+}
+
+[part="button"]:active::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: -1px;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 3px var(--pg-search-focus-glow, rgb(79, 143, 249, 0.6));
+}
+[part="button"]:focus::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: -1px;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 3px var(--pg-search-focus-glow, rgb(79, 143, 249, 0.5));
+}
+
+[part="button"].start {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-right: -1px;
+}
+
+[part="button"].center {
+  border-radius: 0;
+  margin-right: -1px;
+}
+
+[part="button"].end {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+[part="button"].active {
+  box-shadow: 0 1px 0.25rem rgba(0, 0, 0, 0.5) inset;
+  background-color: rgba(69, 60, 79, 0.1);
+  color: var(--pg-button-color, #453C4F);
+}
+[part="button"].active:hover {
+  box-shadow: 0 1px 0.25rem rgba(0, 0, 0, 0.5) inset;
+  background-color: var(--pg-button-color, #453C4F);
+  color: var(--pg-button-hover-color, #fff);
+}
+
+[part="button"].block {
+  flex: 1;
+}
+
+::slotted {
+  align-self: center;
+}

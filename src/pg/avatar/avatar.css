@@ -1,0 +1,45 @@
+:host {
+  display: flex;
+  position: relative;
+  width: var(--pg-avatar-width, 3rem);
+  height: var(--pg-avatar-height, 3rem);
+}
+
+[part="wrap"] {
+  border: 1px solid var(--pg-icon-border-color, #453C4F);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+[part="img"] {
+  width: calc(var(--pg-avatar-width, 3rem) - 2px);
+  height: calc(var(--pg-avatar-height, 3rem) - 2px);
+}
+
+[part="sponsored"] {
+  display: flex;
+  position: absolute;
+  bottom: -0.25rem;
+  right: -0.5rem;
+  border: 1px solid var(--pg-icon-border-color, #453C4F);
+  background-color: #fff;
+  border-radius: 50%;
+  color: #ea4aaa;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-content: center;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+}
+[part="sponsored"]:hover {
+  box-shadow: 0 0 0 0.125rem #fff;
+  color: #fff;
+  background-color: #ea4aaa;
+  border-color: #ea4aaa;
+}
+[part="sponsored"] svg {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 1px; /* meh */
+}

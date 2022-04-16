@@ -1,0 +1,20 @@
+:host {
+  display: block;
+  font-family: var(--pg-font-family);
+}
+
+[part="input"] {
+  border: 1px solid var(--pg-input-text-border-color, #453C4F);
+  border-radius: 0.125rem;
+  padding: calc(0.5rem - 1px) 0.75rem;
+  font-size: 1rem;
+  outline: none;
+  width: calc(100% - 1.5rem - 2px);
+}
+
+[part="input"]:active {
+  box-shadow: 0 0 0 3px var(--pg-input-text-active-glow, rgb(79, 143, 249, 0.6));
+}
+[part="input"]:focus {
+  box-shadow: 0 0 0 3px var(--pg-input-text-focus-glow, rgb(79, 143, 249, 0.5));
+}

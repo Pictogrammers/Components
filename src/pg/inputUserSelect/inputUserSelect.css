@@ -1,0 +1,174 @@
+:host {
+  display: block;
+}
+
+[part="wrapper"] {
+  display: grid;
+  grid-template-rows: auto 0;
+  grid-template-columns: 100%;
+}
+
+[part="select"] {
+  display: grid;
+  grid-template-columns: 3.5rem 1.75rem auto 2.75rem 1fr 1.5rem;
+  grid-template-rows: 1.5rem 1.5rem;
+  grid-row: 1;
+  grid-column: 1;
+  border: 1px solid var(--pg-input-select-border-color, #453C4F);
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  width: 100%;
+  font-size: 1rem;
+  outline: 0;
+  text-align: left;
+  background: var(--pg-input-select-background, #fff);
+}
+
+[part="select"]:focus {
+  box-shadow: 0 0 0 3px rgba(79, 143, 249, 0.5);
+}
+
+[part="select"]:disabled {
+  border: 1px solid var(--pg-input-select-disabled-border-color, rgba(69, 60, 79, 0.6));
+  color: var(--pg-input-select-disabled-color, rgba(69, 60, 79, 0.6));
+}
+
+[part="chevron"] {
+  grid-row: 1 / span 2;
+  grid-column: 6;
+  pointer-events: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-self: center;
+}
+
+.githubIcon,
+[part="githubIcon"] {
+  grid-row: 2;
+  grid-column: 2;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-self: center;
+  color: var(--pg-input-select-border-color, #453C4F);
+}
+
+.avatar,
+[part="selectedAvatar"] {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 1px solid var(--pg-input-select-border-color, #453C4F);
+}
+
+.name,
+[part="selectedName"] {
+  grid-row: 1;
+  grid-column: 2 / span 4;
+  align-self: center;
+}
+
+.github,
+[part="selectedGithub"] {
+  grid-row: 2;
+  grid-column: 3;
+  align-self: center;
+}
+
+.countIcon,
+[part="countIcon"] {
+  grid-row: 2;
+  grid-column: 4;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-self: center;
+  margin-left: 1rem;
+  color: var(--pg-input-select-border-color, #453C4F);
+}
+
+.iconCount,
+[part="selectedCount"] {
+  grid-row: 2;
+  grid-column: 5;
+  align-self: center;
+  font-weight: bold;
+}
+
+[part="dropdown"].open {
+  display: flex;
+}
+
+[part="dropdown"] {
+  grid-row: 2;
+  grid-column: 1;
+  display: none;
+  flex-direction: column;
+  border: 1px solid var(--pg-input-select-border-color, #453C4F);
+  border-radius: 0.25rem;
+  background: #fff;
+  z-index: 1;
+  position: absolute;
+  max-height: 16.5rem;
+  overflow: auto;
+}
+
+[part="dropdown"] button {
+  display: grid;
+  grid-template-columns: 3.5rem 1.75rem auto 2.75rem 1fr;
+  grid-template-rows: auto;
+  border: 0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  background: #fff;
+}
+
+[part="dropdown"] button:hover,
+[part="dropdown"] button:focus {
+  color: #fff;
+  background: #1E90FF;
+}
+
+[part="dropdown"] button:hover .githubIcon,
+[part="dropdown"] button:hover .countIcon,
+[part="dropdown"] button:focus .githubIcon,
+[part="dropdown"] button:focus .countIcon {
+  color: #fff;
+}
+
+[part="loading"] {
+  width: 3rem;
+  height: 3rem;
+  animation: spin 2s infinite linear;
+  grid-row: 1 / span 2;;
+  grid-column: 1;
+  pointer-events: none;
+  align-self: center;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+[part="loadingText"] {
+  grid-row: 1 / span 2;
+  grid-column: 2 / span 3;
+  align-self: center;
+}
+
+[part="noData"] {
+  grid-row: 1 / span 2;
+  grid-column: 1 / span 4;
+  align-self: center;
+}
+
+[part="noSelection"] {
+  grid-row: 1 / span 2;
+  grid-column: 1 / span 4;
+  align-self: center;
+}

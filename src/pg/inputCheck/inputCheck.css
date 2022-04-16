@@ -1,0 +1,45 @@
+:host {
+  display: inline-flex;
+}
+
+.blank {
+  color: var(--pg-input-check-blank-color, #453C4F);
+}
+.blank [part="check"] {
+  visibility: hidden;
+}
+
+.checked {
+  color: var(--pg-input-check-checked-color, #453C4F);
+}
+
+[part="button"] {
+  display: flex;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  border-radius: 0.25rem;
+  background: transparent;
+}
+
+[part="svg"] {
+  width: var(--pg-icon-check-size, 1.5rem);
+  height: var(--pg-icon-check-size, 1.5rem);
+}
+
+[part="button"]:not(:hover):active {
+  box-shadow: 0 0 0 3px var(--pg-input-check-active-glow, rgb(79, 143, 249, 0.6));
+}
+[part="button"]:not(:hover):focus:not(:focus-visible) {
+  box-shadow: none;
+}
+[part="button"]:not(:hover):focus {
+  box-shadow: 0 0 0 3px var(--pg-input-check-focus-glow, rgb(79, 143, 249, 0.5));
+}
+[part="button"]:not(:disabled):hover [part="path"] {
+  fill: #4f8ff9;
+}
+
+[part="button"]:disabled {
+  color: #AAA;
+}
