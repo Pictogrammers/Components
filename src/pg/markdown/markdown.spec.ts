@@ -1,4 +1,4 @@
-import { selectComponent } from '@pictogrammers/element';
+import { selectComponent, getAttributes } from '@pictogrammers/element';
 
 import './markdown';
 import PgMarkdown from './markdown';
@@ -23,8 +23,7 @@ describe('pg-markdown', () => {
   });
 
   it('should only expose known props', () => {
-    const { symbols } = customElements.get(PG_MARKDOWN);
-    const props = Object.keys(symbols);
+    const props = getAttributes(PG_MARKDOWN);
     expect(props.length).toBe(3);
     expect(props).toContain('text');
     expect(props).toContain('file');

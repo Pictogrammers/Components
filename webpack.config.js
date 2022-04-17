@@ -103,7 +103,9 @@ module.exports = (env, argv) => {
   ];
 
   entries[entries.length - 1].devServer = {
-    contentBase: path.join(__dirname, DIST_DIR),
+    static: {
+      directory: path.join(__dirname, DIST_DIR)
+    },
     compress: true,
     port: 3000
   };

@@ -1,4 +1,4 @@
-import { selectComponent } from '@pictogrammers/element';
+import { selectComponent, getAttributes } from '@pictogrammers/element';
 
 import './avatar';
 import PgAvatar from './avatar';
@@ -27,8 +27,7 @@ describe('pg-avatar', () => {
   });
 
   it('should only expose known props', () => {
-    const { symbols } = customElements.get(PG_AVATAR);
-    const props = Object.keys(symbols);
+    const props = getAttributes(PG_AVATAR)
     expect(props.length).toBe(1);
     expect(props).toContain('user');
   });

@@ -1,4 +1,4 @@
-import { selectComponent } from '@pictogrammers/element';
+import { selectComponent, getAttributes } from '@pictogrammers/element';
 
 import './grid';
 import PgGrid from './grid';
@@ -28,8 +28,7 @@ describe('pg-grid', () => {
   });
 
   it('should only expose known props', () => {
-    const { symbols } = customElements.get(PG_GRID);
-    const props = Object.keys(symbols);
+    const props = getAttributes(PG_GRID);
     expect(props.length).toBe(6);
     expect(props).toContain('icons');
     expect(props).toContain('size');

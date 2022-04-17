@@ -1,4 +1,4 @@
-import { selectComponent } from '@pictogrammers/element';
+import { selectComponent, getAttributes } from '@pictogrammers/element';
 
 import './card';
 import PgCard from './card';
@@ -23,8 +23,7 @@ describe('pg-card', () => {
   });
 
   it('should only expose known props', () => {
-    const { symbols } = customElements.get(PG_CARD);
-    const props = Object.keys(symbols);
+    const props = getAttributes(PG_CARD);
     expect(props.length).toBe(0);
   });
 

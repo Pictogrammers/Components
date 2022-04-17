@@ -1,8 +1,8 @@
 import Dexie from 'dexie';
 
 export class Database extends Dexie {
-  hashes: Dexie.Table<HashTable, number>;
-  icons: Dexie.Table<IconTable, number>;
+  hashes: Dexie.Table<HashTable, string>;
+  icons: Dexie.Table<IconTable, string>;
 
   constructor() {
     super("IconCache");
