@@ -47,7 +47,7 @@ exports.createIndex = function(components, mode) {
     contentHtml.push(`<path fill="currentColor" d="${mdiGithub}">`);
     contentHtml.push(`</svg>`);
     contentHtml.push(`</a>`);
-    contentHtml.push(`<button id="${name}Readme">`);
+    contentHtml.push(`<button id="${name}Readme" title="Expand Documentation">`);
     contentHtml.push(`<svg viewBox="0 0 24 24">`);
     contentHtml.push(`<path fill="currentColor" d="${mdiFile}">`);
     contentHtml.push(`</svg>`);

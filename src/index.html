@@ -266,6 +266,7 @@
         markdownCache[name] = !markdownCache[name];
         h2.classList.toggle('open', markdownCache[name]);
         readme.classList.toggle('active', markdownCache[name]);
+        readme.title = `${markdownCache[name] ? 'Collapse' : 'Expand'} Documentation`;
         container.classList.toggle('show', markdownCache[name]);
       });
     }
