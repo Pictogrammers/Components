@@ -31,7 +31,7 @@ npm run build
 ## Publish
 
 ```bash
-npm run publish
+npm publish
 ```
 
 ### Web Components
