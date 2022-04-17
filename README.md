@@ -30,8 +30,10 @@ npm run build
 
 ## Publish
 
+This project does not use the normal `npm publish`. Always run the script.
+
 ```bash
-npm publish
+npm run publish
 ```
 
 ### Web Components
