@@ -7,14 +7,14 @@ jobs:
   publish:
     name: Publish Job
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPMJS_PUBLISH }}
     steps:
     - uses: actions/checkout@v1
     - name: Checkout
       uses: actions/setup-node@v1
       with:
         node-version: 16.x
-    - env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     - name: npm install, build, and publish
       run: |
         npm install
