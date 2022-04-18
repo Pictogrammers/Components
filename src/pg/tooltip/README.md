@@ -1,6 +1,6 @@
 # `<pg-tooltip>`
 
-The `pg-tooltip` component should be placed on the top level. It then is wired to a shared event.
+The `pg-tooltip` component is placed near the root of the web application. Tooltips render above all elements.
 
 ```typescript
 import '@pictogrammers/components/pg/tooltip';
