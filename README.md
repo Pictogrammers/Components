@@ -30,7 +30,7 @@ npm run build
 
 ## Publish
 
-This project does not use the normal `npm publish`. Always run the script.
+This project does not use the normal `npm publish`. Always run the script to build individual components.
 
 ```bash
 npm run publish

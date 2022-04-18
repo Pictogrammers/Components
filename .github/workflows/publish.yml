@@ -18,6 +18,8 @@ jobs:
     - name: npm install, build, and publish
       run: |
         npm install
+        npm version patch
         npm run publish
         cd publish
         npm publish
+        git status

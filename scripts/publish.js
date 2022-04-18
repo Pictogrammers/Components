@@ -35,10 +35,13 @@ const package = JSON.parse(read('package.json'));
 delete package.private;
 delete package.devDependencies;
 delete package.scripts.publish;
+/*
+// Already running `npm version patch`
 package.version = package.version.replace(/(\d+)$/g, (m, minor) => {
   const next = parseInt(minor, 10) + 1;
   return `${next}`;
 });
+*/
 write('publish/package.json', JSON.stringify(package, null, 4));
 console.log(`Done: "package.json" with version "${package.version}"`);
 // Copy src/* to publish/*
