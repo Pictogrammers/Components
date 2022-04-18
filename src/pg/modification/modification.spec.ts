@@ -1,4 +1,4 @@
-import { selectComponent, getAttributes } from '@pictogrammers/element';
+import { selectComponent, getProps } from '@pictogrammers/element';
 
 import './modification';
 import PgModification from './modification';
@@ -23,7 +23,7 @@ describe('pg-modification', () => {
   });
 
   it('should only expose known props', () => {
-    const props = getAttributes(PG_MODIFICATION);
+    const props = getProps(PG_MODIFICATION);
     expect(props.length).toBe(3);
     expect(props).toContain('modifications');
     expect(props).toContain('edit');

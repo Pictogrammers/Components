@@ -1,4 +1,4 @@
-import { selectComponent, getAttributes } from '@pictogrammers/element';
+import { selectComponent, getProps } from '@pictogrammers/element';
 
 import './icon';
 import PgIcon from './icon';
@@ -25,7 +25,7 @@ describe('pg-icon', () => {
   });
 
   it('should only expose known props', () => {
-    const props = getAttributes(PG_ICON);
+    const props = getProps(PG_ICON);
     expect(props.length).toBe(1);
     expect(props).toContain('path');
   });

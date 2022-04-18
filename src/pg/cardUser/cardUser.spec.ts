@@ -1,4 +1,4 @@
-import { selectComponent, getAttributes } from '@pictogrammers/element';
+import { selectComponent, getProps } from '@pictogrammers/element';
 
 import './cardUser';
 import PgCardUser from './cardUser';
@@ -23,7 +23,7 @@ describe('pg-card-user', () => {
   });
 
   it('should only expose known props', () => {
-    const props = getAttributes(PG_CARD_USER);
+    const props = getProps(PG_CARD_USER);
     expect(props.length).toBe(1);
     expect(props).toContain('user');
   });

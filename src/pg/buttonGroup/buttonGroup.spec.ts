@@ -1,4 +1,4 @@
-import { selectComponent, getAttributes } from '@pictogrammers/element';
+import { selectComponent, getProps } from '@pictogrammers/element';
 
 import './buttonGroup';
 import PgButtonGroup from './buttonGroup';
@@ -23,7 +23,7 @@ describe('pg-button-group', () => {
   });
 
   it('should only expose known props', () => {
-    const props = getAttributes(PG_BUTTON_GROUP);
+    const props = getProps(PG_BUTTON_GROUP);
     expect(props.length).toBe(0);
   });
 

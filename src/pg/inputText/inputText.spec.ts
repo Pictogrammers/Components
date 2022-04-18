@@ -1,4 +1,4 @@
-import { selectComponent, getAttributes } from '@pictogrammers/element';
+import { selectComponent, getProps } from '@pictogrammers/element';
 
 import './inputText';
 import PgInputText from './inputText';
@@ -23,7 +23,7 @@ describe('pg-input-text', () => {
   });
 
   it('should only expose known props', () => {
-    const props = getAttributes(PG_INPUT_TEXT);
+    const props = getProps(PG_INPUT_TEXT);
     expect(props.length).toBe(3);
     expect(props).toContain('name');
     expect(props).toContain('value');

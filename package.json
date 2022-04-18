@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@pictogrammers/components",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "author": "Austin Andrews",
   "scripts": {
@@ -15,7 +15,7 @@
     "url": "git+https://github.com/Templarian/MaterialDesign-Web-Component.git"
   },
   "dependencies": {
-    "@pictogrammers/element": "0.0.22",
+    "@pictogrammers/element": "0.0.23",
     "@popperjs/core": "^2.11.5",
     "dexie": "^3.2.1",
     "extra-watch-webpack-plugin": "^1.0.3",

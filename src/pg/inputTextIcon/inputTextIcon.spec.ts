@@ -1,4 +1,4 @@
-import { selectComponent, getAttributes } from '@pictogrammers/element';
+import { selectComponent, getProps } from '@pictogrammers/element';
 
 import './inputTextIcon';
 import PgInputTextIcon from './inputTextIcon';
@@ -23,7 +23,7 @@ describe('pg-input-text-icon', () => {
   });
 
   it('should only expose known props', () => {
-    const props = getAttributes(PG_INPUT_TEXT_ICON);
+    const props = getProps(PG_INPUT_TEXT_ICON);
     expect(props).toContain('path');
   });
 
