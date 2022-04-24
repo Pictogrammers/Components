@@ -10,7 +10,12 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": [
+      "node",
+      "jest",
+      "@pictogrammers/element-jest"
+    ]
   },
   "include": [
     "src/**/*"
