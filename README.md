@@ -7,7 +7,7 @@
 
 The website is made of many components, view the `src/pg` folder to see the source.
 
-- [View the Components](https://templarian.github.io/@pictogrammers/components/)
+- [View the Components](https://pictogrammers.github.io/@pictogrammers/components/)
 
 ## Contribute to this Project
 
@@ -46,4 +46,4 @@ Web Components with a very basic wrapper. The only magic is...
   - `this.$part.innerText = 'Hello World!';`
 - `@Local('default') foo;` Shorthand for localStorage.
 
-Learn More: https://github.com/Templarian/Element
+Learn More: https://github.com/Pictogrammers/Element
