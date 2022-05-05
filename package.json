@@ -20,7 +20,7 @@
   "devDependencies": {
     "@pictogrammers/element": "0.0.23",
     "@pictogrammers/element-jest": "^0.1.4",
-    "@pictogrammers/element-webpack": "^0.1.18",
+    "@pictogrammers/element-webpack": "^0.1.19",
     "@popperjs/core": "^2.11.5",
     "@types/js-yaml": "^4.0.5",
     "dexie": "^3.2.1",
