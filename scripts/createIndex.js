@@ -90,5 +90,6 @@ exports.createIndex = function(components, mode) {
   index = index.replace('<!-- [ListOverlays] -->', listOverlaysHtml.join('\n'));
   index = index.replace('<!-- [ListShared] -->', listSharedHtml.join('\n'));
   index = index.replace('<!-- [Examples] -->', contentHtml.join('\n'));
-  write(`${DIST_DIR}/index.html`, index);
+  // write(`${DIST_DIR}/index.html`, index);
+  return index;
 };

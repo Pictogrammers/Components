@@ -5,9 +5,11 @@
   "license": "MIT",
   "author": "Austin Andrews",
   "scripts": {
-    "start": "webpack serve",
-    "build": "webpack --mode=production",
-    "publish": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.publish.config.js && node ./scripts/publish.js",
+    "start": "element-start",
+    "build": "element-build",
+    "publish": "element-publish",
+    "build2": "webpack --mode=production",
+    "publish2": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.publish.config.js && node ./scripts/publish.js",
     "test": "jest --no-cache"
   },
   "repository": {
@@ -18,7 +20,7 @@
   "devDependencies": {
     "@pictogrammers/element": "0.0.23",
     "@pictogrammers/element-jest": "^0.1.4",
-    "@pictogrammers/element-webpack": "^0.1.8",
+    "@pictogrammers/element-webpack": "^0.1.18",
     "@popperjs/core": "^2.11.5",
     "@types/js-yaml": "^4.0.5",
     "dexie": "^3.2.1",

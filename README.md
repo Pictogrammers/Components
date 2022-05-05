@@ -17,7 +17,7 @@ To run the demo application locally use the following NPM commands.
 npm install
 npm test
 npm start
-# npm start [pgButton|pg-button]
+# npm start [pgButton|pg-button, ...]
 ```
 
 Open http://localhost:8080 (port could vary)

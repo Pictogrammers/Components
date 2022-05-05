@@ -188,10 +188,14 @@ exports.getComponents = function(srcDir) {
   return components;
 };
 
-exports.dashToCamel = function(str) {
+function dashToCamel(str) {
   return str.replace(/-([a-z])/g, m => m[1].toUpperCase());
-};
+}
 
-exports.camelToDash = function(str) {
+exports.dashToCamel = dashToCamel;
+
+function camelToDash(str) {
   return str.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase()
-};
+}
+
+exports.camelToDash = camelToDash;
