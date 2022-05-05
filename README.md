@@ -20,7 +20,7 @@ npm start
 # npm start [pgButton|pg-button, ...]
 ```
 
-Open http://localhost:8080 (port could vary)
+Open http://localhost:3000 (port could vary)
 
 To build just the components.
 
