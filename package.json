@@ -8,7 +8,6 @@
     "start": "element-start",
     "build": "element-build",
     "publish": "element-publish",
-    "build2": "webpack --mode=production",
     "publish2": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.publish.config.js && node ./scripts/publish.js",
     "test": "jest --no-cache"
   },
