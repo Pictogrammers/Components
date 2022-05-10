@@ -31,7 +31,7 @@ exports.createIndex = function(components, mode) {
   components.forEach(({ name, namespace, component, input, examples }) => {
     const data = read(input);
     const m = data.match(/extends (\w+)/);
-    const markdown = read(input.replace(/([^\/]+)$/, 'README.md'))
+    const markdown = read(input.replace(/([^\/\\]+)$/, 'README.md'))
       .replace(/^# [^\r\n]+/, '');
     const type = m === null ? 'Shared' : m[1];
     contentHtml.push(`<h2 id="${name}H2">`);
