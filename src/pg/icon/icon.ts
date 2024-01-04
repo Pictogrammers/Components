@@ -13,10 +13,13 @@ const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
 export default class PgIcon extends HTMLElement {
   @Prop() path: string = noIcon;
 
+  @Part() $svg: SVGSVGElement;
   @Part() $path: SVGPathElement;
 
   render(changes) {
     if (changes.path) {
+      const viewBox = getComputedStyle(this).getPropertyValue('--pg-icon-viewbox');
+      this.$svg.setAttribute('viewBox', viewBox || '0 0 24 24');
       this.$path.setAttribute('d', this.path);
     }
   }

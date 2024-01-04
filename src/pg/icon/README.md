@@ -19,8 +19,9 @@ import PgIcon from '@pictogrammers/components/pg/icon';
 
 ## CSS Variables
 
-| CSS Variables       | Default   | Description |
-| ------------------- | --------- | ----------- |
-| `--pg-icon-color`  | `#453C4F` | Color       |
-| `--pg-icon-width`  | `1.5rem`  | Width       |
-| `--pg-icon-height` | `1.5rem`  | Height      |
+| CSS Variables       | Default     | Description |
+| ------------------- | ----------- | ----------- |
+| `--pg-icon-color`   | `#453C4F`   | Color       |
+| `--pg-icon-viewbox` | `0 0 24 24` | SVG viewBox |
+| `--pg-icon-width`   | `1.5rem`    | Width       |
+| `--pg-icon-height`  | `1.5rem`    | Height      |
