@@ -42,7 +42,7 @@ export default function(components, mode) {
     contentH2.push(`<path fill="currentColor" d="${mdiLink}">`);
     contentH2.push(`</svg>`);
     contentH2.push(`</a>`);
-    contentH2.push(`<a title="View Code" href="https://github.com/Templarian/MaterialDesign-Components/tree/master/src/${namespace}/${component}" target="_blank">`);
+    contentH2.push(`<a title="View Code" href="https://github.com/Pictogrammers/Components/tree/master/src/${namespace}/${component}" target="_blank">`);
     contentH2.push(`<svg viewBox="0 0 24 24">`);
     contentH2.push(`<path fill="currentColor" d="${mdiGithub}">`);
     contentH2.push(`</svg>`);
