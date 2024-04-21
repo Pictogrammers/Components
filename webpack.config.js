@@ -1,13 +1,12 @@
-const config = require('@pictogrammers/element-webpack');
-const { exists } = require('@pictogrammers/element-webpack/utils');
+import config from '@pictogrammers/element-webpack';
 
-const { createIndex } = require('./scripts/createIndex');
+import createIndex from './scripts/createIndex.js';
 
 const bold = (text) => '\x1b[1m' + text + '\x1b[0m';
 const green = (text) => '\x1b[32m' + text + '\x1b[0m';
 const red = (text) => '\x1b[31m' + text + '\x1b[0m';
 
-module.exports = config({
+export default config({
   port: 3000,
   dist: 'dist',
   index: (components, args, mode) => {

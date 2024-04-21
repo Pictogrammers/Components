@@ -1,4 +1,4 @@
-import { Component, Part, Prop } from '@pictogrammers/element';
+import { Component, Part, Prop, normalizeBoolean } from '@pictogrammers/element';
 
 import template from './button.html';
 import style from './button.css';
@@ -9,13 +9,15 @@ import style from './button.css';
   template
 })
 export default class PgButton extends HTMLElement {
-  @Prop() active: string | boolean = false;
-  @Prop() block: string | boolean = false;
-  @Prop() start: string | boolean = false;
-  @Prop() center: string | boolean = false;
-  @Prop() end: string | boolean = false;
+  @Prop(normalizeBoolean) active: boolean = false;
+  @Prop(normalizeBoolean) block: boolean = false;
+  @Prop(normalizeBoolean) start: boolean = false;
+  @Prop(normalizeBoolean) center: boolean = false;
+  @Prop(normalizeBoolean) end: boolean = false;
 
   @Part() $button: HTMLButtonElement;
+  @Part() $number: HTMLSpanElement;
+  @Part() $bar: HTMLSpanElement;
 
   connectedCallback() {
     this.$button.addEventListener('click', (e) => {
@@ -25,21 +27,20 @@ export default class PgButton extends HTMLElement {
   }
 
   render(changes) {
-    const t = [true, 'true', ''];
     if (changes.active) {
-      this.$button.classList.toggle('active', t.includes(this.active));
+      this.$button.classList.toggle('active', this.active);
     }
     if (changes.start) {
-      this.$button.classList.toggle('start', t.includes(this.start));
+      this.$button.classList.toggle('start', this.start);
     }
     if (changes.end) {
-      this.$button.classList.toggle('end', t.includes(this.end));
+      this.$button.classList.toggle('end', this.end);
     }
     if (changes.center) {
-      this.$button.classList.toggle('center', t.includes(this.center));
+      this.$button.classList.toggle('center', this.center);
     }
     if (changes.block) {
-      this.$button.classList.toggle('block', t.includes(this.block));
+      this.$button.classList.toggle('block', this.block);
     }
   }
 }

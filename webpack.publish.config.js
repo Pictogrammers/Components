@@ -1,9 +1,9 @@
-const path = require('path');
-const {
+import path from 'path';
+import {
   dashToCamel,
   getComponents
-} = require('./scripts/utils');
-const { createIndex } = require('./scripts/createIndex');
+} from './scripts/utils';
+import createIndex from './scripts/createIndex.js';
 
 const DIST_DIR = 'dist';
 
@@ -18,7 +18,7 @@ components.forEach(({ input, examples }) => {
   });
 });
 
-module.exports = (env, argv) => {
+export default (env, argv) => {
   const entries = [];
   const mode = argv.mode === 'production' ? 'production' : 'development';
   function addEntries(input, name) {

@@ -1,6 +1,7 @@
 {
   "private": true,
   "name": "@pictogrammers/components",
+  "type": "module",
   "version": "0.3.3",
   "license": "MIT",
   "author": "Austin Andrews",
@@ -8,7 +9,7 @@
     "start": "element-start",
     "build": "element-build",
     "publish": "element-publish",
-    "publish2": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.publish.config.js && node ./scripts/publish.js",
+    "publish2": "cross-env NODE_OPTIONS=--max_old_space_size=8192 mode=production webpack --config webpack.publish.config.js && node ./scripts/publish.js",
     "test": "jest --no-cache"
   },
   "repository": {
@@ -25,12 +26,12 @@
     "remarkable": "^2.0.1"
   },
   "devDependencies": {
-    "@pictogrammers/element": "0.0.27",
-    "@pictogrammers/element-jest": "^0.1.4",
-    "@pictogrammers/element-webpack": "^0.1.24",
+    "@pictogrammers/element": "0.0.40",
+    "@pictogrammers/element-jest": "^0.1.7",
+    "@pictogrammers/element-webpack": "^0.1.40",
     "cross-env": "^7.0.3",
     "npm-run-all": "^4.1.5",
     "raw-loader": "^4.0.2",
-    "typescript": "^4.6.4"
+    "typescript": "^5.3.2"
   }
 }

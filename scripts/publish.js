@@ -1,6 +1,6 @@
 // This script is super ugly
 
-const {
+import {
   read,
   write,
   exists,
@@ -11,8 +11,8 @@ const {
   copyFolderSync,
   copyFolderContentsSync,
   eachComponent
-} = require('./utils');
-const { execSync } = require("child_process");
+} from './utils';
+import { execSync } from "child_process";
 
 // publish/
 // - dist/
@@ -31,10 +31,10 @@ removeFolder('publish/dist/api');
 remove('publish/dist/index.html');
 remove('publish/dist/main.js.LICENSE.txt');
 // Write publish/package.json
-const package = JSON.parse(read('package.json'));
-delete package.private;
-delete package.devDependencies;
-delete package.scripts.publish;
+const pkg = JSON.parse(read('package.json'));
+delete pkg.private;
+delete pkg.devDependencies;
+delete pkg.scripts.publish;
 /*
 // Already running `npm version patch`
 package.version = package.version.replace(/(\d+)$/g, (m, minor) => {
@@ -42,8 +42,8 @@ package.version = package.version.replace(/(\d+)$/g, (m, minor) => {
   return `${next}`;
 });
 */
-write('publish/package.json', JSON.stringify(package, null, 4));
-console.log(`Done: "package.json" with version "${package.version}"`);
+write('publish/package.json', JSON.stringify(pkg, null, 4));
+console.log(`Done: "package.json" with version "${pkg.version}"`);
 // Copy src/* to publish/*
 copyFolderContentsSync('src', 'publish');
 // Inject index.ts into every component

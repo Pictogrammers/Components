@@ -1,23 +1,23 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-exports.write = (file, data) => {
+export function write(file, data) {
   fs.writeFileSync(file, data);
-};
+}
 
-exports.read = (file) => {
+export function read(file) {
   return fs.readFileSync(file, 'utf8');
-};
+}
 
-exports.exists = (file) => {
+export function exists(file) {
   return fs.existsSync(file);
-};
+}
 
-exports.remove = (file) => {
+export function remove(file) {
   return fs.unlinkSync(file);
-};
+}
 
-function removeFolder(p) {
+export function removeFolder(p) {
   if (fs.existsSync(p)) {
     fs.readdirSync(p).forEach((file) => {
       const curPath = path.join(p, file);
@@ -31,15 +31,13 @@ function removeFolder(p) {
   }
 }
 
-exports.removeFolder = removeFolder;
-
-exports.folder = (targetFolder) => {
+export function folder (targetFolder) {
   if (!fs.existsSync(targetFolder)) {
     fs.mkdirSync(targetFolder);
   }
-};
+}
 
-function copyFileSync(source, target) {
+export function copyFileSync(source, target) {
 
   var targetFile = target;
 
@@ -51,11 +49,9 @@ function copyFileSync(source, target) {
   }
 
   fs.writeFileSync(targetFile, fs.readFileSync(source));
-};
+}
 
-exports.copyFileSync = copyFileSync;
-
-function copyFolderSync(source, target) {
+export function copyFolderSync(source, target) {
   var files = [];
 
   //check if folder needs to be created or integrated
@@ -76,11 +72,9 @@ function copyFolderSync(source, target) {
       }
     });
   }
-};
+}
 
-exports.copyFolderSync = copyFolderSync;
-
-function copyFolderContentsSync(source, target) {
+export function copyFolderContentsSync(source, target) {
   var files = [];
 
   //check if folder needs to be created or integrated
@@ -101,11 +95,9 @@ function copyFolderContentsSync(source, target) {
       }
     });
   }
-};
+}
 
-exports.copyFolderContentsSync = copyFolderContentsSync;
-
-exports.eachComponent = (srcDir, callback) => {
+export function eachComponent(srcDir, callback) {
   const namespaces = fs.readdirSync(srcDir)
     .filter((f) => f.match(/^[a-z]+$/) !== null);
   namespaces.forEach((namespace) => {
@@ -134,7 +126,7 @@ exports.eachComponent = (srcDir, callback) => {
       }
     });
   });
-};
+}
 
 /*
   [{
@@ -147,7 +139,7 @@ exports.eachComponent = (srcDir, callback) => {
     }
   }]
  */
-exports.getComponents = function(srcDir) {
+export function getComponents(srcDir) {
   const srcDir2 = srcDir
     ? path.join(__dirname, '..', srcDir)
     : path.join(__dirname, '..');
@@ -186,16 +178,12 @@ exports.getComponents = function(srcDir) {
     });
   });
   return components;
-};
+}
 
-function dashToCamel(str) {
+export function dashToCamel(str) {
   return str.replace(/-([a-z])/g, m => m[1].toUpperCase());
 }
 
-exports.dashToCamel = dashToCamel;
-
-function camelToDash(str) {
+export function camelToDash(str) {
   return str.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase()
 }
-
-exports.camelToDash = camelToDash;
