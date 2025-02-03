@@ -14,6 +14,8 @@ import iterateGrid from './utils/interateGrid';
 import bitmaskToPath from './utils/bitmapToMask';
 import createLayer from './utils/createLayer';
 
+type Pixel = { x: number, y: number };
+
 @Component({
   selector: 'pg-input-pixel-editor',
   style,
@@ -59,8 +61,40 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#context = context;
     // Wire Up Events
     this.$canvas.addEventListener(
+      'contextMenu',
+      this.handleContextMenu.bind(this)
+    );
+    this.$canvas.addEventListener(
+      'doubleClick',
+      this.handleDoubleClick.bind(this)
+    );
+    this.$canvas.addEventListener(
       'pointerdown',
       this.handlePointerDown.bind(this)
+    );
+    this.$canvas.addEventListener(
+      'pointerup',
+      this.handlePointerUp.bind(this)
+    );
+    this.$canvas.addEventListener(
+      'pointermove',
+      this.handlePointerMove.bind(this)
+    );
+    this.$canvas.addEventListener(
+      'pointerenter',
+      this.handlePointerEnter.bind(this)
+    );
+    this.$canvas.addEventListener(
+      'pointerleave',
+      this.handlePointerLeave.bind(this)
+    );
+    this.$canvas.addEventListener(
+      'keydown',
+      this.handleKeyDown.bind(this)
+    );
+    this.$canvas.addEventListener(
+      'keyup',
+      this.handleKeyUp.bind(this)
     );
   }
 
@@ -76,6 +110,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     const actualHeight = this.height * totalSize - this.gridSize;
     this.$canvas.width = actualWidth;
     this.$canvas.height = actualHeight;
+    this.#data = fillGrid(this.width, this.height);
     [this.#baseLayer, this.#baseLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#editLayer, this.#editLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#noEditLayer, this.#noEditLayerContext] = createLayer(actualWidth, actualHeight);
@@ -96,7 +131,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   #delayTimerId: number = 0;
   #delayedChange() {
     clearInterval(this.#delayTimerId);
-    this.#delayTimerId = window.setTimeout(this.#handleChange, 1000);
+    this.#delayTimerId = window.setTimeout(this.#handleChange.bind(this), 1000);
   };
 
   #setPixel (x: number, y: number, color: number) {
@@ -144,7 +179,72 @@ export default class PgInputPixelEditor extends HTMLElement {
     // Verify this is the only place setting pixel data!
     this.#data[y][x] = color;
     this.#delayedChange();
-  };
+  }
+
+  #setPreview(pixels: Pixel[], previousX: number, previousY: number) {
+    const totalSize = this.size + this.gridSize;
+    const actualWidth = this.width * totalSize - this.gridSize;
+    const actualHeight = this.height * totalSize - this.gridSize;
+    const { minX, maxX, minY, maxY } = pixels.reduce((previous, current) => {
+      return {
+        minX: Math.min(previous.minX, current.x, previousX),
+        maxX: Math.max(previous.maxX, current.x, previousX),
+        minY: Math.min(previous.minY, current.y, previousY),
+        maxY: Math.max(previous.maxY, current.y, previousY)
+      };
+    }, { minX: this.width, maxX: 0, minY: this.height, maxY: 0 });
+    // base layer to main canvas
+    this.#context.drawImage(
+      this.#baseLayer,
+      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize,
+      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize
+    );
+    // edit to main canvas
+    this.#context.drawImage(
+      this.#editLayer,
+      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize,
+      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize
+    );
+    // preview layer
+    this.#previewLayerContext.clearRect(0, 0, actualWidth, actualHeight);
+    pixels.forEach(({ x, y }) => {
+      this.#previewLayerContext.fillStyle = WHITE;
+      this.#previewLayerContext.beginPath();
+      this.#previewLayerContext.arc(x * totalSize + 5, y * totalSize + 5, 3, 0, 2 * Math.PI);
+      this.#previewLayerContext.closePath();
+      this.#previewLayerContext.fill();
+      this.#previewLayerContext.fillStyle = '#1B79C8';
+      this.#previewLayerContext.beginPath();
+      this.#previewLayerContext.arc(x * totalSize + 5, y * totalSize + 5, 2, 0, 2 * Math.PI);
+      this.#previewLayerContext.closePath();
+      this.#previewLayerContext.fill();
+    });
+    // preview layer to main canvas
+    this.#context.drawImage(
+      this.#previewLayer,
+      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize,
+      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize
+    );
+    console.log('render preview', minX, minY, maxX, maxY);
+  }
+
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.key === ' ') {
+      console.log('space!')
+    }
+  }
+
+  handleKeyUp(event: KeyboardEvent) {
+
+  }
+
+  handleContextMenu(event: MouseEvent) {
+    event?.preventDefault();
+  }
+
+  handleDoubleClick(event: MouseEvent) {
+    event?.preventDefault();
+  }
 
   handlePointerDown(event: MouseEvent) {
     if (event.buttons !== 1 && event.buttons !== 32) {
@@ -225,6 +325,97 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#x = -1;
     this.#y = -1;
     this.#isPressed = false;
+  }
+
+  handlePointerMove(event: PointerEvent) {
+    const canvas = this.$canvas;
+    if (this.#isPressed) {
+      const data = this.#data;
+      const rect = canvas.getBoundingClientRect();
+      const totalSize = this.size + this.gridSize;
+      const points: [number, number][] = [];
+      const startX = this.#startX;
+      const startY = this.#startY;
+      const x = this.#x;
+      const y = this.#y;
+      // If supported get all the inbetween points
+      // really noticable for pen support + pencil tool
+      if (typeof event.getCoalescedEvents === 'function') {
+        const events = event.getCoalescedEvents();
+        for (const evt of events) {
+          let tX = Math.floor((evt.clientX - rect.left) / totalSize);
+          let tY = Math.floor((evt.clientY - rect.top) / totalSize);
+          if (tX >= this.width || tY >= this.height || (tX === x && tY === y)) {
+            continue;
+          }
+          points.push([tX, tY]);
+        }
+      } else {
+        let newX = Math.floor((event.clientX - rect.left) / totalSize);
+        let newY = Math.floor((event.clientY - rect.top) / totalSize);
+        if (newX === x && newY === y) { return; }
+        if (newX >= this.width) { newX = this.width - 1; }
+        if (newY >= this.height) { newY = this.height - 1; }
+        points.push([newX, newY]);
+      }
+      // Is Eraser
+      const color = event.buttons === 32 ? 0 : 1;
+      // Shape tools only care about the last point
+      if (points.length === 0) { return; }
+      const [lastX, lastY] = points.at(-1) as [number, number];
+      // This is not ideal, but might be good enough,
+      // really it should be finding the point furthest absolute
+      // point from startX/startY.
+      this.#x = lastX;
+      this.#y = lastY;
+      switch (this.#inputMode) {
+        case InputMode.Pixel:
+          for (var point of points) {
+            this.#setPixel(point[0], point[1], color);
+            data[point[1]][point[0]] = color;
+          }
+          break;
+        case InputMode.Line:
+          console.log(x, y)
+          this.#setPreview(getLinePixels(startX, startY, lastX, lastY), x, y);
+          break;
+        case InputMode.Rectangle:
+          this.#setPreview(getRectanglePixels(startX, startY, lastX, lastY), x, y);
+          break;
+        case InputMode.RectangleOutline:
+          this.#setPreview(getRectangleOutlinePixels(startX, startY, lastX, lastY), x, y);
+          break;
+        case InputMode.Ellipse:
+          this.#setPreview(getEllipseOutlinePixels(startX, startY, lastX, lastY), x, y);
+          break;
+        case InputMode.EllipseOutline:
+          this.#setPreview(getEllipseOutlinePixels(startX, startY, lastX, lastY), x, y);
+          break;
+      }
+    }
+  }
+
+  handlePointerEnter(event: MouseEvent) {
+    console.log('hmmmm')
+    if (!this.#isPressed && !this.#isEditing) {
+      this.#isEditing = true;
+      // base layer to main canvas
+      this.#context.drawImage(this.#baseLayer, 0, 0);
+      // editing layer to main canvas
+      this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
+    }
+    console.log('enter');
+  }
+
+  handlePointerLeave(event: MouseEvent) {
+    if (!this.#isPressed) {
+      this.#isEditing = false;
+      // base layer to main canvas
+      this.#context.drawImage(this.#baseLayer, 0, 0);
+      // editing layer to main canvas
+      this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
+    }
+    console.log('leave');
   }
 
   #updateGrid() {

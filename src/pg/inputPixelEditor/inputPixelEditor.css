@@ -1,0 +1,7 @@
+:host {
+  display: inline-flex;
+}
+
+canvas {
+  touch-action: none;
+}
