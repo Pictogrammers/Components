@@ -121,7 +121,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     const path = bitmaskToPath(this.#data, { scale: 1 });
     console.log('change:', path);
     this.dispatchEvent(new CustomEvent('change', {
-      detail: path
+      detail: { value: path }
     }));
     /*this.dispatchEvent(new CustomEvent('change', {
       detail: data
@@ -225,6 +225,13 @@ export default class PgInputPixelEditor extends HTMLElement {
       minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize,
       minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize
     );
+    this.dispatchEvent(new CustomEvent('debug', {
+      detail: {
+        editLayer: this.#editLayer,
+        baseLayer: this.#baseLayer,
+        previewLayer: this.#previewLayer
+      }
+    }));
     console.log('render preview', minX, minY, maxX, maxY);
   }
 
@@ -376,7 +383,6 @@ export default class PgInputPixelEditor extends HTMLElement {
           }
           break;
         case InputMode.Line:
-          console.log(x, y)
           this.#setPreview(getLinePixels(startX, startY, lastX, lastY), x, y);
           break;
         case InputMode.Rectangle:
@@ -396,7 +402,6 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   handlePointerEnter(event: MouseEvent) {
-    console.log('hmmmm')
     if (!this.#isPressed && !this.#isEditing) {
       this.#isEditing = true;
       // base layer to main canvas
