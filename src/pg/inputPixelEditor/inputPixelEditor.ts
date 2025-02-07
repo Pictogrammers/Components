@@ -7,12 +7,13 @@ import cloneGrid from './utils/cloneGrid';
 import getEllipseOutlinePixels from './utils/getEllipseOutlinePixels';
 import { WHITE } from './utils/constants';
 import getLinePixels from './utils/getLinePixels';
-import getRectanglePixels from './utils/getRectangleOutlinePixels';
+import getRectanglePixels from './utils/getRectanglePixels';
 import getRectangleOutlinePixels from './utils/getRectangleOutlinePixels';
 import fillGrid from './utils/fillGrid';
 import iterateGrid from './utils/interateGrid';
 import bitmaskToPath from './utils/bitmapToMask';
 import createLayer from './utils/createLayer';
+import diffGrid from './utils/diffGrid';
 
 type Pixel = { x: number, y: number };
 
@@ -40,6 +41,9 @@ export default class PgInputPixelEditor extends HTMLElement {
   #startY: number = -1;
   #x: number = -1;
   #y: number = -1;
+  #isCtrl: boolean = false;
+  #isShift: boolean = false;
+  #isAlt: boolean = false;
   #data: number[][] = [];
   #undoHistory: [number, number, number][][] = [];
   #redoHistory: [number, number, number][][] = [];
@@ -61,11 +65,11 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#context = context;
     // Wire Up Events
     this.$canvas.addEventListener(
-      'contextMenu',
+      'contextmenu',
       this.handleContextMenu.bind(this)
     );
     this.$canvas.addEventListener(
-      'doubleClick',
+      'doubleclick',
       this.handleDoubleClick.bind(this)
     );
     this.$canvas.addEventListener(
@@ -193,17 +197,22 @@ export default class PgInputPixelEditor extends HTMLElement {
         maxY: Math.max(previous.maxY, current.y, previousY)
       };
     }, { minX: this.width, maxX: 0, minY: this.height, maxY: 0 });
+    const x = minX * totalSize;
+    const y = minY * totalSize;
+    const width = (maxX - minX + 1) * totalSize;
+    const height = (maxY - minY + 1) * totalSize;
+    this.#context.clearRect(x, y, width, height);
     // base layer to main canvas
     this.#context.drawImage(
       this.#baseLayer,
-      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize,
-      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize
+      x, y, width, height,
+      x, y, width, height
     );
     // edit to main canvas
     this.#context.drawImage(
       this.#editLayer,
-      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize,
-      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize
+      x, y, width, height,
+      x, y, width, height
     );
     // preview layer
     this.#previewLayerContext.clearRect(0, 0, actualWidth, actualHeight);
@@ -222,20 +231,28 @@ export default class PgInputPixelEditor extends HTMLElement {
     // preview layer to main canvas
     this.#context.drawImage(
       this.#previewLayer,
-      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize,
-      minX * totalSize, minY * totalSize, maxX * totalSize, maxY * totalSize
+      x, y, width, height,
+      x, y, width, height
     );
+    // Debug
     this.dispatchEvent(new CustomEvent('debug', {
       detail: {
+        x,
+        y,
+        width,
+        height,
+        canvas: this.$canvas,
+        context: this.#context,
         editLayer: this.#editLayer,
+        noEditLayer: this.#noEditLayer,
         baseLayer: this.#baseLayer,
         previewLayer: this.#previewLayer
       }
     }));
-    console.log('render preview', minX, minY, maxX, maxY);
   }
 
   handleKeyDown(event: KeyboardEvent) {
+    console.log(event.shiftKey, event.ctrlKey, event.altKey, event.key);
     if (event.key === ' ') {
       console.log('space!')
     }
@@ -259,6 +276,11 @@ export default class PgInputPixelEditor extends HTMLElement {
       event.stopPropagation();
       return;
     }
+    // Update Modifiers
+    this.#isAlt = event.altKey;
+    this.#isCtrl = event.ctrlKey;
+    this.#isShift = event.shiftKey;
+    // Drawing
     const rect = this.$canvas.getBoundingClientRect();
     const totalSize = this.size + this.gridSize;
     let newX = Math.floor((event.clientX - rect.left) / totalSize);
@@ -273,6 +295,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#x = newX;
     this.#y = newY;
     const color = event.buttons === 32 ? 0 : 1;
+    console.log(this.#colors, this.#colors[color], event.buttons);
     switch (this.#inputMode) {
       case InputMode.Pixel:
         this.#setPixel(newX, newY, color);
@@ -337,6 +360,9 @@ export default class PgInputPixelEditor extends HTMLElement {
   handlePointerMove(event: PointerEvent) {
     const canvas = this.$canvas;
     if (this.#isPressed) {
+      this.#isAlt = event.altKey;
+      this.#isCtrl = event.ctrlKey;
+      this.#isShift = event.shiftKey;
       const data = this.#data;
       const rect = canvas.getBoundingClientRect();
       const totalSize = this.size + this.gridSize;
@@ -427,7 +453,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     // base layer to main canvas
     this.#context.drawImage(this.#baseLayer, 0, 0);
     // editing layer to main canvas
-    this.#context.drawImage(this.#editLayer, 0, 0);
+    this.#context.drawImage(this.#noEditLayer, 0, 0);
   }
 
   mergeColor(fromIndex: number, toIndex: number) {
@@ -435,6 +461,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
   clear() {
     this.#data = fillGrid(this.width, this.height);
+    this.#updateGrid();
   }
   clearHistory() {
     this.#undoHistory = [];

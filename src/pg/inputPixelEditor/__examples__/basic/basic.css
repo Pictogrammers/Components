@@ -1,0 +1,9 @@
+[part="debug"] {
+  background: #555;
+  padding: 1rem;
+  display: flex;
+}
+
+[part="debug"] canvas {
+  border: 1px solid #FFF;
+}

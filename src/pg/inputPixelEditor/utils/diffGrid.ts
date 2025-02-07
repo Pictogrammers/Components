@@ -6,7 +6,7 @@
  * @returns list of changes [[x, y, color], ...]
  */
 export default function diffGrid(oldData: number[][], newData: number[][]): number[][] {
-    const changes = [];
+    const changes: [number, number, number, number][] = [];
     // Loop the larger grid
     const oldWidth = oldData[0].length;
     const oldHeight = oldData.length;

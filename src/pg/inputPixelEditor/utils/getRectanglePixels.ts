@@ -1,5 +1,5 @@
 export default function getRectanglePixels(x0: number, y0: number, x1: number, y1: number) {
-  const pixels = [];
+  const pixels: { x: number, y: number }[] = [];
   const oX = Math.min(x0, x1);
   const oY = Math.min(y0, y1);
   var w = Math.abs(x1 - x0) + 1;

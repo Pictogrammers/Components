@@ -7,7 +7,7 @@ export default function getEllipsePixels(x0: number, y0: number, x1: number, y1:
   if (y0 > y1) y0 = y1; /* .. exchange them */
   y0 += (b + 1) / 2; y1 = y0 - b1;   /* starting pixel */
   a *= 8 * a; b1 = 8 * b * b;
-  const pixels = [];
+  const pixels: { x: number, y: number }[] = [];
   do {
     pixels.push({ x: x1, y: y0 }); /*   I. Quadrant */
     pixels.push({ x: x0, y: y0 }); /*  II. Quadrant */

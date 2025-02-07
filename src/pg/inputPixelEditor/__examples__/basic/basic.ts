@@ -2,9 +2,11 @@ import { Component, Part } from '@pictogrammers/element';
 import PgInputPixelEditor from '../../inputPixelEditor';
 
 import template from './basic.html';
+import style from './basic.css';
 
 @Component({
   selector: 'x-pg-input-pixel-editor-basic',
+  style,
   template
 })
 export default class XPgInputPixelEditorBasic extends HTMLElement {
@@ -14,6 +16,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $value2: HTMLSpanElement;
   @Part() $debug: HTMLDivElement;
 
+  @Part() $clear: HTMLButtonElement;
   @Part() $modePixel: HTMLButtonElement;
   @Part() $modeLine: HTMLButtonElement;
   @Part() $modeRectangle: HTMLButtonElement;
@@ -34,6 +37,18 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$modeRectangle.addEventListener('click', () => {
       this.$input.inputModeRectangle();
     });
+    this.$modeRectangleOutline.addEventListener('click', () => {
+      this.$input.inputModeRectangleOutline();
+    });
+    this.$modeEllipse.addEventListener('click', () => {
+      this.$input.inputModeEllipse();
+    });
+    this.$modeEllipseOutline.addEventListener('click', () => {
+      this.$input.inputModeEllipseOutline();
+    });
+    this.$clear.addEventListener('click', () => {
+      this.$input.clear();
+    });
   }
 
   handleChange(e: CustomEvent) {
@@ -47,9 +62,13 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   }
 
   handleDebug(e: CustomEvent) {
-    const { baseLayer, editLayer, previewLayer } = e.detail;
+    const { x, y, width, height, context, baseLayer, editLayer, noEditLayer, previewLayer } = e.detail;
     this.$debug.appendChild(baseLayer);
     this.$debug.appendChild(editLayer);
+    this.$debug.appendChild(noEditLayer);
     this.$debug.appendChild(previewLayer);
+    //context.strokeStyle = 'rgba(255, 0, 0, 0.3)';
+    //context.lineWidth = 1;
+    //context.strokeRect(x, y, width, height);
   }
 }
