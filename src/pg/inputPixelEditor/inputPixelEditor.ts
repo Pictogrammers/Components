@@ -1,4 +1,4 @@
-import { Component, Prop, Part, normalizeInt } from '@pictogrammers/element';
+import { Component, Prop, Part, normalizeInt, normalizeBoolean } from '@pictogrammers/element';
 
 import template from './inputPixelEditor.html';
 import style from './inputPixelEditor.css';
@@ -71,6 +71,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   @Prop(normalizeInt) height: number = 10;
   @Prop(normalizeInt) size: number = 10;
   @Prop(normalizeInt) gridSize: number = 1;
+  @Prop(normalizeBoolean) transparent: boolean = false;
   @Prop() placeholder: string = '';
 
   @Part() $canvas: HTMLCanvasElement;
@@ -175,17 +176,37 @@ export default class PgInputPixelEditor extends HTMLElement {
       }];
       this.#data = [fillGrid(this.width, this.height)];
       this.#reset = false;
+      this.#undoHistory = [];
+      this.#redoHistory = [];
+    } else {
+      this.#redraw();
     }
-    this.#redraw();
   }
 
   #redraw() {
     // Render individual pixels
-    this.#data[this.#layer].forEach((row, y) => {
-      row.forEach((cell, x) => {
-        this.#setPixel(x, y, cell);
-      });
-    });
+    const data = this.#data.toReversed();
+    const layerCount = data.length;
+    for (let y = 0; y < this.height; y++) {
+      if (y >= data[0].length) {
+        for (let l = 0; l < layerCount; l++) {
+          data[l].push(new Array(this.width).fill(0));
+        }
+      }
+      for (let x = 0; x < this.width; x++) {
+        if (x >= data[0][y].length) {
+          for (let l = 0; l < layerCount; l++) {
+            data[l][y].push(0);
+          }
+        }
+        for (let l = 0; l < layerCount; l++) {
+          if (data[l][y][x] !== 0) {
+            this.#setPixel(x, y, data[l][y][x]);
+            break;
+          }
+        }
+      }
+    }
   }
 
   #handleChange() {
@@ -526,6 +547,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   mergeColor(fromIndex: number, toIndex: number) {
     // ToDo: Code this
   }
+
   clear() {
     const gridEmpty = fillGrid(this.width, this.height);
     const diff = diffGrid(this.#data[this.#layer], gridEmpty);
@@ -545,13 +567,21 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#data = [fillGrid(this.width, this.height)];
     this.#updateGrid();
   }
+
+  reset() {
+    this.#reset = true;
+    this.#init();
+  }
+
   clearHistory() {
     this.#undoHistory = [];
     this.#redoHistory = [];
   }
+
   applyTemplate(template: number[][]) {
     this.#data = [template];
   }
+
   flipHorizontal() {
     const cloned = cloneGrid(this.#data[this.#layer]);
     const w = cloned[0].length - 1;
@@ -606,14 +636,14 @@ export default class PgInputPixelEditor extends HTMLElement {
     // ToDo: Rewrite to use new history api
     const revert = this.#undoHistory.pop();
     if (!revert) { return; }
-    switch(revert.type) {
+    switch (revert.type) {
       case HistoryType.Pixel:
-          this.#redoHistory.push(revert);
-          (revert.data as HistoryPixelType).pixels.forEach((item) => {
-            const [x, y] = item;
-            this.#data[this.#layer][y][x] = item[2];
-            // redraw canvas
-          });
+        this.#redoHistory.push(revert);
+        (revert.data as HistoryPixelType).pixels.forEach((item) => {
+          const [x, y] = item;
+          this.#data[this.#layer][y][x] = item[2];
+          // redraw canvas
+        });
         break;
     }
   }

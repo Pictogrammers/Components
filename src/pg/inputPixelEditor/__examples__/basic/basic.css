@@ -7,3 +7,14 @@
 [part="debug"] canvas {
   border: 1px solid #FFF;
 }
+
+.props {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.5rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+}

@@ -19,6 +19,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $height: HTMLInputElement;
   @Part() $size: HTMLInputElement;
 
+  @Part() $reset: HTMLButtonElement;
   @Part() $clear: HTMLButtonElement;
   @Part() $modePixel: HTMLButtonElement;
   @Part() $modeLine: HTMLButtonElement;
@@ -32,9 +33,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$height.value = '10';
     this.$size.value = '10';
     this.$input.addEventListener('change', this.handleChange.bind(this));
-    this.$width.addEventListener('change', this.handleWidthChange.bind(this));
-    this.$height.addEventListener('change', this.handleHeightChange.bind(this));
-    this.$size.addEventListener('change', this.handleSizeChange.bind(this));
+    this.$width.addEventListener('input', this.handleWidthChange.bind(this));
+    this.$height.addEventListener('input', this.handleHeightChange.bind(this));
+    this.$size.addEventListener('input', this.handleSizeChange.bind(this));
     this.$input.addEventListener('input', this.handleInput.bind(this));
     this.$input.addEventListener('debug', this.handleDebug.bind(this));
     this.$modePixel.addEventListener('click', () => {
@@ -54,6 +55,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     });
     this.$modeEllipseOutline.addEventListener('click', () => {
       this.$input.inputModeEllipseOutline();
+    });
+    this.$reset.addEventListener('click', () => {
+      this.$input.reset();
     });
     this.$clear.addEventListener('click', () => {
       this.$input.clear();

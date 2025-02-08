@@ -1,8 +1,21 @@
 <div class="example">
-  <div>
-    <input part="width" type="range" min="10" max="400">
-    <input part="height" type="range" min="10" max="240">
-    <input part="size" type="range" min="4" max="16">
+  <div class="props">
+    <label>
+      Width
+      <input part="width" type="range" min="10" max="22">
+    </label>
+    <label>
+      Height
+      <input part="height" type="range" min="10" max="22">
+    </label>
+    <label>
+      Size
+      <input part="size" type="range" min="4" max="16">
+    </label>
+    <label>
+      <input part="transparent" type="checkbox">
+      Transparent
+    </label>
   </div>
   <pg-input-pixel-editor part="input" width="10" height="10" size="10" style="box-shadow:0 0 0.5rem rgba(0, 0, 0, 0.2)"></pg-input-pixel-editor>
   <div>
@@ -13,7 +26,8 @@
   </div>
 
   <div>
-    <button part="clear">clear</button>
+    <button part="reset">Reset</button>
+    <button part="clear">Clear</button>
     <button part="modePixel">Pixel</button>
     <button part="modeLine">Line</button>
     <button part="modeRectangle">Rectangle</button>
