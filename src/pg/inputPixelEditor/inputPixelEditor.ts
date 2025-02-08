@@ -14,6 +14,7 @@ import iterateGrid from './utils/interateGrid';
 import bitmaskToPath from './utils/bitmapToMask';
 import createLayer from './utils/createLayer';
 import diffGrid from './utils/diffGrid';
+import { getGuides } from './utils/getGuides';
 
 type Pixel = { x: number, y: number };
 
@@ -152,25 +153,39 @@ export default class PgInputPixelEditor extends HTMLElement {
     }
   }
 
+  #reset = true;
   #init() {
     const totalSize = this.size + this.gridSize;
     const actualWidth = this.width * totalSize - this.gridSize;
     const actualHeight = this.height * totalSize - this.gridSize;
     this.$canvas.width = actualWidth;
     this.$canvas.height = actualHeight;
-    this.#layer = 0;
-    this.#layers = [{
-      name: 'Layer 1',
-      export: true,
-      locked: false,
-      visible: true,
-      opacity: 1
-    }];
-    this.#data = [fillGrid(this.width, this.height)];
     [this.#baseLayer, this.#baseLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#editLayer, this.#editLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#noEditLayer, this.#noEditLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#previewLayer, this.#previewLayerContext] = createLayer(actualWidth, actualHeight);
+    if (this.#reset) {
+      this.#layer = 0;
+      this.#layers = [{
+        name: 'Layer 1',
+        export: true,
+        locked: false,
+        visible: true,
+        opacity: 1
+      }];
+      this.#data = [fillGrid(this.width, this.height)];
+      this.#reset = false;
+    }
+    this.#redraw();
+  }
+
+  #redraw() {
+    // Render individual pixels
+    this.#data[this.#layer].forEach((row, y) => {
+      row.forEach((cell, x) => {
+        this.#setPixel(x, y, cell);
+      });
+    });
   }
 
   #handleChange() {
@@ -579,6 +594,13 @@ export default class PgInputPixelEditor extends HTMLElement {
       cloned[y][x] = cloned[y][x] === 0 ? 1 : 0;
     });
     this.#data[this.#layer] = cloned;
+  }
+  applyGuides() {
+    const guides = getGuides(this.width, this.height, this.size, this.gridSize);
+    this.#baseLayerContext.drawImage(guides, 0, 0);
+  }
+  clearGuides() {
+
   }
   undo() {
     // ToDo: Rewrite to use new history api

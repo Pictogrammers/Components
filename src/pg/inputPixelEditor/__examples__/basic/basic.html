@@ -1,4 +1,9 @@
 <div class="example">
+  <div>
+    <input part="width" type="range" min="10" max="400">
+    <input part="height" type="range" min="10" max="240">
+    <input part="size" type="range" min="4" max="16">
+  </div>
   <pg-input-pixel-editor part="input" width="10" height="10" size="10" style="box-shadow:0 0 0.5rem rgba(0, 0, 0, 0.2)"></pg-input-pixel-editor>
   <div>
     <code>onchange: <span part="value1"></span></code>
@@ -6,6 +11,7 @@
   <div>
     <code>oninput: <span part="value2"></span></code>
   </div>
+
   <div>
     <button part="clear">clear</button>
     <button part="modePixel">Pixel</button>
