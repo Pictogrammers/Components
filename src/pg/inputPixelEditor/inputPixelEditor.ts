@@ -341,8 +341,14 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   handleKeyDown(event: KeyboardEvent) {
     console.log(event.shiftKey, event.ctrlKey, event.altKey, event.key);
-    if (event.key === ' ') {
-      console.log('space!')
+    switch(event.key) {
+      case ' ':
+        console.log('space');
+        break;
+      case 'Escape':
+        console.log('escape');
+        // Cancel editing
+        break;
     }
   }
 
@@ -590,6 +596,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
     this.#data[this.#layer] = cloned;
   }
+
   flipVertical() {
     const cloned = cloneGrid(this.#data[this.#layer]);
     const h = cloned.length - 1;
@@ -598,6 +605,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
     this.#data[this.#layer] = cloned;
   }
+
   move(translateX: number, translateY: number) {
     const cloned = fillGrid(this.width, this.height);
     for (let iy = 0; iy < this.height; iy++) {
@@ -658,7 +666,16 @@ export default class PgInputPixelEditor extends HTMLElement {
       // redraw canvas
     });*/
   }
-  rotate(counterClockwise: boolean = false) {
+
+  rotateClockwise() {
+    this.#rotate(false);
+  }
+
+  rotateCounterclockwise() {
+    this.#rotate(true);
+  }
+
+  #rotate(counterClockwise: boolean = false) {
     const cloned = cloneGrid(this.#data[this.#layer]);
     if (counterClockwise) {
       const newData = this.#data[0].map((val, index) => this.#data.map(row => row[row.length - 1 - index]));

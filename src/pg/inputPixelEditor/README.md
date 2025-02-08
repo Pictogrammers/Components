@@ -16,7 +16,6 @@ import { PgInputPixelEditor } from '@pictogrammers/components/pgInputPixelEditor
 | Attributes  | Tested   | Description |
 | ----------- | -------- | ----------- |
 | name        |          | Unique name in `pg-form` |
-| value       |          | Field value |
 | width       |          | Pixel width. Default `10` |
 | height      |          | Pixel height. Default `10` |
 | size        |          | Pixel size, minimum value `4`. Default `10` |
@@ -28,3 +27,25 @@ import { PgInputPixelEditor } from '@pictogrammers/components/pgInputPixelEditor
 | ---------- | -------- | ----------- |
 | change     |          | `{ detail: { value }` |
 | input      |          | `{ detail: { value }` |
+
+## Methods
+
+See usage for each method below.
+
+| Method     | Tested   | Description |
+| ---------- | -------- | ----------- |
+| `save(callback, options)` | -        | Save file. |
+| `open(file, callback)` | -        | Open file. |
+| undo() | -           | Undo. |
+| hasUndo() | -     | Has undo |
+| hasRedo() | -     | Has redo |
+| redo() | -           | Redo. |
+| selectLayer() | -    |       |
+| getLayers() | -    | Get layer array. |
+| addLayer(option) | -        | Add layer. |
+| removeLayer(index) | -      | Remove layer. |
+| rotateClockwise() | -    | Rotate. |
+| rotateCounterclockwise() | -    | Rotate. |
+| move(x, y[, layer]) | -  | Move canvas. |
+| flipHorizontal() |
+| flipVertical() |
