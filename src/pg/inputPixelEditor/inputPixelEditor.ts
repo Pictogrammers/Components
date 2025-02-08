@@ -17,6 +17,49 @@ import diffGrid from './utils/diffGrid';
 
 type Pixel = { x: number, y: number };
 
+enum HistoryType {
+  Group,
+  Pixel,
+  ColorUpdate,
+  ColorAdd,
+  ColorRemove,
+  LayerAdd,
+  LayerRemove,
+  LayerName,
+  LayerLock,
+  LayerUnlock,
+  LayerExport,
+  LayerVisible,
+  LayerOpacity
+}
+
+type HistoryGroupType = {
+  name: string
+}
+
+type HistoryPixelType = {
+  pixels: [number, number, number][],
+  layer: number
+}
+
+type HistoryColorUpdateType = {
+  color: [number, number, number, number],
+  index: number
+}
+
+type History = {
+  type: HistoryType,
+  data: HistoryGroupType | HistoryPixelType | HistoryColorUpdateType
+}
+
+type Layer = {
+  name: string,
+  visible: boolean,
+  locked: boolean,
+  opacity: number,
+  export: boolean
+}
+
 @Component({
   selector: 'pg-input-pixel-editor',
   style,
@@ -27,7 +70,6 @@ export default class PgInputPixelEditor extends HTMLElement {
   @Prop(normalizeInt) height: number = 10;
   @Prop(normalizeInt) size: number = 10;
   @Prop(normalizeInt) gridSize: number = 1;
-  @Prop() value: string = '';
   @Prop() placeholder: string = '';
 
   @Part() $canvas: HTMLCanvasElement;
@@ -41,12 +83,14 @@ export default class PgInputPixelEditor extends HTMLElement {
   #startY: number = -1;
   #x: number = -1;
   #y: number = -1;
+  #layer: number = 0;
+  #layers: Layer[] = [];
   #isCtrl: boolean = false;
   #isShift: boolean = false;
   #isAlt: boolean = false;
-  #data: number[][] = [];
-  #undoHistory: [number, number, number][][] = [];
-  #redoHistory: [number, number, number][][] = [];
+  #data: number[][][] = [];
+  #undoHistory: History[] = [];
+  #redoHistory: History[] = [];
   #context: CanvasRenderingContext2D;
   #colors: string[] = ['transparent', '#000'];
   #baseLayer: HTMLCanvasElement;
@@ -114,7 +158,15 @@ export default class PgInputPixelEditor extends HTMLElement {
     const actualHeight = this.height * totalSize - this.gridSize;
     this.$canvas.width = actualWidth;
     this.$canvas.height = actualHeight;
-    this.#data = fillGrid(this.width, this.height);
+    this.#layer = 0;
+    this.#layers = [{
+      name: 'Layer 1',
+      export: true,
+      locked: false,
+      visible: true,
+      opacity: 1
+    }];
+    this.#data = [fillGrid(this.width, this.height)];
     [this.#baseLayer, this.#baseLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#editLayer, this.#editLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#noEditLayer, this.#noEditLayerContext] = createLayer(actualWidth, actualHeight);
@@ -122,7 +174,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   #handleChange() {
-    const path = bitmaskToPath(this.#data, { scale: 1 });
+    const path = bitmaskToPath(this.#data[this.#layer], { scale: 1 });
     console.log('change:', path);
     this.dispatchEvent(new CustomEvent('change', {
       detail: { value: path }
@@ -138,7 +190,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#delayTimerId = window.setTimeout(this.#handleChange.bind(this), 1000);
   };
 
-  #setPixel (x: number, y: number, color: number) {
+  #setPixel(x: number, y: number, color: number) {
     if (x > this.width) {
       throw new Error(`Invalid x; ${x} > ${this.width}`);
     }
@@ -179,9 +231,9 @@ export default class PgInputPixelEditor extends HTMLElement {
       x * totalSize, y * totalSize, this.size + 2, this.size + 2,
       x * totalSize, y * totalSize, this.size + 2, this.size + 2
     );
-    console.log('draw pixel(x, y, color, data):', x, y, color, this.#data[y][x]);
+    console.log('draw pixel(x, y, color, data):', x, y, color, this.#data[this.#layer][y][x]);
     // Verify this is the only place setting pixel data!
-    this.#data[y][x] = color;
+    this.#data[this.#layer][y][x] = color;
     this.#delayedChange();
   }
 
@@ -289,7 +341,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (newX >= this.width) { newX = this.width - 1; }
     if (newY >= this.height) { newY = this.height - 1; }
     this.#isPressed = true;
-    this.#startColor = this.#data[newY][newX];
+    this.#startColor = this.#data[this.#layer][newY][newX];
     this.#startX = newX;
     this.#startY = newY;
     this.#x = newX;
@@ -299,7 +351,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     switch (this.#inputMode) {
       case InputMode.Pixel:
         this.#setPixel(newX, newY, color);
-        this.#data[newY][newX] = color;
+        this.#data[this.#layer][newY][newX] = color;
         break;
     }
     console.log(this.#inputMode, newX, newY);
@@ -320,7 +372,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       switch (this.#inputMode) {
         case InputMode.Pixel:
           this.#setPixel(newX, newY, 0);
-          this.#data[newY][newX] = 0;
+          this.#data[this.#layer][newY][newX] = 0;
           break;
       }
     } else {
@@ -405,7 +457,7 @@ export default class PgInputPixelEditor extends HTMLElement {
         case InputMode.Pixel:
           for (var point of points) {
             this.#setPixel(point[0], point[1], color);
-            data[point[1]][point[0]] = color;
+            data[this.#layer][point[1]][point[0]] = color;
           }
           break;
         case InputMode.Line:
@@ -460,7 +512,22 @@ export default class PgInputPixelEditor extends HTMLElement {
     // ToDo: Code this
   }
   clear() {
-    this.#data = fillGrid(this.width, this.height);
+    const gridEmpty = fillGrid(this.width, this.height);
+    const diff = diffGrid(this.#data[this.#layer], gridEmpty);
+    this.#undoHistory.push({
+      type: HistoryType.Group,
+      data: {
+        name: 'Clear'
+      }
+    });
+    this.#undoHistory.push({
+      type: HistoryType.Pixel,
+      data: {
+        pixels: [],
+        layer: this.#layer
+      }
+    });
+    this.#data = [fillGrid(this.width, this.height)];
     this.#updateGrid();
   }
   clearHistory() {
@@ -468,91 +535,95 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#redoHistory = [];
   }
   applyTemplate(template: number[][]) {
-    this.#data = template;
+    this.#data = [template];
   }
   flipHorizontal() {
-    const cloned = cloneGrid(this.#data);
+    const cloned = cloneGrid(this.#data[this.#layer]);
     const w = cloned[0].length - 1;
-    iterateGrid(this.#data, (x, y) => {
-      cloned[y][x] = this.#data[y][w - x];
+    iterateGrid(this.#data[this.#layer], (x, y) => {
+      cloned[y][x] = this.#data[this.#layer][y][w - x];
     });
-    this.#data = cloned;
+    this.#data[this.#layer] = cloned;
   }
   flipVertical() {
-    const cloned = cloneGrid(this.#data);
+    const cloned = cloneGrid(this.#data[this.#layer]);
     const h = cloned.length - 1;
-    iterateGrid(this.#data, (x, y) => {
-      cloned[y][x] = this.#data[h - y][x];
+    iterateGrid(this.#data[this.#layer], (x, y) => {
+      cloned[this.#layer][y][x] = this.#data[h - y][x];
     });
-    this.#data = cloned;
+    this.#data[this.#layer] = cloned;
   }
   move(translateX: number, translateY: number) {
     const cloned = fillGrid(this.width, this.height);
     for (let iy = 0; iy < this.height; iy++) {
       cloned[iy].fill(0);
     }
-    iterateGrid(this.#data, (x, y) => {
+    iterateGrid(this.#data[this.#layer], (x, y) => {
       if (y - translateY < 0
         || x - translateX < 0
         || y - translateY >= this.height
         || x - translateX >= this.width) {
         return;
       }
-      cloned[y][x] = this.#data[y - translateY][x - translateX];
+      cloned[y][x] = this.#data[this.#layer][y - translateY][x - translateX];
     });
-    this.#data = cloned;
+    this.#data[this.#layer] = cloned;
   }
   invert() {
     // Only works with 2 colors
     if (this.#colors.length > 2) {
       return;
     }
-    const cloned = cloneGrid(this.#data);
+    const cloned = cloneGrid(this.#data[this.#layer]);
     iterateGrid(cloned, (x, y) => {
       cloned[y][x] = cloned[y][x] === 0 ? 1 : 0;
     });
-    this.#data = cloned;
+    this.#data[this.#layer] = cloned;
   }
   undo() {
     // ToDo: Rewrite to use new history api
     const revert = this.#undoHistory.pop();
     if (!revert) { return; }
-    this.#redoHistory.push(revert);
-    revert?.forEach((item) => {
-      const [x, y] = item;
-      this.#data[y][x] = item[2];
-      // redraw canvas
-    });
+    switch(revert.type) {
+      case HistoryType.Pixel:
+          this.#redoHistory.push(revert);
+          (revert.data as HistoryPixelType).pixels.forEach((item) => {
+            const [x, y] = item;
+            this.#data[this.#layer][y][x] = item[2];
+            // redraw canvas
+          });
+        break;
+    }
   }
   redo() {
     // ToDo: Rewrite to use new history api
-    const revert = this.#redoHistory.pop();
+    /*const revert = this.#redoHistory.pop();
     if (!revert) { return; }
     this.#undoHistory.push(revert);
     revert?.forEach((item) => {
       const [x, y] = item;
       this.#data[y][x] = item[2];
       // redraw canvas
-    });
+    });*/
   }
   rotate(counterClockwise: boolean = false) {
-    const cloned = cloneGrid(this.#data);
+    const cloned = cloneGrid(this.#data[this.#layer]);
     if (counterClockwise) {
       const newData = this.#data[0].map((val, index) => this.#data.map(row => row[row.length - 1 - index]));
       for (let iy = 0; iy < this.height; iy++) {
         for (let ix = 0; ix < this.width; ix++) {
-          cloned[iy][ix] = newData[iy][ix];
+          cloned[iy][ix] = newData[this.#layer][iy][ix];
         }
       }
     } else {
       const newData = this.#data[0].map((val, index) => this.#data.map(row => row[index]).reverse());
       for (let iy = 0; iy < this.height; iy++) {
         for (let ix = 0; ix < this.width; ix++) {
-          cloned[iy][ix] = newData[iy][ix];
+          cloned[iy][ix] = newData[this.#layer][iy][ix];
         }
       }
     }
-    this.#data = cloned;
+    this.#data[this.#layer] = cloned;
   }
   hasUndo() {
     return this.#undoHistory.length !== 0;
