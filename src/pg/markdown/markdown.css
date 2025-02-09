@@ -221,6 +221,17 @@ table code {
   transform: translateY(-1px);
 }
 
+h1 > code,
+h2 > code,
+h3 > code,
+h4 > code,
+h5 > code {
+  border: 1px solid #DDD;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  background: #F1F1F1;
+}
+
 p > svg.icon,
 blockquote > svg.icon,
 p > a.icon > svg.icon,

@@ -152,6 +152,25 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (changes.width || changes.height || changes.size) {
       this.#init();
     }
+    if (changes.transparent) {
+      const totalSize = this.size + this.gridSize;
+      const actualWidth = this.width * totalSize - this.gridSize;
+      const actualHeight = this.height * totalSize - this.gridSize;
+      if (this.transparent) {
+        for (let y = 0; y < this.height; y++) {
+          for (let x = 0; x < this.width; x++) {
+            this.#baseLayerContext.fillStyle = WHITE;
+            this.#baseLayerContext.fillRect(x * totalSize, y * totalSize, this.size + 1, this.size + 1);
+            this.#baseLayerContext.fillStyle = '#DDD';
+            this.#baseLayerContext.fillRect(x * totalSize + 5, y * totalSize, 5, 5);
+            this.#baseLayerContext.fillRect(x * totalSize, y * totalSize + 5, 5, 5);
+          }
+        }
+      } else {
+        this.#baseLayerContext.clearRect(0, 0, actualWidth, actualHeight);
+      }
+      this.#updateGrid();
+    }
   }
 
   #reset = true;
@@ -247,14 +266,6 @@ export default class PgInputPixelEditor extends HTMLElement {
     // No Edit Layer
     this.#noEditLayerContext.fillStyle = this.#colors[color] === 'transparent' ? WHITE : this.#colors[color];
     this.#noEditLayerContext.fillRect(x * totalSize, y * totalSize, this.size, this.size);
-    // Update pixel grid
-    /*if (!props.disableTransparency && colors[color] === 'transparent') {
-      pixelContext.fillStyle = '#DDD';
-      pixelContext.fillRect(x * totalSize + 1, y * totalSize + 1, size, size);
-      pixelContext.fillStyle = WHITE;
-      pixelContext.fillRect(x * totalSize + 1, y * totalSize + 1, 5, 5);
-      pixelContext.fillRect(x * totalSize + 6, y * totalSize + 6, 5, 5);
-    } else {*/
     // base layer to main canvas
     this.#context.drawImage(
       this.#baseLayer,
@@ -341,7 +352,7 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   handleKeyDown(event: KeyboardEvent) {
     console.log(event.shiftKey, event.ctrlKey, event.altKey, event.key);
-    switch(event.key) {
+    switch (event.key) {
       case ' ':
         console.log('space');
         break;
@@ -622,6 +633,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
     this.#data[this.#layer] = cloned;
   }
+
   invert() {
     // Only works with 2 colors
     if (this.#colors.length > 2) {
@@ -640,6 +652,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   clearGuides() {
 
   }
+
   undo() {
     // ToDo: Rewrite to use new history api
     const revert = this.#undoHistory.pop();
@@ -655,6 +668,7 @@ export default class PgInputPixelEditor extends HTMLElement {
         break;
     }
   }
+
   redo() {
     // ToDo: Rewrite to use new history api
     /*const revert = this.#redoHistory.pop();
@@ -694,27 +708,35 @@ export default class PgInputPixelEditor extends HTMLElement {
     }
     this.#data[this.#layer] = cloned;
   }
+
   hasUndo() {
     return this.#undoHistory.length !== 0;
   }
+
   hasRedo() {
     return this.#redoHistory.length !== 0;
   }
+
   inputModePixel() {
     this.#inputMode = InputMode.Pixel;
   }
+
   inputModeLine() {
     this.#inputMode = InputMode.Line;
   }
+
   inputModeRectangle() {
     this.#inputMode = InputMode.Rectangle;
   }
+
   inputModeRectangleOutline() {
     this.#inputMode = InputMode.RectangleOutline;
   }
+
   inputModeEllipse() {
     this.#inputMode = InputMode.Ellipse;
   }
+
   inputModeEllipseOutline() {
     this.#inputMode = InputMode.EllipseOutline;
   }

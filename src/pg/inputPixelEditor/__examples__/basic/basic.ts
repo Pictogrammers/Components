@@ -18,6 +18,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $width: HTMLInputElement;
   @Part() $height: HTMLInputElement;
   @Part() $size: HTMLInputElement;
+  @Part() $transparent: HTMLInputElement;
 
   @Part() $reset: HTMLButtonElement;
   @Part() $clear: HTMLButtonElement;
@@ -36,6 +37,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$width.addEventListener('input', this.handleWidthChange.bind(this));
     this.$height.addEventListener('input', this.handleHeightChange.bind(this));
     this.$size.addEventListener('input', this.handleSizeChange.bind(this));
+    this.$transparent.addEventListener('input', this.handleTransparentChange.bind(this));
     this.$input.addEventListener('input', this.handleInput.bind(this));
     this.$input.addEventListener('debug', this.handleDebug.bind(this));
     this.$modePixel.addEventListener('click', () => {
@@ -98,5 +100,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   handleSizeChange(e) {
     this.$input.size = e.target.value;
     this.$debug.innerHTML = '';
+  }
+
+  handleTransparentChange(e) {
+    this.$input.transparent = e.target.checked;
   }
 }
