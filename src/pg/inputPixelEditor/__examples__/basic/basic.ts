@@ -22,6 +22,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
 
   @Part() $reset: HTMLButtonElement;
   @Part() $clear: HTMLButtonElement;
+  @Part() $invert: HTMLButtonElement;
   @Part() $modePixel: HTMLButtonElement;
   @Part() $modeLine: HTMLButtonElement;
   @Part() $modeRectangle: HTMLButtonElement;
@@ -63,6 +64,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     });
     this.$clear.addEventListener('click', () => {
       this.$input.clear();
+    });
+    this.$invert.addEventListener('click', () => {
+      this.$input.invert();
     });
   }
 

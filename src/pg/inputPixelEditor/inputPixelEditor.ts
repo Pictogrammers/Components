@@ -301,6 +301,14 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#delayedChange();
   }
 
+  #setPixelAll() {
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        this.#setPixel(x, y, this.#data[this.#layer][y][x]);
+      }
+    }
+  }
+
   #setPreview(pixels: Pixel[], previousX: number, previousY: number) {
     const totalSize = this.size + this.gridSize;
     const actualWidth = this.width * totalSize - this.gridSize;
@@ -656,16 +664,17 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (this.#colors.length > 2) {
       return;
     }
-    const cloned = cloneGrid(this.#data[this.#layer]);
-    iterateGrid(cloned, (x, y) => {
-      cloned[y][x] = cloned[y][x] === 0 ? 1 : 0;
+    iterateGrid(this.#data[this.#layer], (x, y) => {
+      this.#data[this.#layer][y][x] = this.#data[this.#layer] [y][x] === 0 ? 1 : 0;
     });
-    this.#data[this.#layer] = cloned;
+    this.#setPixelAll();
   }
+
   applyGuides() {
     const guides = getGuides(this.width, this.height, this.size, this.gridSize);
     this.#baseLayerContext.drawImage(guides, 0, 0);
   }
+
   clearGuides() {
 
   }
