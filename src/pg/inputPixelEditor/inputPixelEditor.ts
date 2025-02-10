@@ -18,6 +18,8 @@ import { getGuides } from './utils/getGuides';
 
 type Pixel = { x: number, y: number };
 
+type Color = [number, number, number, number];
+
 enum HistoryType {
   Group,
   Pixel,
@@ -44,7 +46,7 @@ type HistoryPixelType = {
 }
 
 type HistoryColorUpdateType = {
-  color: [number, number, number, number],
+  color: Color,
   index: number
 }
 
@@ -59,6 +61,10 @@ type Layer = {
   locked: boolean,
   opacity: number,
   export: boolean
+}
+
+function toColor([r, g, b, a]: Color) {
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
 
 @Component({
@@ -94,7 +100,10 @@ export default class PgInputPixelEditor extends HTMLElement {
   #undoHistory: History[] = [];
   #redoHistory: History[] = [];
   #context: CanvasRenderingContext2D;
-  #colors: string[] = ['transparent', '#000'];
+  #colors: Color[] = [
+    [0, 0, 0, 0],
+    [0, 0, 0, 1]
+  ];
   #baseLayer: HTMLCanvasElement;
   #baseLayerContext: CanvasRenderingContext2D;
   #editLayer: HTMLCanvasElement;
@@ -261,11 +270,19 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.size + (this.gridSize * 2) - 2,
       this.size + (this.gridSize * 2) - 2
     );
-    this.#editLayerContext.fillStyle = this.#colors[color] === 'transparent' ? WHITE : this.#colors[color];
-    this.#editLayerContext.fillRect(x * totalSize + 1, y * totalSize + 1, this.size - 2, this.size - 2);
-    // No Edit Layer
-    this.#noEditLayerContext.fillStyle = this.#colors[color] === 'transparent' ? WHITE : this.#colors[color];
-    this.#noEditLayerContext.fillRect(x * totalSize, y * totalSize, this.size, this.size);
+    this.#context.clearRect(x * totalSize, y * totalSize, this.size, this.size);
+    this.#editLayerContext.clearRect(x * totalSize, y * totalSize, this.size, this.size);
+    this.#noEditLayerContext.clearRect(x * totalSize, y * totalSize, this.size, this.size);
+    // Edit layer
+    if (this.#colors[color][3] !== 0) {
+      this.#editLayerContext.fillStyle = toColor(this.#colors[color]);
+      this.#editLayerContext.fillRect(x * totalSize + 1, y * totalSize + 1, this.size - 2, this.size - 2);
+    }
+    // No Edit layer
+    if (this.#colors[color][3] !== 0) {
+      this.#noEditLayerContext.fillStyle = toColor(this.#colors[color]);
+      this.#noEditLayerContext.fillRect(x * totalSize, y * totalSize, this.size, this.size);
+    }
     // base layer to main canvas
     this.#context.drawImage(
       this.#baseLayer,
