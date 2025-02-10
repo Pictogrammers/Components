@@ -263,18 +263,18 @@ export default class PgInputPixelEditor extends HTMLElement {
     }
     const totalSize = this.size + this.gridSize;
     // Edit Layer
-    this.#editLayerContext.fillStyle = WHITE;
-    this.#editLayerContext.fillRect(
-      x * totalSize - (this.gridSize) + 1,
-      y * totalSize - (this.gridSize) + 1,
-      this.size + (this.gridSize * 2) - 2,
-      this.size + (this.gridSize * 2) - 2
-    );
     this.#context.clearRect(x * totalSize, y * totalSize, this.size, this.size);
     this.#editLayerContext.clearRect(x * totalSize, y * totalSize, this.size, this.size);
     this.#noEditLayerContext.clearRect(x * totalSize, y * totalSize, this.size, this.size);
     // Edit layer
     if (this.#colors[color][3] !== 0) {
+      this.#editLayerContext.fillStyle = WHITE;
+      this.#editLayerContext.fillRect(
+        x * totalSize - (this.gridSize) + 1,
+        y * totalSize - (this.gridSize) + 1,
+        this.size + (this.gridSize * 2) - 2,
+        this.size + (this.gridSize * 2) - 2
+      );
       this.#editLayerContext.fillStyle = toColor(this.#colors[color]);
       this.#editLayerContext.fillRect(x * totalSize + 1, y * totalSize + 1, this.size - 2, this.size - 2);
     }
