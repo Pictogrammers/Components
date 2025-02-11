@@ -63,6 +63,21 @@ type Layer = {
   export: boolean
 }
 
+interface FileOptions {
+  history?: boolean
+}
+
+interface File {
+  width: number
+  height: number
+  transparent: boolean
+  colors: Color[]
+  layers: Layer[]
+  data: number[][][]
+  undo?: History[]
+  redo?: History[]
+}
+
 function toColor([r, g, b, a]: Color) {
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
@@ -158,27 +173,8 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   render(changes) {
-    if (changes.width || changes.height || changes.size) {
+    if (changes.width || changes.height || changes.size || changes.transparent) {
       this.#init();
-    }
-    if (changes.transparent) {
-      const totalSize = this.size + this.gridSize;
-      const actualWidth = this.width * totalSize - this.gridSize;
-      const actualHeight = this.height * totalSize - this.gridSize;
-      if (this.transparent) {
-        for (let y = 0; y < this.height; y++) {
-          for (let x = 0; x < this.width; x++) {
-            this.#baseLayerContext.fillStyle = WHITE;
-            this.#baseLayerContext.fillRect(x * totalSize, y * totalSize, this.size + 1, this.size + 1);
-            this.#baseLayerContext.fillStyle = '#DDD';
-            this.#baseLayerContext.fillRect(x * totalSize + 5, y * totalSize, 5, 5);
-            this.#baseLayerContext.fillRect(x * totalSize, y * totalSize + 5, 5, 5);
-          }
-        }
-      } else {
-        this.#baseLayerContext.clearRect(0, 0, actualWidth, actualHeight);
-      }
-      this.#updateGrid();
     }
   }
 
@@ -189,10 +185,24 @@ export default class PgInputPixelEditor extends HTMLElement {
     const actualHeight = this.height * totalSize - this.gridSize;
     this.$canvas.width = actualWidth;
     this.$canvas.height = actualHeight;
+    this.#context.clearRect(0, 0, actualWidth, actualHeight);
     [this.#baseLayer, this.#baseLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#editLayer, this.#editLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#noEditLayer, this.#noEditLayerContext] = createLayer(actualWidth, actualHeight);
     [this.#previewLayer, this.#previewLayerContext] = createLayer(actualWidth, actualHeight);
+    if (this.transparent) {
+      for (let y = 0; y < this.height; y++) {
+        for (let x = 0; x < this.width; x++) {
+          this.#baseLayerContext.fillStyle = WHITE;
+          this.#baseLayerContext.fillRect(x * totalSize, y * totalSize, this.size + 1, this.size + 1);
+          this.#baseLayerContext.fillStyle = '#DDD';
+          this.#baseLayerContext.fillRect(x * totalSize + 5, y * totalSize, 5, 5);
+          this.#baseLayerContext.fillRect(x * totalSize, y * totalSize + 5, 5, 5);
+        }
+      }
+    } else {
+      this.#baseLayerContext.clearRect(0, 0, actualWidth, actualHeight);
+    }
     if (this.#reset) {
       this.#layer = 0;
       this.#layers = [{
@@ -209,6 +219,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     } else {
       this.#redraw();
     }
+    this.#updateGrid();
   }
 
   #redraw() {
@@ -665,7 +676,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       return;
     }
     iterateGrid(this.#data[this.#layer], (x, y) => {
-      this.#data[this.#layer][y][x] = this.#data[this.#layer] [y][x] === 0 ? 1 : 0;
+      this.#data[this.#layer][y][x] = this.#data[this.#layer][y][x] === 0 ? 1 : 0;
     });
     this.#setPixelAll();
   }
@@ -766,4 +777,48 @@ export default class PgInputPixelEditor extends HTMLElement {
   inputModeEllipseOutline() {
     this.#inputMode = InputMode.EllipseOutline;
   }
+
+  async save(options: FileOptions = {}): Promise<File> {
+    const file: File = {
+      width: this.width,
+      height: this.height,
+      transparent: this.transparent,
+      colors: this.#colors,
+      layers: this.#layers,
+      data: this.#data
+    };
+    if (options.history === true) {
+      file.undo = this.#undoHistory;
+      file.redo = this.#redoHistory;
+    }
+    // Trim data
+    for (let l = 0; l < file.data.length; l++) {
+      for (let y = file.data[l].length - 1; y >= 0; y--) {
+        if (y >= this.height) {
+          file.data[l].pop();
+          continue;
+        }
+        for (let x = file.data[l][y].length - 1; x >= 0; x--) {
+          if (x >= this.width) {
+            file.data[l][y].pop();
+          }
+        }
+      }
+    }
+    // Output
+    return file;
+  }
+
+  async open(json: File) {
+    const errors: string[] = [];
+    // Validate 6 properties exist
+    const keys = Object.keys(json);
+    const required = ['width', 'height', 'transparent', 'colors', 'layers', 'data'];
+    required.forEach((key) => {
+      if (!keys.includes(key)) {
+        errors.push(`JSON key '${key}' required.`);
+      }
+    });
+  }
+
 }

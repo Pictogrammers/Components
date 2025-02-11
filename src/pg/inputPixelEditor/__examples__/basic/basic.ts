@@ -30,6 +30,10 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $modeEllipse: HTMLButtonElement;
   @Part() $modeEllipseOutline: HTMLButtonElement;
 
+  @Part() $save: HTMLButtonElement;
+  @Part() $open: HTMLButtonElement;
+  @Part() $output: HTMLPreElement;
+
   connectedCallback() {
     this.$width.value = '10';
     this.$height.value = '10';
@@ -67,6 +71,14 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     });
     this.$invert.addEventListener('click', () => {
       this.$input.invert();
+    });
+    this.$save.addEventListener('click', async () => {
+      const json = await this.$input.save();
+      this.$output.textContent = JSON.stringify(json, null, 4);
+    });
+    this.$open.addEventListener('click', () => {
+      const json = this.$output.textContent;
+      this.$input.open(json as any);
     });
   }
 
