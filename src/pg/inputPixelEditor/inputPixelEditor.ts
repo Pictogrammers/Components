@@ -436,7 +436,6 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#x = newX;
     this.#y = newY;
     const color = event.buttons === 32 ? 0 : 1;
-    console.log(this.#colors, this.#colors[color], event.buttons);
     switch (this.#inputMode) {
       case InputMode.Pixel:
         this.#setPixel(newX, newY, color);
@@ -576,7 +575,6 @@ export default class PgInputPixelEditor extends HTMLElement {
       // editing layer to main canvas
       this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
     }
-    console.log('enter');
   }
 
   handlePointerLeave(event: MouseEvent) {
@@ -587,7 +585,6 @@ export default class PgInputPixelEditor extends HTMLElement {
       // editing layer to main canvas
       this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
     }
-    console.log('leave');
   }
 
   #updateGrid() {

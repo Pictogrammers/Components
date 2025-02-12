@@ -46,6 +46,7 @@
 }
 
 [part="label"]:focus::before {
+  pointer-events: none;
   content: '';
   position: absolute;
   top: -1px;

@@ -2,6 +2,24 @@
   display: inline-flex;
 }
 
+[part="wrapper"] {
+  display: flex;
+  position: relative;
+  outline: 0;
+}
+
+[part="wrapper"]:focus::before {
+  pointer-events: none;
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: -1px;
+  border-radius: 0.125rem;
+  box-shadow: 0 0 0 3px var(--pg-search-focus-glow, rgb(79, 143, 249, 0.5));
+}
+
 canvas {
   touch-action: none;
   user-select: none;

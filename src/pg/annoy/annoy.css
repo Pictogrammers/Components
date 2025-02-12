@@ -52,14 +52,15 @@ div {
 }
 
 [part=close]:focus::before {
+  pointer-events: none;
   content: '';
-    position: absolute;
-    top: -1px;
-    right: -1px;
-    bottom: -1px;
-    left: -1px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 3px var(--pg-search-focus-glow, rgb(79, 143, 249, 0.6));
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: -1px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--pg-search-focus-glow, rgb(79, 143, 249, 0.6));
 }
 
 [part=close] svg {
