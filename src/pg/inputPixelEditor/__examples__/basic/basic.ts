@@ -34,6 +34,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $open: HTMLButtonElement;
   @Part() $output: HTMLPreElement;
 
+  @Part() $colors: HTMLPreElement;
+  @Part() $layers: HTMLPreElement;
+
   connectedCallback() {
     this.$width.value = '10';
     this.$height.value = '10';
@@ -77,7 +80,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       this.$output.textContent = JSON.stringify(json, null, 4);
     });
     this.$open.addEventListener('click', () => {
-      const json = this.$output.textContent;
+      const json = JSON.parse(this.$output.textContent || '');
       this.$input.open(json as any);
     });
   }

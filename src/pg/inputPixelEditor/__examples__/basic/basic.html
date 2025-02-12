@@ -10,7 +10,7 @@
     </label>
     <label>
       Size
-      <input part="size" type="range" min="4" max="16">
+      <input part="size" type="range" step="2" min="4" max="16">
     </label>
     <label>
       <input part="transparent" type="checkbox">
@@ -24,11 +24,17 @@
   <div>
     <code>oninput: <span part="value2"></span></code>
   </div>
-
   <div>
+    <h3>Canvas Tools</h3>
     <button part="reset">Reset</button>
     <button part="clear">Clear</button>
     <button part="invert">Invert</button>
+    |
+    <button part="save">Save</button>
+    <button part="open">Open</button>
+  </div>
+  <div>
+    <h3>Drawing Tools</h3>
     <button part="modePixel">Pixel</button>
     <button part="modeLine">Line</button>
     <button part="modeRectangle">Rectangle</button>
@@ -36,12 +42,16 @@
     <button part="modeEllipse">Ellipse</button>
     <button part="modeEllipseOutline">Ellipse Outline</button>
   </div>
-  <div part="debug"></div>
   <div>
-    <button part="save">Save</button>
-    <button part="open">Open</button>
+    <h3>Color Tools</h3>
+    <button part="addColor">Add Color</button>
+    <pre part="colors"></pre>
   </div>
-  <pre part="output">
-
-  </pre>
+  <div>
+    <h3>Layer Tools</h3>
+    <button part="addLayer">Add Layer</button>
+    <pre part="layers"></pre>
+  </div>
+  <div part="debug"></div>
+  <pre part="output" contenteditable></pre>
 </div>

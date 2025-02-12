@@ -196,8 +196,8 @@ export default class PgInputPixelEditor extends HTMLElement {
           this.#baseLayerContext.fillStyle = WHITE;
           this.#baseLayerContext.fillRect(x * totalSize, y * totalSize, this.size + 1, this.size + 1);
           this.#baseLayerContext.fillStyle = '#DDD';
-          this.#baseLayerContext.fillRect(x * totalSize + 5, y * totalSize, 5, 5);
-          this.#baseLayerContext.fillRect(x * totalSize, y * totalSize + 5, 5, 5);
+          this.#baseLayerContext.fillRect(x * totalSize + Math.ceil(this.size / 2), y * totalSize, Math.floor(this.size / 2), Math.floor(this.size / 2));
+          this.#baseLayerContext.fillRect(x * totalSize, y * totalSize + Math.floor(this.size / 2), Math.ceil(this.size / 2), Math.ceil(this.size / 2));
         }
       }
     } else {
@@ -807,6 +807,9 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   async open(json: File) {
+    if (typeof json !== 'object') {
+      return ['json must be type object'];
+    }
     const errors: string[] = [];
     // Validate 6 properties exist
     const keys = Object.keys(json);
@@ -816,6 +819,20 @@ export default class PgInputPixelEditor extends HTMLElement {
         errors.push(`JSON key '${key}' required.`);
       }
     });
+    // Set props
+    this.width = json.width;
+    this.height = json.height;
+    this.transparent = json.transparent;
+    this.#colors = json.colors;
+    this.#layers = json.layers;
+    this.#data = json.data;
+    if (json.undo) {
+      this.#undoHistory = json.undo;
+    }
+    if (json.redo) {
+      this.#redoHistory = json.redo;
+    }
+    this.#init();
   }
 
 }
