@@ -44,6 +44,7 @@ See usage for each method below.
 | `getLayers()` | -    | Get layer array. |
 | `addLayer(option)` | -        | Add layer. |
 | `removeLayer(index)` | -      | Remove layer. |
+| `flattenLayers(layerIndexes)` | -      | Flatten layers. |
 | `moveLayer(startIndex, endIndex)` | -    | Move layer. |
 | `getColors()` | -    | Get colors. |
 | `addColor(r, g, b, a)` | -    | Add color. |

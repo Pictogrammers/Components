@@ -1,5 +1,5 @@
-export function rasterizePath(pathData: string, width: number, height: number) {
-  const grid: Number[][] = Array(height).fill(0).map(() => Array(width).fill(0));
+export function maskToBitmap(pathData: string, width: number, height: number) {
+  const grid: number[][] = Array(height).fill(0).map(() => Array(width).fill(0));
 
   // Store only the vertical edges
   const verticalEdges: { x: number, y: number[] }[] = [];
@@ -11,7 +11,7 @@ export function rasterizePath(pathData: string, width: number, height: number) {
     let x;
     let y;
     // Split the path data into commands
-    const commands = path.match(/[MHVZ][\d,]*/g) || [];
+    const commands = path.match(/[MHVZ][\d, ]*/g) || [];
 
     for (const cmd of commands) {
       const type = cmd[0];
@@ -20,7 +20,7 @@ export function rasterizePath(pathData: string, width: number, height: number) {
 
       switch (type) {
         case 'M': {
-          const [vX, vY] = value.split(',').map(v => parseInt(v, 10));
+          const [vX, vY] = value.split(/,| /).map(v => parseInt(v, 10));
           x = vX;
           y = vY;
           x0 = vX;

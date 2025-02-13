@@ -630,6 +630,7 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   applyTemplate(template: number[][]) {
     this.#data = [template];
+    this.#setPixelAll();
   }
 
   flipHorizontal() {

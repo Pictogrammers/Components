@@ -1,5 +1,6 @@
 import { Component, Part } from '@pictogrammers/element';
 import PgInputPixelEditor from '../../inputPixelEditor';
+import { maskToBitmap } from '../../utils/maskToBitmap';
 
 import template from './basic.html';
 import style from './basic.css';
@@ -33,6 +34,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $save: HTMLButtonElement;
   @Part() $open: HTMLButtonElement;
   @Part() $output: HTMLPreElement;
+  @Part() $file: HTMLInputElement;
+  @Part() $saveSvg: HTMLInputElement;
+  @Part() $savePng: HTMLInputElement;
 
   @Part() $colors: HTMLPreElement;
   @Part() $layers: HTMLPreElement;
@@ -83,6 +87,53 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       const json = JSON.parse(this.$output.textContent || '');
       this.$input.open(json as any);
     });
+    this.$file.addEventListener('change', this.handleFile.bind(this));
+    this.$saveSvg.addEventListener('click', async () => {
+      // @ts-ignore
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'CanvasName',
+        types: [{
+          description: 'SVG Document',
+          accept: {'image/svg+xml': ['.svg']},
+        }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write('something');
+      await writable.close();
+    });
+    this.$savePng.addEventListener('click', () => {
+
+    });
+  }
+
+  handleFile(e) {
+    const { files } = e.currentTarget;
+    if (files.length !== 1) {
+      throw new Error('select only 1 file');
+    }
+    switch(files[0].type) {
+      case 'image/svg+xml':
+        // Read the file
+        const reader = new FileReader();
+        reader.onload = () => {
+          const content = reader.result as string;
+          const size = content.match(/viewBox="\d+ \d+ (\d+) (\d+)"/) as string[];
+          const width = parseInt(size[1], 10);
+          const height = parseInt(size[2], 10);
+          const path = (content.match(/d="([^"]+)"/) as string[])[1];
+          // Render path
+          console.log(path, size[1], size[2]);
+          this.$input.applyTemplate(maskToBitmap(path, width, height));
+          ;
+        };
+        reader.onerror = () => {
+          throw new Error("Error reading the file. Please try again.");
+        };
+        reader.readAsText(files[0]);
+        break;
+      default:
+        throw new Error('Unsupported format.');
+    }
   }
 
   handleChange(e: CustomEvent) {
