@@ -249,10 +249,10 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   #handleChange() {
-    const path = bitmaskToPath(this.#data[this.#layer], { scale: 1 });
-    console.log('change:', path);
+    const paths = this.#data.map(layer => bitmaskToPath(layer, { scale: 1 }));
+    console.log('change:', paths);
     this.dispatchEvent(new CustomEvent('change', {
-      detail: { value: path }
+      detail: { value: paths }
     }));
     /*this.dispatchEvent(new CustomEvent('change', {
       detail: data

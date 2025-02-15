@@ -38,6 +38,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $saveSvg: HTMLInputElement;
   @Part() $savePng: HTMLInputElement;
 
+  // MAKE A LIST COMPONENT!!!! [text | delete]
   @Part() $colors: HTMLPreElement;
   @Part() $layers: HTMLPreElement;
 
@@ -91,6 +92,21 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$saveSvg.addEventListener('click', async () => {
       // @ts-ignore
       const handle = await window.showSaveFilePicker({
+        suggestedName: 'Canvas',
+        types: [{
+          description: 'SVG Document',
+          accept: {'image/svg+xml': ['.svg']},
+        }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${this.$width.value} ${this.$height.value}">`);
+      await writable.write(`<path d="${'test'}" />`);
+      await writable.write('</svg>');
+      await writable.close();
+    });
+    this.$savePng.addEventListener('click', async () => {
+      // @ts-ignore
+      const handle = await window.showSaveFilePicker({
         suggestedName: 'CanvasName',
         types: [{
           description: 'SVG Document',
@@ -99,10 +115,8 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       });
       const writable = await handle.createWritable();
       await writable.write('something');
+      await writable.write
       await writable.close();
-    });
-    this.$savePng.addEventListener('click', () => {
-
     });
   }
 
@@ -138,7 +152,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
 
   handleChange(e: CustomEvent) {
     const { value } = e.detail;
-    this.$value1.innerText = value;
+    this.$value1.innerText = value.join('--');
   }
 
   handleInput(e: CustomEvent) {
