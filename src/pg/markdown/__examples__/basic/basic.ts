@@ -12,7 +12,7 @@ export default class XPgMarkdownBasic extends HTMLElement {
   @Part() $markdown: PgMarkdown;
 
   connectedCallback() {
-    this.$markdown.replace = [{
+    this.$markdown.replace.push({
       find: new RegExp('(\\\\mdi|mdi|icon):([a-z0-9-]+):?([#a-z0-9-]+)?', 'g'),
       replace: (m, type, icon, color) => {
         if (type == '\\mdi') { return `mdi:${icon}`; }
@@ -36,7 +36,7 @@ export default class XPgMarkdownBasic extends HTMLElement {
         }
         return m;
       }
-    }];
+    });
 
     this.$markdown.text = example;
 

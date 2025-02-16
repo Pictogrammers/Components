@@ -1,0 +1,11 @@
+:host {
+  display: contents;
+}
+
+[part="button"] {
+  display: flex;
+}
+
+[part="item"] {
+  display: flex;
+}

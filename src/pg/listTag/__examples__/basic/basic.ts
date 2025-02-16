@@ -21,25 +21,24 @@ export default class XPgIconBasic extends HTMLElement {
     this.$buttonAdd.addEventListener('click', this.handleAdd.bind(this));
     this.$buttonRemove.addEventListener('click', this.handleRemove.bind(this));
     this.$buttonEdit.addEventListener('click', this.handleEdit.bind(this));
-    this.$tags.items = tags;
+    this.$tags.items.push(...tags);
   }
 
   handleClear() {
-    this.$tags.items = [];
+    this.$tags.items.splice(0, this.$tags.items.length)
   }
 
   uuid = 4;
 
   handleAdd() {
-    this.$tags.items = [
-      ...this.$tags.items,
+    this.$tags.items.push(
       new Tag().from({
         id: `uuid${this.uuid++}`,
         count: 42,
         name: 'Foo Bar',
         url: 'foo-bar'
       })
-    ];
+    );
   }
 
   handleRemove() {

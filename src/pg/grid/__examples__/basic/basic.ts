@@ -77,7 +77,8 @@ export default class XPgGridBasic extends HTMLElement {
     if (count === -1) {
       this.$grid.icons = this.icons;
     }
-    this.$grid.icons = this.icons.slice(0, count);
+    // update array, fix later
+    this.$grid.icons.push(...this.icons.slice(0, count));
   }
 
   async handleSync(e: CustomEvent) {
