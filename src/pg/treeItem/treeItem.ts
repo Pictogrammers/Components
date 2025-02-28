@@ -36,12 +36,13 @@ export default class PgTreeItem extends HTMLElement {
 
   connectedCallback() {
     this.$item.addEventListener('action', this.#handleAction.bind(this));
-    this.$button.addEventListener('dblclick', this.#handleRename.bind(this));
+    this.$button.addEventListener('dblclick', this.#handleDoubleClick.bind(this));
     this.$button.addEventListener('click', this.#handleClick.bind(this));
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
     this.$input.addEventListener('keydown', this.#handleKeyDown.bind(this));
     this.$items.addEventListener('select', this.#handleSelect.bind(this));
+    this.$items.addEventListener('rename', this.#handleRename.bind(this));
     forEach({
       container: this.$actions,
       items: this.actions,
@@ -68,6 +69,9 @@ export default class PgTreeItem extends HTMLElement {
     if (changes.selected) {
       this.$item.classList.toggle('selected', this.selected);
     }
+    if (changes.items) {
+      this.$items.classList.toggle('hide', this.items.length === 0);
+    }
   }
 
   #handleClick() {
@@ -92,6 +96,10 @@ export default class PgTreeItem extends HTMLElement {
     }));
   }
 
+  #handleRename(e: any) {
+    e.detail.indexes.unshift(this.index);
+  }
+
   #handleSelect(e: any) {
     e.detail.indexes.unshift(this.index);
   }
@@ -100,7 +108,7 @@ export default class PgTreeItem extends HTMLElement {
     e.preventDefault();
   }
 
-  #handleRename(e) {
+  #handleDoubleClick(e) {
     this.$button.classList.add('hide');
     this.$actions.classList.add('hide');
     this.$input.classList.remove('hide');
@@ -118,7 +126,7 @@ export default class PgTreeItem extends HTMLElement {
       bubbles: true,
       composed: true,
       detail: {
-        index: this.index,
+        indexes: [this.index],
         label: this.$input.value
       }
     }));
