@@ -30,9 +30,19 @@
 }
 
 [part="item"]:hover {
-  background: var(--pg-tree-item-background-hover, #383838)
+  background: var(--pg-tree-item-background-hover, #383838);
+}
+
+[part="item"].selected {
+  background: var(--pg-tree-item-background-selected, #4B5876)
 }
 
 [part="actions"] {
   display: flex;
+}
+
+[part="items"] {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1rem;
 }

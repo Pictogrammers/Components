@@ -35,7 +35,6 @@ function createItem(key) {
 })
 export default class XPgTreeBasic extends HTMLElement {
   @Part() $tree: PgTree;
-  @Part() $tree2: PgTree;
   @Part() $addItem: HTMLButtonElement;
   @Part() $removeItem: HTMLButtonElement;
   @Part() $updateItem: HTMLButtonElement;
@@ -65,6 +64,13 @@ export default class XPgTreeBasic extends HTMLElement {
       const { index, label } = e.detail;
       this.$tree.items[index].label = label;
     });
+    this.$tree.addEventListener('select', (e: any) => {
+      const { indexes } = e.detail;
+      const item = indexes.reduce((item, index) => {
+        return item.items[index];
+      }, this.$tree);
+      item.selected = true;
+    });
     this.$tree.addEventListener('menu', (e: any) => {
       // action clicked
     });
@@ -72,6 +78,7 @@ export default class XPgTreeBasic extends HTMLElement {
       icon: {
         path: IconEye
       },
+      selected: true,
       label: 'Item 1',
       actions: [{
         type: PgTreeButtonIcon,
@@ -86,10 +93,13 @@ export default class XPgTreeBasic extends HTMLElement {
       }]
     },
     {
-      label: 'Item 2'
+      label: 'Item 2',
+      items: [
+        {
+          label: 'Nested'
+        }
+      ]
     }];
-    // Assign to same array instance!
-    this.$tree2.items = this.$tree.items;
     // Push to same array instance!
     this.$tree.items.push({ label: 'testing' });
 

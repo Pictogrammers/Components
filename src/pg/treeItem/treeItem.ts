@@ -21,8 +21,10 @@ export default class PgTreeItem extends HTMLElement {
 
   @Prop() index: number;
   @Prop() label: string = '';
+  @Prop() selected: boolean = false;
   @Prop() icon: { path: string };
   @Prop() actions: any[] = [];
+  @Prop() items: any[] = [];
 
   @Part() $item: HTMLDivElement;
   @Part() $input: HTMLInputElement;
@@ -30,25 +32,29 @@ export default class PgTreeItem extends HTMLElement {
   @Part() $icon: PgIcon;
   @Part() $label: HTMLDivElement;
   @Part() $actions: HTMLDivElement;
+  @Part() $items: HTMLDivElement;
 
   connectedCallback() {
     this.$item.addEventListener('action', this.#handleAction.bind(this));
     this.$button.addEventListener('dblclick', this.#handleRename.bind(this));
+    this.$button.addEventListener('click', this.#handleClick.bind(this));
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
     this.$input.addEventListener('keydown', this.#handleKeyDown.bind(this));
+    this.$items.addEventListener('select', this.#handleSelect.bind(this));
     forEach({
       container: this.$actions,
       items: this.actions,
       type: (item) => {
         return PgTreeButtonIcon;
-      },
-      create: ($item, item) => {
-        // after creation of $item element
-      },
-      update: ($item, item) => {
-        // after every $item update
-      },
+      }
+    });
+    forEach({
+      container: this.$items,
+      items: this.items,
+      type: (item) => {
+        return PgTreeItem;
+      }
     });
   }
 
@@ -59,6 +65,19 @@ export default class PgTreeItem extends HTMLElement {
     if (changes.icon && this.icon) {
       this.$icon.path = this.icon.path;
     }
+    if (changes.selected) {
+      this.$item.classList.toggle('selected', this.selected);
+    }
+  }
+
+  #handleClick() {
+    this.dispatchEvent(new CustomEvent('select', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index]
+      }
+    }));
   }
 
   #handleAction(e) {
@@ -71,6 +90,10 @@ export default class PgTreeItem extends HTMLElement {
         actionIndex: e.detail.index
       }
     }));
+  }
+
+  #handleSelect(e: any) {
+    e.detail.indexes.unshift(this.index);
   }
 
   #handleContextMenu(e) {
@@ -102,8 +125,17 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Enter') {
-      this.#handleBlur();
+    switch (e.key ) {
+      case 'Enter':
+        this.#handleBlur();
+        break;
+      case 'Escape':
+        this.$button.classList.remove('hide');
+        this.$actions.classList.remove('hide');
+        this.$input.classList.add('hide');
+        this.$input.value = this.label;
+        this.$button.focus();
+        break;
     }
   }
 
