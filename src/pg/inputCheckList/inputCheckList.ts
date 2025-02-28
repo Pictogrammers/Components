@@ -52,6 +52,7 @@ export default class PgInputCheckList extends HTMLElement {
 
   render(changes) {
     if (changes.options) {
+      /*
       list(
         this.$list,
         this.options,
@@ -92,6 +93,7 @@ export default class PgInputCheckList extends HTMLElement {
           $item.querySelector('button').innerText = option.label;
         }
       );
+      */
     }
     if (changes.value) {
       //const value = [true, 'true'].includes(this.value);

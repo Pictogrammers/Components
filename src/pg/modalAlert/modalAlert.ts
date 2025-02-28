@@ -21,16 +21,30 @@ export default class PgModalAlert extends PgOverlay {
   @Part() $yes: PgButton;
   @Part() $no: PgButton;
 
+  #cacheKeydownHandler: any;
+
   connectedCallback() {
-    this.$yes.addEventListener('click', this.handleYes.bind(this));
-    this.$no.addEventListener('click', this.handleNo.bind(this));
+    this.$yes.addEventListener('click', this.#handleYes.bind(this));
+    this.$no.addEventListener('click', this.#handleNo.bind(this));
+    this.#cacheKeydownHandler ??= this.#handleKeyDown.bind(this);
+    document.addEventListener('keydown', this.#cacheKeydownHandler);
   }
 
-  handleYes() {
+  disconnectedCallback() {
+    document.removeEventListener('keydown', this.#cacheKeydownHandler);
+  }
+
+  #handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      this.close(null);
+    }
+  }
+
+  #handleYes() {
     this.close(true);
   }
 
-  handleNo() {
+  #handleNo() {
     this.close(false);
   }
 

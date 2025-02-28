@@ -1,3 +1,3 @@
-module.exports = {
+export default {
   preset: '@pictogrammers/element-jest'
 };

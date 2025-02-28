@@ -11,7 +11,8 @@ import PgIcon from '../icon/icon';
 })
 export default class PgTreeButtonIcon extends HTMLElement {
 
-  @Prop() icon: { path: string };
+  @Prop() index: number;
+  @Prop() icon: string;
 
   @Part() $button: HTMLButtonElement;
   @Part() $icon: PgIcon;
@@ -23,13 +24,16 @@ export default class PgTreeButtonIcon extends HTMLElement {
   #handleClick(e) {
     this.dispatchEvent(new CustomEvent('action', {
       bubbles: true,
-      composed: true
+      composed: true,
+      detail: {
+        index: this.index
+      }
     }));
   }
 
   render(changes) {
     if (changes.icon) {
-      this.$icon.path = this.icon.path;
+      this.$icon.path = this.icon;
     }
   }
 

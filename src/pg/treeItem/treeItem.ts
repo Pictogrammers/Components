@@ -19,9 +19,10 @@ function uuid() {
 })
 export default class PgTreeItem extends HTMLElement {
 
-  @Prop() label: string;
+  @Prop() index: number;
+  @Prop() label: string = '';
   @Prop() icon: { path: string };
-  @Prop() actions: any[];
+  @Prop() actions: any[] = [];
 
   @Part() $item: HTMLDivElement;
   @Part() $input: HTMLInputElement;
@@ -31,8 +32,24 @@ export default class PgTreeItem extends HTMLElement {
   @Part() $actions: HTMLDivElement;
 
   connectedCallback() {
+    this.$item.addEventListener('action', this.#handleAction.bind(this));
     this.$button.addEventListener('dblclick', this.#handleRename.bind(this));
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
+    this.$input.addEventListener('blur', this.#handleBlur.bind(this));
+    this.$input.addEventListener('keydown', this.#handleKeyDown.bind(this));
+    forEach({
+      container: this.$actions,
+      items: this.actions,
+      type: (item) => {
+        return PgTreeButtonIcon;
+      },
+      create: ($item, item) => {
+        // after creation of $item element
+      },
+      update: ($item, item) => {
+        // after every $item update
+      },
+    });
   }
 
   render(changes) {
@@ -42,22 +59,18 @@ export default class PgTreeItem extends HTMLElement {
     if (changes.icon && this.icon) {
       this.$icon.path = this.icon.path;
     }
-    if (changes.actions && this.actions) {
-      this.actions.forEach(x => { if(!('key' in x)) { x.key = uuid(); } });
-      forEach({
-        container: this.$actions,
-        items: this.actions,
-        type: (item) => {
-          return PgTreeButtonIcon;
-        },
-        create: ($item, item) => {
-          // after creation of $item element
-        },
-        update: ($item, item) => {
-          // after every $item update
-        },
-      });
-    }
+  }
+
+  #handleAction(e) {
+    e.stopPropagation();
+    this.dispatchEvent(new CustomEvent('action', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        index: this.index,
+        actionIndex: e.detail.index
+      }
+    }));
   }
 
   #handleContextMenu(e) {
@@ -65,9 +78,33 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleRename(e) {
+    this.$button.classList.add('hide');
+    this.$actions.classList.add('hide');
+    this.$input.classList.remove('hide');
     this.$input.value = this.label;
     this.$input.select();
     e.preventDefault();
+  }
+
+  #handleBlur() {
+    this.$button.classList.remove('hide');
+    this.$actions.classList.remove('hide');
+    this.$input.classList.add('hide');
+    this.$button.focus();
+    this.dispatchEvent(new CustomEvent('rename', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        index: this.index,
+        label: this.$input.value
+      }
+    }));
+  }
+
+  #handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      this.#handleBlur();
+    }
   }
 
 }
