@@ -4,10 +4,6 @@ import template from './tree.html';
 import style from './tree.css';
 import PgTreeItem from '../treeItem/treeItem';
 
-function ForBlah(foo: any) {
-
-}
-
 @Component({
   selector: 'pg-tree',
   style,
