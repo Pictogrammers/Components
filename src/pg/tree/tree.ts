@@ -24,13 +24,7 @@ export default class PgTree extends HTMLElement {
       items: this.items,
       type: (item) => {
         return PgTreeItem;
-      },
-      create: ($item, item) => {
-        // after creation of $item element
-      },
-      update: ($item, item) => {
-        // after every $item update
-      },
+      }
     });
   }
 
