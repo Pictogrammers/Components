@@ -33,7 +33,6 @@ export default class PgTabs extends HTMLElement {
     const { detail } = e;
     this.tabs.push(detail);
 
-
     /*list(
       this.$tabset,
       this.tabs,
