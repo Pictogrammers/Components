@@ -15,7 +15,7 @@ interface InputSelectItem {
 })
 export default class PgInputSelect extends HTMLElement {
   @Prop() options: InputSelectItem[] = [];
-  @Prop() value: string;
+  @Prop() value: string = '';
   @Prop() name: string = '';
 
   @Part() $select: HTMLSelectElement;

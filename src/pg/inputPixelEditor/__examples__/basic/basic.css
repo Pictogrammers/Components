@@ -8,6 +8,10 @@
   border: 1px solid #FFF;
 }
 
+[part="value1"] {
+  word-wrap: break-word;
+}
+
 .props {
   display: flex;
   flex-direction: row;

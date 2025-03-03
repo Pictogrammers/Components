@@ -38,12 +38,12 @@ export default class PgMenuIcon extends HTMLElement {
   @Part() $colorPicker: any;
   @Part() $colorHexRgb: any;
 
-  @Local('#000000') cachePngColor: string;
-  @Local('24') cachePngSize: string;
-  @Local('#000000') cacheSvgColor: string;
+  @Local() cachePngColor: string = '#000000';
+  @Local() cachePngSize: string = '24';
+  @Local() cacheSvgColor: string = '#000000';
 
   color = 'svg';
-  @Prop() currentIndex: 0;
+  @Prop() currentIndex: number = 0;
   @Prop() icon: Icon = new Icon();
 
   connectedCallback() {

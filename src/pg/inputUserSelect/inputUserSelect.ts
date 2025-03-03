@@ -34,7 +34,7 @@ const mdiShape = 'M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22
   template
 })
 export default class PgInputUserSelect extends HTMLElement {
-  @Prop() options: User[] | null = null;
+  @Prop() options: User[] = [];
   @Prop() value: User | null = null;
   @Prop() clear: boolean = false;
   @Prop() noDataText: string = 'Empty Users List';

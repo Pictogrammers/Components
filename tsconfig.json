@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
-    "module": "ES2015",
-    "target": "ES2017",
+    "module": "ES6",
+    "target": "ES2023",
     "lib": ["ES2023", "ES5", "ES6", "DOM"],
     "moduleResolution": "node",
     "baseUrl": "src",
     "sourceMap": true,
-    "experimentalDecorators": true,
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "dist",

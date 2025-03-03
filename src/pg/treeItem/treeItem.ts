@@ -5,12 +5,7 @@ import style from './treeItem.css';
 import PgIcon from '../icon/icon';
 import PgTreeButtonIcon from '../treeButtonIcon/treeButtonIcon';
 
-function uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
+const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
 
 @Component({
   selector: 'pg-tree-item',
@@ -22,7 +17,7 @@ export default class PgTreeItem extends HTMLElement {
   @Prop() index: number;
   @Prop() label: string = '';
   @Prop() selected: boolean = false;
-  @Prop() icon: { path: string };
+  @Prop() icon: { path: string } = { path: noIcon };
   @Prop() actions: any[] = [];
   @Prop() items: any[] = [];
 

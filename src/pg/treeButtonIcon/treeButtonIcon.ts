@@ -4,6 +4,8 @@ import template from './treeButtonIcon.html';
 import style from './treeButtonIcon.css';
 import PgIcon from '../icon/icon';
 
+const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
+
 @Component({
   selector: 'pg-tree-button-icon',
   style,
@@ -12,7 +14,7 @@ import PgIcon from '../icon/icon';
 export default class PgTreeButtonIcon extends HTMLElement {
 
   @Prop() index: number;
-  @Prop() icon: string;
+  @Prop() icon: string = noIcon;
 
   @Part() $button: HTMLButtonElement;
   @Part() $icon: PgIcon;

@@ -1,10 +1,9 @@
-import { Component, Prop, Part, node } from '@pictogrammers/element';
-import { list, item } from '../shared/list';
+import { Component, Prop, Part, node, forEach } from '@pictogrammers/element';
 import PgTab from '../tab/tab';
 
 import template from './tabs.html';
 import style from './tabs.css';
-import partialTab from './partials/tab.html';
+import PgPartialTab from './partials/tab';
 
 @Component({
   selector: 'pg-tabs',
@@ -13,7 +12,7 @@ import partialTab from './partials/tab.html';
 })
 export default class PgTabs extends HTMLElement {
 
-  @Part() $tabset: HTMLDivElement;
+  @Part() $tabset: HTMLUListElement;
   @Part() $slot: HTMLSlotElement;
 
   tabs: any[] = [];
@@ -21,12 +20,21 @@ export default class PgTabs extends HTMLElement {
   connectedCallback() {
     this.addEventListener('tab', this.handleTab.bind(this));
     this.$slot.addEventListener('slotchange', this.handleSlotChange.bind(this));
+    forEach({
+      container: this.$tabset,
+      items: this.tabs,
+      type: (tab: any) => {
+        return PgPartialTab;
+      }
+    });
   }
 
   handleTab(e: CustomEvent) {
     const { detail } = e;
     this.tabs.push(detail);
-    list(
+
+
+    /*list(
       this.$tabset,
       this.tabs,
       'id',
@@ -50,7 +58,7 @@ export default class PgTabs extends HTMLElement {
       (tab, $item) => {
 
       }
-    );
+    );*/
     e.stopPropagation();
   }
 

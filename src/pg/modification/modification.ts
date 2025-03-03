@@ -96,7 +96,7 @@ function itemsInsertDates(modifications) {
   template
 })
 export default class PgModification extends HTMLElement {
-  @Prop() modifications: Modification[] | null = null;
+  @Prop() modifications: Modification[] = [];
   @Prop() edit: boolean = false;
   // Ex: pictogrammers/repo
   @Prop() github: string = '';
