@@ -20,7 +20,7 @@ export default class PgIcon extends HTMLElement {
     if (changes.path) {
       const viewBox = getComputedStyle(this).getPropertyValue('--pg-icon-viewbox');
       this.$svg.setAttribute('viewBox', viewBox || '0 0 24 24');
-      if (this.path) {
+      if (!this.path) {
         throw new Error('invalid path set on pg-icon');
       }
       this.$path.setAttribute('d', this.path);
