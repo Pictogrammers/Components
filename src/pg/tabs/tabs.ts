@@ -19,6 +19,7 @@ export default class PgTabs extends HTMLElement {
   #tabs: any[] = [];
 
   #selectedTab: number = 0;
+  #focusedTab: number = 0;
 
   connectedCallback() {
     this.addEventListener('tab', this.#handleTab.bind(this));
@@ -36,29 +37,31 @@ export default class PgTabs extends HTMLElement {
           console.log(index, this.#tabs[e.detail.index]);
           const elements = this.$slot.assignedElements() as PgTab[];
           elements[this.#selectedTab].hide();
+          $tabs[this.#selectedTab].selected = false;
           elements[index].show();
+          $tabs[index].selected = true;
           this.#selectedTab = index;
         });
-        $tab.addEventListener('arrowleft',  (e: any) => {
+        $tab.addEventListener('arrowleft', (e: any) => {
           const { index } = e.detail;
           if (this.#tabs.length > 1) {
             if (index === 0) {
-              this.#selectedTab = this.#tabs.length - 1;
+              this.#focusedTab = this.#tabs.length - 1;
             } else {
-              this.#selectedTab = index - 1;
+              this.#focusedTab = index - 1;
             }
-            $tabs[this.#selectedTab].focus();
+            $tabs[this.#focusedTab].focus();
           }
         });
         $tab.addEventListener('arrowright',  (e: any) => {
           const { index } = e.detail;
           if (this.#tabs.length > 1) {
             if (index === this.#tabs.length - 1) {
-              this.#selectedTab = 0;
+              this.#focusedTab = 0;
             } else {
-              this.#selectedTab++;
+              this.#focusedTab++;
             }
-            $tabs[this.#selectedTab].focus();
+            $tabs[this.#focusedTab].focus();
           }
         });
       }
@@ -72,9 +75,11 @@ export default class PgTabs extends HTMLElement {
   }
 
   handleSlotChange(e) {
+    const tabs = Array.from(this.$tabset.children) as PgPartialTab[];
     const elements = this.$slot.assignedElements() as PgTab[];
     if (elements.length !== 0) {
       elements[0].show();
+      tabs[0].selected = true;
     }
   }
 

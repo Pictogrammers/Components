@@ -1,10 +1,12 @@
 import { Component, Prop, Part, node, forEach } from '@pictogrammers/element';
 
 import template from './tab.html';
+import style from './tab.css';
 
 @Component({
   selector: 'pg-partial-tab',
-  template
+  template,
+  style
 })
 export default class PgPartialTab extends HTMLElement {
 
@@ -47,6 +49,7 @@ export default class PgPartialTab extends HTMLElement {
           }
         });
         this.dispatchEvent(arrowLeftEvent);
+        e.preventDefault();
         break;
       case 'ArrowRight':
         const arrowRightEvent = new CustomEvent('arrowright', {
@@ -55,6 +58,7 @@ export default class PgPartialTab extends HTMLElement {
           }
         });
         this.dispatchEvent(arrowRightEvent);
+        e.preventDefault();
         break;
     }
   }
