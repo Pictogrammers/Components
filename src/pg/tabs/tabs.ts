@@ -34,7 +34,6 @@ export default class PgTabs extends HTMLElement {
       connect: ($tab, tab, $tabs) => {
         $tab.addEventListener('select', (e: any) => {
           const { index } = e.detail;
-          console.log(index, this.#tabs[e.detail.index]);
           const elements = this.$slot.assignedElements() as PgTab[];
           elements[this.#selectedTab].hide();
           $tabs[this.#selectedTab].selected = false;
@@ -74,7 +73,7 @@ export default class PgTabs extends HTMLElement {
     e.stopPropagation();
   }
 
-  handleSlotChange(e) {
+  handleSlotChange(e: Event) {
     const tabs = Array.from(this.$tabset.children) as PgPartialTab[];
     const elements = this.$slot.assignedElements() as PgTab[];
     if (elements.length !== 0) {

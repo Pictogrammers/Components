@@ -1,3 +1,5 @@
+import { BOTTOM } from "./position";
+
 export function addTooltip($part, render, position?) {
   function handleMouseEnter() {
     $part.dispatchEvent(
@@ -6,7 +8,7 @@ export function addTooltip($part, render, position?) {
           visible: true,
           rect: $part.getBoundingClientRect(),
           text: render(),
-          position: position
+          position: position ?? BOTTOM
         },
         bubbles: true,
         composed: true

@@ -33,9 +33,11 @@ export default class XPgAvatarBasic extends HTMLElement {
   handleTooltip(e) {
     const { visible, rect, text, position } = e.detail;
     this.$tooltip.visible = visible;
-    this.$tooltip.rect = rect;
-    this.$tooltip.text = text;
-    this.$tooltip.position = position;
+    if (visible) {
+      this.$tooltip.rect = rect;
+      this.$tooltip.text = text;
+      this.$tooltip.position = position;
+    }
     e.stopPropagation();
   }
 }
