@@ -31,7 +31,7 @@ export default class PgTabs extends HTMLElement {
         return PgPartialTab;
       },
       // @ts-ignore
-      connect: ($tab, tab, $tabs) => {
+      connect: ($tab, tab, $tabs: PgPartialTab[]) => {
         $tab.addEventListener('select', (e: any) => {
           const { index } = e.detail;
           const elements = this.$slot.assignedElements() as PgTab[];
