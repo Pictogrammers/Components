@@ -38,9 +38,11 @@ export default class PgMenuIcon extends HTMLElement {
   @Part() $colorPicker: any;
   @Part() $colorHexRgb: any;
 
-  @Local() cachePngColor: string = '#000000';
-  @Local() cachePngSize: string = '24';
-  @Local() cacheSvgColor: string = '#000000';
+  @Local('store') store = new Map<string, any>([
+    ['cachePngColor', '#000000'],
+    ['cachePngSize', 24],
+    ['cacheSvgColor', '#000000']
+  ]);
 
   color = 'svg';
   @Prop() currentIndex: number = 0;
@@ -50,19 +52,19 @@ export default class PgMenuIcon extends HTMLElement {
     // Wire Up Context Menu
     this.$copyIconName.addEventListener('click', this.handleCopyIconName.bind(this));
     this.$svgBlack.addEventListener('click', () => {
-      this.cacheSvgColor = '#000000';
+      this.store.set('cacheSvgColor', '#000000');
       this.render();
     });
     this.$svgWhite.addEventListener('click', () => {
-      this.cacheSvgColor = '#FFFFFF';
+      this.store.set('cacheSvgColor', '#FFFFFF');
       this.render();
     });
     let preventSvgColor = false;
     this.$svgColor.addEventListener('click', () => {
       if (preventSvgColor) { preventSvgColor = false; return; }
       this.color = 'svg';
-      this.$colorPicker.value = this.cacheSvgColor;
-      this.$colorHexRgb.value = this.cacheSvgColor;
+      this.$colorPicker.value = this.store.get('cacheSvgColor');
+      this.$colorHexRgb.value = this.store.get('cacheSvgColor');
       const self = this;
       //createPopper(this.$svgColor, this.$color, {
       //  placement: 'bottom-start'
@@ -83,19 +85,19 @@ export default class PgMenuIcon extends HTMLElement {
       document.addEventListener('mousedown', handleMouseDown);
     });
     this.$pngBlack.addEventListener('click', () => {
-      this.cachePngColor = '#000000';
+      this.store.set('cachePngColor', '#000000');
       this.render();
     });
     this.$pngWhite.addEventListener('click', () => {
-      this.cachePngColor = '#FFFFFF';
+      this.store.set('cachePngColor', '#FFFFFF');
       this.render();
     });
     let preventPngColor = false;
     this.$pngColor.addEventListener('click', () => {
       if (preventPngColor) { preventPngColor = false; return; }
       this.color = 'png';
-      this.$colorPicker.value = this.cachePngColor;
-      this.$colorHexRgb.value = this.cachePngColor;
+      this.$colorPicker.value = this.store.get('cachePngColor');
+      this.$colorHexRgb.value = this.store.get('cachePngColor');
       const self = this;
       //createPopper(this.$pngColor, this.$color, {
       //  placement: 'bottom-start'
@@ -116,26 +118,26 @@ export default class PgMenuIcon extends HTMLElement {
       document.addEventListener('mousedown', handleMouseDown);
     });
     this.$png24.addEventListener('click', () => {
-      this.cachePngSize = '24';
+      this.store.set('cachePngSize', 24);
       this.render();
     });
     this.$png36.addEventListener('click', () => {
-      this.cachePngSize = '36';
+      this.store.set('cachePngSize', 36);
       this.render();
     });
     this.$png48.addEventListener('click', () => {
-      this.cachePngSize = '48';
+      this.store.set('cachePngSize', 48);
       this.render();
     });
     this.$png96.addEventListener('click', () => {
-      this.cachePngSize = '96';
+      this.store.set('cachePngSize', 96);
       this.render();
     });
     this.$svgDownload.addEventListener('click', () => {
-      alert(`SVG ${this.cacheSvgColor}`);
+      alert(`SVG ${this.store.get('cacheSvgColor')}`);
     });
     this.$pngDownload.addEventListener('click', () => {
-      alert(`SVG ${this.cachePngSize} ${this.cachePngColor}`);
+      alert(`SVG ${this.store.get('cachePngSize')} ${this.store.get('cachePngColor')}`);
     });
     this.$copySvgInline.addEventListener('click', () => {
       const icon = this.icon;
@@ -214,16 +216,19 @@ export default class PgMenuIcon extends HTMLElement {
 
   render() {
     // Context Menu
-    this.$svgBlack.classList.toggle('active', this.cacheSvgColor === '#000000');
-    this.$svgWhite.classList.toggle('active', this.cacheSvgColor === '#FFFFFF');
-    this.$svgColor.classList.toggle('active', this.cacheSvgColor !== '#000000' && this.cacheSvgColor !== '#FFFFFF');
-    this.$pngBlack.classList.toggle('active', this.cachePngColor === '#000000');
-    this.$pngWhite.classList.toggle('active', this.cachePngColor === '#FFFFFF');
-    this.$pngColor.classList.toggle('active', this.cachePngColor !== '#000000' && this.cachePngColor !== '#FFFFFF');
-    this.$png24.classList.toggle('active', this.cachePngSize === '24');
-    this.$png36.classList.toggle('active', this.cachePngSize === '36');
-    this.$png48.classList.toggle('active', this.cachePngSize === '48');
-    this.$png96.classList.toggle('active', this.cachePngSize === '96');
+    const cacheSvgColor = this.store.get('cacheSvgColor');
+    const cachePngColor = this.store.get('cachePngColor');
+    const cachePngSize = this.store.get('cachePngSize');
+    this.$svgBlack.classList.toggle('active', cacheSvgColor === '#000000');
+    this.$svgWhite.classList.toggle('active', cacheSvgColor === '#FFFFFF');
+    this.$svgColor.classList.toggle('active', cacheSvgColor !== '#000000' && cacheSvgColor !== '#FFFFFF');
+    this.$pngBlack.classList.toggle('active', cachePngColor === '#000000');
+    this.$pngWhite.classList.toggle('active', cachePngColor === '#FFFFFF');
+    this.$pngColor.classList.toggle('active', cachePngColor !== '#000000' && cachePngColor !== '#FFFFFF');
+    this.$png24.classList.toggle('active', cachePngSize === 24);
+    this.$png36.classList.toggle('active', cachePngSize === 36);
+    this.$png48.classList.toggle('active', cachePngSize === 48);
+    this.$png96.classList.toggle('active', cachePngSize === 96);
     this.$colorPicker.addEventListener('select', this.handleColorSelect.bind(this));
     this.$colorHexRgb.addEventListener('change', this.handleHexRgbChange.bind(this));
     this.syncEyedropper();
@@ -232,10 +237,10 @@ export default class PgMenuIcon extends HTMLElement {
   handleColorSelect(e) {
     switch(this.color) {
       case 'svg':
-        this.cacheSvgColor = e.detail.hex;
+        this.store.set('cacheSvgColor', e.detail.hex);
         break;
       case 'png':
-        this.cachePngColor = e.detail.hex;
+        this.store.set('cachePngColor', e.detail.hex);
         break;
     }
     this.$colorHexRgb.value = e.detail.hex;
@@ -245,10 +250,10 @@ export default class PgMenuIcon extends HTMLElement {
   handleHexRgbChange(e) {
     switch(this.color) {
       case 'svg':
-        this.cacheSvgColor = e.detail.hex;
+        this.store.set('cacheSvgColor', e.detail.hex);
         break;
       case 'png':
-        this.cachePngColor = e.detail.hex;
+        this.store.set('cachePngColor', e.detail.hex);
         break;
     }
     this.$colorPicker.value = e.detail.hex;
@@ -256,13 +261,15 @@ export default class PgMenuIcon extends HTMLElement {
   }
 
   syncEyedropper() {
-    if (this.cachePngColor !== '#000000' && this.cachePngColor !== '#FFFFFF') {
-      this.$pngColor.style.color = this.cachePngColor;
+    const cachePngColor = this.store.get('cachePngColor');
+    if (cachePngColor !== '#000000' && cachePngColor !== '#FFFFFF') {
+      this.$pngColor.style.color = cachePngColor;
     } else {
       this.$pngColor.style.color = 'transparent';
     }
-    if (this.cacheSvgColor !== '#000000' && this.cacheSvgColor !== '#FFFFFF') {
-      this.$svgColor.style.color = this.cacheSvgColor;
+    const cacheSvgColor = this.store.get('cacheSvgColor');
+    if (cacheSvgColor !== '#000000' && cacheSvgColor !== '#FFFFFF') {
+      this.$svgColor.style.color = cacheSvgColor;
     } else {
       this.$svgColor.style.color = 'transparent';
     }

@@ -3,7 +3,7 @@
 Out of all the components this is the most useful one as it controls the local cache of icon data. From a high level this component gives access to a `DatabaseService` instance.
 
 ```typescript
-import '@pictogrammers/components/pgAnnoy.js';
+import '@pictogrammers/components/pgDatabase.js';
 ```
 
 ## Usage

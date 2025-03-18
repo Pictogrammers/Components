@@ -44,6 +44,6 @@ Web Components with a very basic wrapper. The only magic is...
   - Calls `this.render()` on change.
 - `@Part() $foo: HTMLDivElement;` = `<div part="foo"></div>`
   - `this.$part.innerText = 'Hello World!';`
-- `@Local('default') foo;` Shorthand for localStorage.
+- `@Local('store') foo = Map([['key', true]]);` Shorthand for localStorage.
 
 Learn More: https://github.com/Pictogrammers/Element

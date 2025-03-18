@@ -1,4 +1,4 @@
-import { Component, Part, Prop } from '@pictogrammers/element';
+import { Component, Part } from '@pictogrammers/element';
 import PgButtonToggle from '../../buttonToggle';
 
 import template from './basic.html';
@@ -18,6 +18,6 @@ export default class XPgButtonToggleBasic extends HTMLElement {
 
   handleClick(e) {
     const { active } = e.detail;
-    this.$value.innerText = `${active}`;
+    this.$value.textContent = `${active}`;
   }
 }
