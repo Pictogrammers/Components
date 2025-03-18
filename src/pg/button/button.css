@@ -7,8 +7,8 @@
   align-items: center;
   align-content: center;
   font-family: var(--pg-font-family);
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font-size: var(--pg-button-font-size, 1rem);
+  line-height: var(--pg-button-line-height, 1.5rem);
   border: 1px solid var(--pg-button-border-color, #453C4F);
   background-color: var(--pg-button-background-color, #fff);
   color: var(--pg-button-color, #453C4F);

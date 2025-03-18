@@ -38,6 +38,9 @@ import PgButton from '@pictogrammers/components/pg/button';
 | `--pg-button-active-color` | `#fff`  | `active` Text color      |
 | `--pg-button-active-background-color` | `#453C4F`  | `active` Background color      |
 | `--pg-button-active-border-color` | `#453C4F`  | `active` Border color      |
+| `--pg-button-padding` | `0.25rem 0.5rem` | Padding. |
+| `--pg-button-font-size` | `1rem` | Font size. |
+| `--pg-button-line-height` | `1.5rem` | Line height. |
 
 ### Slots
 
