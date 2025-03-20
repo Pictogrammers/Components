@@ -16,7 +16,10 @@ export default class XPgOverlayMenuBasic extends HTMLElement {
     this.$button.addEventListener('click', this.#handleClick.bind(this));
   }
 
+  #menuOpen = false;
   async #handleClick() {
+    if (this.#menuOpen) { return; }
+    this.#menuOpen = true;
     const result = await PgOverlayMenu.open({
       source: this.$button,
       items: [{
@@ -29,5 +32,6 @@ export default class XPgOverlayMenuBasic extends HTMLElement {
       }]
     });
     console.log(result);
+    this.#menuOpen = false;
   }
 }
