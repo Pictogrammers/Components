@@ -35,4 +35,9 @@ export default class PgMenu extends HTMLElement {
     });
   }
 
+  focus() {
+    const first = this.$items.firstChild as HTMLElement;
+    first?.focus();
+  }
+
 }

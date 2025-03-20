@@ -16,7 +16,6 @@ export default class PgOverlayMenu extends PgOverlay {
 
   @Prop() source: HTMLElement | null = null;
   @Prop() items = [];
-  #uniqueId = 0;
 
   render(changes) {
     if (changes.items) {
@@ -34,10 +33,10 @@ export default class PgOverlayMenu extends PgOverlay {
       });
     }
     this.$overlay.addEventListener('toggle', this.#toggle.bind(this));
+    this.$menu.focus();
   }
 
   #toggle(e: ToggleEvent) {
-    console.log(e.newState);
     if (e.newState === 'closed') {
       this.close();
     }

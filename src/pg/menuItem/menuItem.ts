@@ -30,4 +30,8 @@ export default class PgMenuItem extends HTMLElement {
     })
   }
 
+  focus() {
+    this.$label.focus();
+  }
+
 }
