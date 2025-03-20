@@ -1,4 +1,5 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
+import PgMenu from '../../menu';
 
 import template from './basic.html';
 
@@ -7,5 +8,12 @@ import template from './basic.html';
   template
 })
 export default class XPgMenuBasic extends HTMLElement {
+  @Part() $menu: PgMenu;
 
+  connectedCallback() {
+    this.$menu.items = [{
+      label: 'Item 1',
+      value: 'item1'
+    }];
+  }
 }

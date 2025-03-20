@@ -11,12 +11,23 @@ const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
   template
 })
 export default class PgMenuItem extends HTMLElement {
+  @Prop() index: number;
   @Prop() label: string = '';
 
   @Part() $label: HTMLDivElement;
 
-  connectedCallback() {
+  render(changes) {
+    if (changes.label) {
+      this.$label.textContent = this.label;
+    }
+  }
 
+  connectedCallback() {
+    this.$label.addEventListener('click', () => {
+      this.dispatchEvent(new CustomEvent('select', {
+        detail: { index: this.index }
+      }));
+    })
   }
 
 }

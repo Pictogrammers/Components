@@ -1,4 +1,4 @@
-import { Component, Prop, Part } from '@pictogrammers/element';
+import { Component, Prop, Part, forEach } from '@pictogrammers/element';
 
 import template from './inputSelect.html';
 import style from './inputSelect.css';
@@ -20,18 +20,20 @@ export default class PgInputSelect extends HTMLElement {
 
   @Part() $select: HTMLSelectElement;
 
+  //cacheKeys: string[] = [];
+
   render(changes) {
-    if (changes.options) {
-      this.options.forEach(o => {
+    /*if (changes.options) {
+      this.options.forEach((o) => {
         const option = document.createElement('option');
-        option.innerText = o.label;
+        option.textContent = o.label;
         option.value = o.value;
         this.$select.appendChild(option);
       });
       if (this.$select.value !== this.value) {
         this.$select.value = this.value;
       }
-    }
+    }*/
     if (changes.value) {
       if (this.$select.value !== this.value) {
         this.$select.value = this.value;
@@ -40,6 +42,13 @@ export default class PgInputSelect extends HTMLElement {
   }
 
   connectedCallback() {
+    forEach({
+      container: this.$select,
+      items: this.options,
+      type: () => {
+        return HTMLOptionElement;
+      }
+    })
     this.$select.addEventListener('change', this.handleSelect.bind(this));
   }
 

@@ -12,6 +12,7 @@ const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
   template
 })
 export default class PgMenu extends HTMLElement {
+
   @Prop() items: any[] = [];
 
   @Part() $items: HTMLDivElement;
@@ -22,6 +23,14 @@ export default class PgMenu extends HTMLElement {
       items: this.items,
       type: (item) => {
         return PgMenuItem;
+      },
+      create: ($item) => {
+        $item.addEventListener('select', (e: any) => {
+          const { index } = e.detail;
+          this.dispatchEvent(new CustomEvent('select', {
+            detail: { index }
+          }))
+        });
       }
     });
   }
