@@ -24,24 +24,29 @@ export default class PgOverlayMenu extends PgOverlay {
     }
   }
 
-  #handleMouseDown;
   connectedCallback() {
-    this.#handleMouseDown = (e: any) => {
-      if (e.target !== this) {
-        this.close();
-      }
-    };
-    document.addEventListener('mousedown', this.#handleMouseDown);
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
-    this.$overlay.id = `overlayMenu${this.#uniqueId++}`;
+    this.$overlay.popover = 'auto';
+    if (this.source !== null) {
+      // @ts-ignore
+      this.$overlay.showPopover({
+        source: this.source
+      });
+    }
+    this.$overlay.addEventListener('toggle', this.#toggle.bind(this));
+  }
+
+  #toggle(e: ToggleEvent) {
+    console.log(e.newState);
+    if (e.newState === 'closed') {
+      this.close();
+    }
   }
 
   disconnectedCallback() {
-    document.removeEventListener('mousedown', this.#handleMouseDown);
   }
 
   #handleSelect(e: any) {
     this.close(e.detail.index);
-    this.source?.focus();
   }
 }
