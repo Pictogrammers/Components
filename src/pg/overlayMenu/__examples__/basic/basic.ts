@@ -11,6 +11,7 @@ import style from './basic.css';
 })
 export default class XPgOverlayMenuBasic extends HTMLElement {
   @Part() $button: HTMLButtonElement;
+  @Part() $result: HTMLSpanElement;
 
   connectedCallback() {
     this.$button.addEventListener('click', this.#handleClick.bind(this));
@@ -31,7 +32,7 @@ export default class XPgOverlayMenuBasic extends HTMLElement {
         value: 'item2'
       }]
     });
-    console.log(result);
+    this.$result.textContent = result;
     this.#menuOpen = false;
   }
 }

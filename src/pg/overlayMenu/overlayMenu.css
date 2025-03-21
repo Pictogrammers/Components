@@ -8,4 +8,5 @@
   min-width: anchor-size();
   padding: 0;
   border: 0;
+  position-try-fallbacks: flip-block;
 }

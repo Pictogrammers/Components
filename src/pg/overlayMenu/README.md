@@ -3,6 +3,8 @@
 The `PgOverlayMenu` creates a menu.
 
 ```typescript
+if (this.#isOpen) { return; }
+this.#isOpen = true;
 const result = await PgOverlayMenu.open({
   source: this.$element,
   items: [{
@@ -13,4 +15,5 @@ const result = await PgOverlayMenu.open({
     value: 'item2'
   }]
 });
+console.log(result);
 ```

@@ -1,15 +1,15 @@
 # `<pg-menu>`
 
-The `pg-menu` component renders a menu list.
+The `pg-menu-item` is usually rendered as a child of the `pg-menu`.
 
 ```typescript
-import '@pictogrammers/components/pgMenu.js';
+import '@pictogrammers/components/pgMenuItem.js';
 ```
 
 ```html
-<pg-menu></pg-menu>
+<pg-menu-item></pg-menu-item>
 ```
 
 | Attributes | Tested   | Description |
 | ---------- | -------- | ----------- |
-| `items`    |          | Set items list. |
+| `label`    |          | Item label. |

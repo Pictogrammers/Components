@@ -22,13 +22,13 @@ export default class PgMenu extends HTMLElement {
       container: this.$items,
       items: this.items,
       type: (item) => {
-        return PgMenuItem;
+        return item.type ?? PgMenuItem;
       },
-      create: ($item) => {
+      create: ($item, item) => {
         $item.addEventListener('select', (e: any) => {
           const { index } = e.detail;
           this.dispatchEvent(new CustomEvent('select', {
-            detail: { index }
+            detail: { index, item }
           }))
         });
       }
