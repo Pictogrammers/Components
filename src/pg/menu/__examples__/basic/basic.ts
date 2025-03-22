@@ -9,11 +9,21 @@ import template from './basic.html';
 })
 export default class XPgMenuBasic extends HTMLElement {
   @Part() $menu: PgMenu;
+  @Part() $result: HTMLSpanElement;
 
   connectedCallback() {
     this.$menu.items = [{
       label: 'Item 1',
       value: 'item1'
+    },
+    {
+      label: 'Item 2',
+      value: 'item2'
     }];
+    this.$menu.addEventListener('select', this.#handleSelect.bind(this));
+  }
+
+  #handleSelect(e: any) {
+    this.$result.textContent = JSON.stringify(e.detail);
   }
 }
