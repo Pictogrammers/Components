@@ -3,14 +3,25 @@
 }
 
 [part=label] {
+  font-family: var(--pg-font-family);
   text-align: var(--pg-menu-item-text-align, left);
-  background: var(--pg-menu-item-background, #FFFFFF);
+  background: var(--pg-menu-item-background, transparent);
   padding: var(--pg-menu-padding, 0.25rem 0.5rem);
-  border-color: #453C4F;
-  border-width: 1px;
+  border-color: transparent;
+  border-width: 0;
   border-style: solid;
-  border-top-left-radius: var(--pg-menu-item-border-radius-top, 0);
-  border-top-right-radius: var(--pg-menu-item-border-radius-top, 0);
-  border-bottom-left-radius: var(--pg-menu-item-border-radius-bottom, 0);
-  border-bottom-right-radius: var(--pg-menu-item-border-radius-bottom, 0);
+  border-top-left-radius: var(--pg-menu-item-border-radius-top, 0.25rem);
+  border-top-right-radius: var(--pg-menu-item-border-radius-top, 0.25rem);
+  border-bottom-left-radius: var(--pg-menu-item-border-radius-bottom, 0.25rem);
+  border-bottom-right-radius: var(--pg-menu-item-border-radius-bottom, 0.25rem);
+  color: var(--pg-menu-item-color, #FFFFFF);
+}
+
+[part=label]:hover {
+  background: #248BE5;
+  color: #FFFFFF;
+}
+
+[part=label]:active {
+  background: #2B9CFF;
 }

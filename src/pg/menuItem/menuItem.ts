@@ -34,4 +34,8 @@ export default class PgMenuItem extends HTMLElement {
     this.$label.focus();
   }
 
+  getHeight(): number {
+    return this.$label.getBoundingClientRect().height;
+  }
+
 }

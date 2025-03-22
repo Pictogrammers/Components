@@ -5,16 +5,9 @@
 [part=items] {
   display: flex;
   flex-direction: column;
-  padding: var(--pg-menu-padding, 0);
+  padding: var(--pg-menu-padding, 0.25rem);
   border-width: var(--pg-menu-border-width, 0);
   border-style: solid;
-  border-radius: 0.25rem;
-}
-
-[part=items] > *:first-child {
-  --pg-menu-item-border-radius-top: var(--pg-menu-border-radius, 0.25rem);
-}
-
-[part=items] > *:last-child {
-  --pg-menu-item-border-radius-bottom: var(--pg-menu-border-radius, 0.25rem);
+  border-radius: 0.5rem;
+  background-color: var(--pg-menu-background-color, #1E1E1E);
 }

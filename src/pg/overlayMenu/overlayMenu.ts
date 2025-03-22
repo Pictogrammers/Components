@@ -15,7 +15,8 @@ export default class PgOverlayMenu extends PgOverlay {
   @Part() $menu: PgMenu;
 
   @Prop() source: HTMLElement | null = null;
-  @Prop() items = [];
+  @Prop() items: any[] = [];
+  @Prop() value: any = null;
 
   render(changes) {
     if (changes.items) {
@@ -33,7 +34,23 @@ export default class PgOverlayMenu extends PgOverlay {
       });
     }
     this.$overlay.addEventListener('toggle', this.#toggle.bind(this));
-    this.$menu.focus();
+    // Position (replace with css once Firefox supports it)
+    const rect = this.source?.getBoundingClientRect();
+    let x = rect?.left ?? 0, y = rect?.top ?? 0;
+    const value = this.value === null || typeof this.value !== 'object'
+      ? this.value
+      : this.value.value;
+    // value is an item in the items list
+    const index = this.value === null
+      ? -1
+      : this.items.findIndex(x => x.value === value);
+    if (index !== -1) {
+      // Overlap item
+      y -= this.$menu.getItemHeight(0, index);
+    }
+    this.$overlay.style.translate = `${x}px ${y}px`;
+    // Focus
+    this.$menu.focus(index);
   }
 
   #toggle(e: ToggleEvent) {
@@ -46,6 +63,7 @@ export default class PgOverlayMenu extends PgOverlay {
   }
 
   #handleSelect(e: any) {
-    this.close(e.detail.index);
+    e.detail.item.index = e.detail.index;
+    this.close(e.detail.item);
   }
 }

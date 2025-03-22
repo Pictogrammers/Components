@@ -3,10 +3,8 @@
 }
 
 [part="overlay"] {
-  position-area: end center;
   margin: 0;
-  min-width: anchor-size();
   padding: 0;
   border: 0;
-  position-try-fallbacks: flip-block;
+  background: transparent;
 }
