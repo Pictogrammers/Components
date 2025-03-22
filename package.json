@@ -17,7 +17,6 @@
     "url": "git+https://github.com/Templarian/MaterialDesign-Web-Component.git"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.5",
     "@types/js-yaml": "^4.0.5",
     "dexie": "^3.2.1",
     "js-yaml": "^4.1.0",

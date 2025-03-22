@@ -1,7 +1,6 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 import PgButton from '../button/button';
 import PgGrid from '../grid/grid';
-import { createPopper } from '@popperjs/core';
 
 import template from './picker.html';
 import style from './picker.css';
@@ -24,24 +23,7 @@ export default class PgPicker extends HTMLElement { // extends PgButton = bug in
 
   isVisible = false;
   connectedCallback() {
-    /*createPopper(this.$button, this.$popover, {
-      placement: 'bottom-start',
-      modifiers: [
-        {
-          name: 'offset',
-          options: {
-            offset: [-4, 8],
-          },
-        },
-        {
-          name: 'arrow',
-          options: {
-            element: this.$arrow,
-            padding: 0,
-          },
-        },
-      ]
-    });
+    /*
     this.$popover.style.visibility = 'hidden';
     this.$button.addEventListener('click', () => {
       this.$popover.style.visibility = this.isVisible ? 'hidden' : 'visible';

@@ -1,5 +1,4 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
-import { createPopper } from '@popperjs/core';
 
 import template from './dropdown.html';
 import style from './dropdown.css';
@@ -28,24 +27,6 @@ export default class PgDropdown extends HTMLElement {
   }
 
   wireUpPopover(node) {
-    createPopper(node, this.$popover, {
-      placement: 'bottom-start',
-      modifiers: [
-        {
-          name: 'offset',
-          options: {
-            offset: [-4, 8],
-          },
-        },
-        {
-          name: 'arrow',
-          options: {
-            element: this.$arrow,
-            padding: 0,
-          },
-        },
-      ]
-    });
     this.$popover.style.visibility = 'hidden';
     node.addEventListener('click', (e) => {
       this.$popover.style.visibility = this.isVisible ? 'hidden' : 'visible';

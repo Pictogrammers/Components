@@ -10,4 +10,5 @@
   border-style: solid;
   border-radius: 0.5rem;
   background-color: var(--pg-menu-background-color, #1E1E1E);
+  box-shadow: var(--pg-menu-box-shadow, none);
 }

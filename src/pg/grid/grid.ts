@@ -1,5 +1,4 @@
 import { Component, Prop, Part, Local } from '@pictogrammers/element';
-// import { createPopper } from '@popperjs/core';
 import { debounce, } from '../shared/debounce';
 import PgScroll from '../scroll/scroll';
 
