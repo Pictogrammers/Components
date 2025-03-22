@@ -13,12 +13,20 @@ const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
 export default class PgMenuItem extends HTMLElement {
   @Prop() index: number;
   @Prop() label: string = '';
+  @Prop() checked: boolean = false;
+  @Prop() disabled: boolean = false;
 
-  @Part() $label: HTMLDivElement;
+  @Part() $label: HTMLButtonElement;
 
   render(changes) {
     if (changes.label) {
       this.$label.textContent = this.label;
+    }
+    if (changes.disabled) {
+      this.$label.disabled = this.disabled;
+    }
+    if (changes.checked) {
+      this.$label.classList.toggle('checked', this.checked);
     }
   }
 

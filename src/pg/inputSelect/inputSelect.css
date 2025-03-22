@@ -4,6 +4,7 @@
 
 [part=button] {
   font-family: var(--pg-font-family);
+  background: var(--pg-input-select-background, #FFFFFF);
   text-align: left;
   display: grid;
   grid-template-rows: auto;

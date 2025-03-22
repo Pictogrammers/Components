@@ -18,6 +18,7 @@ export default class PgInputSelect extends HTMLElement {
   @Prop() options: InputSelectItem[] = [];
   @Prop() value: string = '';
   @Prop() name: string = '';
+  @Prop() default: any = null;
 
   @Part() $button: HTMLButtonElement;
   @Part() $label: HTMLSpanElement;
@@ -27,8 +28,12 @@ export default class PgInputSelect extends HTMLElement {
   }
 
   render(changes) {
-    if (changes.value) {
-      this.$label.textContent = this.value ? this.value : '\u00A0';
+    if (changes.value || changes.default) {
+      this.$label.textContent = this.value
+        ? this.value
+        : this.default
+          ? this.default.label
+          : '\u00A0'; // nbsp
     }
   }
 
@@ -38,6 +43,7 @@ export default class PgInputSelect extends HTMLElement {
     this.#menuOpen = true;
     const result = await PgOverlayMenu.open({
       source: this.$button,
+      default: this.default,
       value: this.options.find(x => x.value === this.value) ?? null,
       items: this.options
     });

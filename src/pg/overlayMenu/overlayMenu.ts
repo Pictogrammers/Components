@@ -15,11 +15,16 @@ export default class PgOverlayMenu extends PgOverlay {
   @Part() $menu: PgMenu;
 
   @Prop() source: HTMLElement | null = null;
+  @Prop() default: any = null;
   @Prop() items: any[] = [];
   @Prop() value: any = null;
 
   render(changes) {
     if (changes.items) {
+      if (this.value !== null) {
+        this.items.forEach(item => item.checked = false);
+        this.items.find(item => item.value === this.value.value).checked = true;
+      }
       this.$menu.items = this.items;
     }
   }
@@ -53,6 +58,12 @@ export default class PgOverlayMenu extends PgOverlay {
         y += (rect.height - height) / 2;
       }
     } else if (this.items.length > 0) {
+      // insert default if defined
+      if (this.default) {
+        this.default.checked = true;
+        this.$menu.items.unshift(this.default);
+      }
+      // focus first item
       const height = this.$menu.getItemHeight(0);
       y -= this.$menu.getItemOffset(0, 0);
       if (rect?.height !== height && rect?.height) {

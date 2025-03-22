@@ -19,6 +19,7 @@ export default class XPgInputSelectBasic extends HTMLElement {
       { label: 'Option 3', value: 'option3' },
       { label: 'Option 4', value: 'option4' }
     );
+    this.$input.default = { label: 'None', value: '', disabled: true };
     //this.$input.value = this.$input.options[1].value;
     this.$input.addEventListener('change', this.#handleChange.bind(this));
   }

@@ -1,4 +1,5 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
+import PgMenuItem from '../../menuItem';
 
 import template from './basic.html';
 
@@ -7,5 +8,5 @@ import template from './basic.html';
   template
 })
 export default class XPgMenuItemBasic extends HTMLElement {
-
+  @Part() $item: PgMenuItem;
 }
