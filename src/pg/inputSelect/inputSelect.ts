@@ -1,4 +1,5 @@
 import { Component, Prop, Part, forEach } from '@pictogrammers/element';
+import PgOverlayMenu from '../overlayMenu/overlayMenu';
 
 import template from './inputSelect.html';
 import style from './inputSelect.css';
@@ -18,49 +19,36 @@ export default class PgInputSelect extends HTMLElement {
   @Prop() value: string = '';
   @Prop() name: string = '';
 
-  @Part() $select: HTMLSelectElement;
+  @Part() $button: HTMLButtonElement;
+  @Part() $label: HTMLSpanElement;
 
-  //cacheKeys: string[] = [];
+  connectedCallback() {
+    this.$button.addEventListener('click', this.#handleClick.bind(this));
+  }
 
   render(changes) {
-    /*if (changes.options) {
-      this.options.forEach((o) => {
-        const option = document.createElement('option');
-        option.textContent = o.label;
-        option.value = o.value;
-        this.$select.appendChild(option);
-      });
-      if (this.$select.value !== this.value) {
-        this.$select.value = this.value;
-      }
-    }*/
     if (changes.value) {
-      if (this.$select.value !== this.value) {
-        this.$select.value = this.value;
-      }
+      this.$label.textContent = this.value ? this.value : '\u00A0';
     }
   }
 
-  connectedCallback() {
-    forEach({
-      container: this.$select,
-      items: this.options,
-      type: () => {
-        return HTMLOptionElement;
-      }
-    })
-    this.$select.addEventListener('change', this.handleSelect.bind(this));
-  }
-
-  handleSelect(e) {
-    const { value } = e.target;
-    this.dispatchEvent(
-      new CustomEvent('change', {
+  #menuOpen = false;
+  async #handleClick() {
+    if (this.#menuOpen) { return; }
+    this.#menuOpen = true;
+    const result = await PgOverlayMenu.open({
+      source: this.$button,
+      value: this.options.find(x => x.value === this.value) ?? null,
+      items: this.options
+    });
+    if (result !== undefined) {
+      this.dispatchEvent(new CustomEvent('change', {
         detail: {
-          value,
-          name: this.name
+          value: result.value
         }
-      })
-    )
+      }));
+      this.$label.textContent = result.label;
+    }
+    this.#menuOpen = false;
   }
 }

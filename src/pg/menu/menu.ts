@@ -45,7 +45,7 @@ export default class PgMenu extends HTMLElement {
    * @param startIndex Start index.
    * @param endIndex End index.
    */
-  getItemHeight(startIndex, endIndex): number {
+  getItemOffset(startIndex, endIndex): number {
     const computedStyle = getComputedStyle(this.$items);
     let height = parseInt(computedStyle.getPropertyValue('padding-top'), 10);
     const total = this.$items.children.length;
@@ -57,6 +57,11 @@ export default class PgMenu extends HTMLElement {
       height += ele.getHeight();
     }
     return height;
+  }
+
+  getItemHeight(index) {
+    const ele = this.$items.children[index] as any;
+    return ele.getHeight();
   }
 
 }

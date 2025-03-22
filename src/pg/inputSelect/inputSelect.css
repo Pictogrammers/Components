@@ -1,31 +1,32 @@
 :host {
-  display: block;
-  font-family: var(--pg-font-family);
+  display: contents;
 }
 
-[part="wrapper"] {
+[part=button] {
+  font-family: var(--pg-font-family);
+  text-align: left;
   display: grid;
   grid-template-rows: auto;
   grid-template-columns: 100% 0;
-}
-
-[part="select"] {
-  grid-row: 1;
-  grid-column: 1;
   border: 1px solid var(--pg-input-select-border-color, #453C4F);
   border-radius: 0.25rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0;
   width: 100%;
   font-size: 1rem;
   outline: 0;
-  -webkit-appearance: none;
 }
 
-[part="select"]:focus {
+[part=button]:focus {
   box-shadow: 0 0 0 3px rgba(79, 143, 249, 0.5);
 }
 
-[part="chevron"] {
+[part=label] {
+  grid-row: 1;
+  grid-column: 1;
+  padding: 0.5rem 0.75rem;
+}
+
+[part=chevron] {
   grid-row: 1;
   grid-column: 2;
   pointer-events: none;
