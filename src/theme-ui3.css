@@ -14,4 +14,12 @@
   --pg-button-hover-background-color: #453C4F;
   --pg-button-hover-color: #FFFFFF;
   --pg-button-hover-color: #FFFFFF;
+  /* Menu */
+  --pg-menu-padding: 0.25rem;
+  --pg-menu-border-width: 0;
+  --pg-menu-border-color: transparent;
+  /* Menu Item */
+  --pg-menu-item-color: #FFFFFF;
+  --pg-menu-item-background: transparent;
+  --pg-menu-item-selected-background: #248BE5;
 }

@@ -16,12 +16,11 @@
   border-top-right-radius: var(--pg-menu-item-border-radius-top, 0.25rem);
   border-bottom-left-radius: var(--pg-menu-item-border-radius-bottom, 0.25rem);
   border-bottom-right-radius: var(--pg-menu-item-border-radius-bottom, 0.25rem);
-  color: var(--pg-menu-item-color, #FFFFFF);
+  color: var(--pg-menu-item-color, #453C4F);
 }
 
-[part=label]:not(:disabled):hover
-/*[part=label]:not(:disabled):focus*/ {
-  background: #248BE5;
+[part=label]:not(:disabled):hover {
+  background: var(--pg-menu-item-selected-background, #453C4F);
   color: #FFFFFF;
 }
 

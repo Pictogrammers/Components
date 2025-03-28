@@ -6,9 +6,10 @@
   display: flex;
   flex-direction: column;
   padding: var(--pg-menu-padding, 0.25rem);
-  border-width: var(--pg-menu-border-width, 0);
+  border-width: var(--pg-menu-border-width, 1px);
+  border-color: var(--pg-menu-border-color, #453C4F);
   border-style: solid;
   border-radius: 0.5rem;
-  background-color: var(--pg-menu-background-color, #1E1E1E);
+  background-color: var(--pg-menu-background-color, #FFFFFF);
   box-shadow: var(--pg-menu-box-shadow, none);
 }
