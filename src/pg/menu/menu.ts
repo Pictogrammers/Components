@@ -29,7 +29,25 @@ export default class PgMenu extends HTMLElement {
           const { index } = e.detail;
           this.dispatchEvent(new CustomEvent('select', {
             detail: { index, item }
-          }))
+          }));
+        });
+        $item.addEventListener('up', (e: any) => {
+          const { index } = e.detail;
+          let first = this.items[0].disabled ? 1 : 0;
+          if (index === first) {
+            this.focus(this.items.length - 1);
+          } else {
+            this.focus(index - 1);
+          }
+        });
+        $item.addEventListener('down', (e: any) => {
+          const { index } = e.detail;
+          if (index === this.items.length - 1) {
+            let first = this.items[0].disabled ? 1 : 0;
+            this.focus(first);
+          } else {
+            this.focus(index + 1);
+          }
         });
       }
     });
@@ -51,9 +69,9 @@ export default class PgMenu extends HTMLElement {
   getItemOffset(startIndex, endIndex): number {
     const computedStyle = getComputedStyle(this.$items);
     let height = parseInt(computedStyle.getPropertyValue('padding-top'), 10);
-    const total = this.$items.children.length;
+    const total = this.items.length;
     if (startIndex > total || endIndex > total) {
-      throw new Error('startIndex or endIndex out of bounds');
+      throw new Error('startIndex or endIndex not within range of items');
     }
     for (let i = startIndex; i < endIndex; i++) {
       const ele = this.$items.children[i] as any;
@@ -62,7 +80,15 @@ export default class PgMenu extends HTMLElement {
     return height;
   }
 
+  /**
+   * Get the height of an individiaual item.
+   * @param index Item index
+   * @returns {number} Item height
+   */
   getItemHeight(index) {
+    if (index > this.items.length) {
+      throw new Error('index outside range of items');
+    }
     const ele = this.$items.children[index] as any;
     return ele.getHeight();
   }

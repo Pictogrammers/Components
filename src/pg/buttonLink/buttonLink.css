@@ -46,7 +46,7 @@
   bottom: -1px;
   left: -1px;
   border-radius: 0.25rem;
-  box-shadow: 0 0 0 3px var(--pg-search-focus-glow, rgb(79, 143, 249, 0.6));
+  box-shadow: 0 0 0 3px var(--pg-focus-color, rgb(79, 143, 249, 0.6));
 }
 [part="button"]:focus::before {
   pointer-events: none;
@@ -57,7 +57,7 @@
   bottom: -1px;
   left: -1px;
   border-radius: 0.25rem;
-  box-shadow: 0 0 0 3px var(--pg-search-focus-glow, rgb(79, 143, 249, 0.5));
+  box-shadow: 0 0 0 3px var(--pg-focus-color, rgb(79, 143, 249, 0.5));
 }
 
 [part="button"].start {

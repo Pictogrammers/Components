@@ -12,6 +12,7 @@ import style from './basic.css';
 export default class XPgOverlayMenuBasic extends HTMLElement {
   @Part() $button: HTMLButtonElement;
   @Part() $result: HTMLSpanElement;
+  @Part() $input: HTMLSpanElement;
 
   connectedCallback() {
     this.$button.addEventListener('click', this.#handleClick.bind(this));
@@ -34,7 +35,10 @@ export default class XPgOverlayMenuBasic extends HTMLElement {
     const result = await PgOverlayMenu.open({
       source: this.$button,
       value: this.#value,
-      items
+      items,
+      oninput: (value) => {
+        this.$input.textContent = value;
+      }
     });
     if (result !== undefined) {
       this.#value = result;

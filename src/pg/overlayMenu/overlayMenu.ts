@@ -78,6 +78,7 @@ export default class PgOverlayMenu extends PgOverlay {
   #toggle(e: ToggleEvent) {
     if (e.newState === 'closed') {
       this.close();
+      this.source?.focus();
     }
   }
 
@@ -87,5 +88,6 @@ export default class PgOverlayMenu extends PgOverlay {
   #handleSelect(e: any) {
     e.detail.item.index = e.detail.index;
     this.close(e.detail.item);
+    this.source?.focus();
   }
 }

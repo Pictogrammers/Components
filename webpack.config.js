@@ -14,7 +14,8 @@ export default config({
   },
   watch: [],
   copy: [
-    { from: "api/", to: `api/` }
+    { from: "api/", to: `api/` },
+    { from: "src/theme-ui3.css", to: `theme-ui3.css` }
   ],
   before: (components, args, mode) => {
     // Components + GreenText(# of Components)

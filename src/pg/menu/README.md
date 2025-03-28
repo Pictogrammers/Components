@@ -28,3 +28,12 @@ connectedCallback() {
   }];
 }
 ```
+
+## CSS Variables
+
+| Variable | Default |
+| -------- | ------- |
+| `--pg-menu-padding` | `0.25rem` |
+| `--pg-menu-border-width` | `0` |
+| `--pg-menu-background-color` | `transparent` |
+| `--pg-menu-box-shadow` | `none` |

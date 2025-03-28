@@ -35,7 +35,21 @@ export default class PgMenuItem extends HTMLElement {
       this.dispatchEvent(new CustomEvent('select', {
         detail: { index: this.index }
       }));
-    })
+    });
+    this.$label.addEventListener('keydown', (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowDown':
+          this.dispatchEvent(new CustomEvent('down', {
+            detail: { index: this.index }
+          }));
+          break;
+        case 'ArrowUp':
+          this.dispatchEvent(new CustomEvent('up', {
+            detail: { index: this.index }
+          }));
+          break;
+      }
+    });
   }
 
   focus() {
