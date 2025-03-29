@@ -49,11 +49,11 @@
   content: var(--pg-menu-item-disabled-check, url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M 17.5,10.2501L 10.5,17.25L 6.5,13.25L 7.9,11.8L 10.5,14.4L 16.0857,8.8L 17.5,10.25Z' fill='rgb(69, 60, 79, 0.5)' /></svg>"));
 }
 
-[part=label]:focus {
+[part=label]:focus-visible {
   position: relative;
 }
 
-[part=label]:focus::after {
+[part=label]:focus-visible::after {
   pointer-events: none;
   content: '';
   position: absolute;
@@ -65,6 +65,6 @@
   box-shadow: 0 0 0 3px var(--pg-focus-color, rgb(79, 143, 249, 0.5));
 }
 
-[part=label]:focus:not(:hover)::after {
+[part=label]:focus-visible:not(:hover)::after {
   background: var(--pg-focus-background-color, rgb(79, 143, 249, 0.1));
 }
