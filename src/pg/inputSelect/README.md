@@ -4,7 +4,7 @@ The `pg-input-select` component creates an select drop down.
 
 ```typescript
 import '@pictogrammers/components/pgInputSelect';
-import { PgInputSelect } '@mdi/components/pgInputSelect';
+import { PgInputSelect } '@pictogrammers/components/pgInputSelect';
 ```
 
 ```html
