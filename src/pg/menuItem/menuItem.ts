@@ -42,11 +42,13 @@ export default class PgMenuItem extends HTMLElement {
           this.dispatchEvent(new CustomEvent('down', {
             detail: { index: this.index }
           }));
+          e.preventDefault();
           break;
         case 'ArrowUp':
           this.dispatchEvent(new CustomEvent('up', {
             detail: { index: this.index }
           }));
+          e.preventDefault();
           break;
       }
     });
