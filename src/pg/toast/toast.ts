@@ -1,16 +1,18 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 import { uuid } from '../shared/uuid';
-import { removeToast } from '../shared/toast';
 
 import template from './toast.html';
 import style from './toast.css';
+import PgOverlay from '../overlay/overlay';
+
+const toasts = [];
 
 @Component({
   selector: 'pg-toast',
   style,
   template
 })
-export default class PgToast extends HTMLElement {
+export default class PgToast extends PgOverlay {
   @Prop() loading: boolean = false;
   @Prop() message: string = '';
   @Prop() type: string = 'default';
@@ -22,11 +24,23 @@ export default class PgToast extends HTMLElement {
   @Part() $message: HTMLSpanElement;
   @Part() $loading: HTMLSpanElement;
 
+  static open(props: any = {}): Promise<any> {
+    // ToDo: validate props
+    super.open(props);
+    const key = uuid();
+    return Promise.resolve(function (config?: any) {
+      const scopedKey = key;
+      if (config === undefined) {
+        this.toasts.find(t => t.key === scopedKey).remove();
+      }
+    });
+  }
+
   toasts: any[] = [];
 
   connectedCallback() {
     this.$button.addEventListener('click', () => {
-      removeToast(this.key);
+
     });
   }
 
