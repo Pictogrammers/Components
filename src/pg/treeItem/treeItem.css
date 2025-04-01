@@ -6,43 +6,66 @@
   display: none !important;
 }
 
-[part="button"] {
+[part=iconButton] {
   display: flex;
   background: transparent;
   border: 0;
-  color: #FFF;
+  color: var(--pg-tree-item-color, #453C4F);
   padding: 0;
-  --pg-icon-color: #FFF;
+  --pg-icon-color: var(--pg-tree-item-color, #453C4F);
+  align-items: center;
+  font-family: var(--pg-font-family);
+  font-size: var(--pg-tree-item-font-size, 1rem);
+}
+[part=labelButton] {
+  display: flex;
+  background: transparent;
+  border: 0;
+  color: var(--pg-tree-item-color, #453C4F);
+  padding: 0;
+  --pg-icon-color: var(--pg-tree-item-color, #453C4F);
   flex: 1;
-  align-items: center
+  align-items: center;
+  font-family: var(--pg-font-family);
+  font-size: var(--pg-tree-item-font-size, 1rem);
 }
 
-[part="input"] {
+[part=input] {
   flex: 1;
   outline: 0;
-  padding: 0.125rem 0.25rem;
-  border: 0;
+  padding: 0.25em 0.5rem;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--pg-tree-item-border-color, #453C4F);
 }
 
-[part="item"] {
+[part=item] {
   display: flex;
   background: var(--pg-tree-item-background, transparent);
   border-radius: 0.25rem;
+  padding: 0.25rem;
+  gap: 0.5rem;
 }
 
-[part="item"]:hover {
-  background: var(--pg-tree-item-background-hover, #383838);
+[part=item]:hover {
+  background: var(--pg-tree-item-background-hover, #453C4F);
+}
+[part=item]:hover [part=labelButton] {
+  --pg-icon-color: var(--pg-tree-item-color-hover, #FFF);
+}
+[part=item]:hover [part=label] {
+  color: var(--pg-tree-item-color-hover, #FFFFFF);
 }
 
-[part="item"].selected {
-  background: var(--pg-tree-item-background-selected, #4B5876)
+[part=item].selected {
+  background: var(--pg-tree-item-background-selected, #453C4F);
 }
 
-[part="actions"] {
+[part=actions] {
   display: flex;
 }
 
-[part="items"] {
+[part=items] {
   display: flex;
   flex-direction: column;
   padding-left: 1rem;

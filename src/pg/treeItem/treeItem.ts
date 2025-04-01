@@ -23,16 +23,17 @@ export default class PgTreeItem extends HTMLElement {
 
   @Part() $item: HTMLDivElement;
   @Part() $input: HTMLInputElement;
-  @Part() $button: HTMLButtonElement;
+  @Part() $iconButton: HTMLButtonElement;
   @Part() $icon: PgIcon;
   @Part() $label: HTMLDivElement;
+  @Part() $labelButton: HTMLButtonElement;
   @Part() $actions: HTMLDivElement;
   @Part() $items: HTMLDivElement;
 
   connectedCallback() {
     this.$item.addEventListener('action', this.#handleAction.bind(this));
-    this.$button.addEventListener('dblclick', this.#handleDoubleClick.bind(this));
-    this.$button.addEventListener('click', this.#handleClick.bind(this));
+    this.$labelButton.addEventListener('dblclick', this.#handleDoubleClick.bind(this));
+    this.$labelButton.addEventListener('click', this.#handleClick.bind(this));
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
     this.$input.addEventListener('keydown', this.#handleKeyDown.bind(this));
@@ -114,7 +115,7 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleDoubleClick(e) {
-    this.$button.classList.add('hide');
+    this.$labelButton.classList.add('hide');
     this.$actions.classList.add('hide');
     this.$input.classList.remove('hide');
     this.$input.value = this.label;
@@ -123,10 +124,10 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleBlur() {
-    this.$button.classList.remove('hide');
+    this.$labelButton.classList.remove('hide');
     this.$actions.classList.remove('hide');
     this.$input.classList.add('hide');
-    this.$button.focus();
+    this.$labelButton.focus();
     this.dispatchEvent(new CustomEvent('rename', {
       bubbles: true,
       composed: true,
@@ -143,11 +144,11 @@ export default class PgTreeItem extends HTMLElement {
         this.#handleBlur();
         break;
       case 'Escape':
-        this.$button.classList.remove('hide');
+        this.$labelButton.classList.remove('hide');
         this.$actions.classList.remove('hide');
         this.$input.classList.add('hide');
         this.$input.value = this.label;
-        this.$button.focus();
+        this.$labelButton.focus();
         break;
       case 'ArrowUp':
         this.dispatchEvent(new CustomEvent('up', {
