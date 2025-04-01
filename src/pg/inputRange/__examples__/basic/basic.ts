@@ -14,16 +14,16 @@ export default class XPgInputRangeBasic extends HTMLElement {
   @Part() $value2: HTMLSpanElement;
 
   connectedCallback() {
-    this.$input.addEventListener('change', this.handleChange.bind(this));
-    this.$input.addEventListener('input', this.handleInput.bind(this));
+    this.$input.addEventListener('change', this.#handleChange.bind(this));
+    this.$input.addEventListener('input', this.#handleInput.bind(this));
   }
 
-  handleChange(e: CustomEvent) {
+  #handleChange(e: CustomEvent) {
     const { value } = e.detail;
     this.$value1.innerText = value;
   }
 
-  handleInput(e: CustomEvent) {
+  #handleInput(e: CustomEvent) {
     const { value } = e.detail;
     this.$value2.innerText = value;
   }

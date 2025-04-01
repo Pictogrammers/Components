@@ -20,12 +20,12 @@ export default class XPgInputCheckListBasic extends HTMLElement {
         { value: 'uuid3', label: 'Item 3', disabled: true },
         { value: 'uuid4', label: 'Item 4' }
       );
-      this.$value.innerText = this.$input.value.join(',');
+      this.$value.textContent = this.$input.value.join(',');
       this.$input.addEventListener('change', this.handleChange.bind(this));
   }
 
   handleChange(e) {
     const { value } = e.detail;
-    this.$value.innerText = value.join(',');
+    this.$value.textContent = value.join(',');
   }
 }

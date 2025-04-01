@@ -4,7 +4,7 @@ import PgToast from '../../toast';
 import template from './basic.html';
 
 @Component({
-  selector: 'x-pg-toasts-basic',
+  selector: 'x-pg-toast-basic',
   template
 })
 export default class XPgToastsBasic extends HTMLElement {

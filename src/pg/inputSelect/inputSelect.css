@@ -25,6 +25,7 @@
   grid-row: 1;
   grid-column: 1;
   padding: 0.5rem 0.75rem;
+  font-size: var(--pg-input-select-font-size, 1rem);
 }
 
 [part=chevron] {

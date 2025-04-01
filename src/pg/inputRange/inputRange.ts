@@ -23,11 +23,12 @@ export default class PgInputRange extends HTMLElement {
   }
 
   connectedCallback() {
-    this.$input.addEventListener('change', this.handleChange.bind(this));
-    this.$input.addEventListener('input', this.handleInput.bind(this));
+    this.$input.addEventListener('change', this.#handleChange.bind(this));
+    this.$input.addEventListener('input', this.#handleInput.bind(this));
   }
 
-  handleChange(e) {
+  #handleChange(e: any) {
+    e.stopPropagation();
     const { value } = e.target;
     this.dispatchEvent(
       new CustomEvent('change', {
@@ -39,7 +40,8 @@ export default class PgInputRange extends HTMLElement {
     );
   }
 
-  handleInput(e) {
+  #handleInput(e: any) {
+    e.stopPropagation();
     const { value } = e.target;
     this.dispatchEvent(
       new CustomEvent('input', {

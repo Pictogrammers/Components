@@ -21,7 +21,7 @@ export default class XPgModalAlertBasic extends HTMLElement {
       header: 'Delete Item',
       message: 'Are you sure you want to delete the item?'
     });
-    this.$result.innerText = `${result}`;
+    this.$result.textContent = `${result}`;
   }
 
 }

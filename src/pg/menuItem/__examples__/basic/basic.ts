@@ -9,4 +9,10 @@ import template from './basic.html';
 })
 export default class XPgMenuItemBasic extends HTMLElement {
   @Part() $item: PgMenuItem;
+
+  connectedCallback() {
+    this.$item.label = 'Item 1';
+    this.$item.checked = false;
+    this.$item.disabled = false;
+  }
 }

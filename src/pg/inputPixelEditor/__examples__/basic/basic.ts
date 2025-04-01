@@ -152,12 +152,12 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
 
   handleChange(e: CustomEvent) {
     const { value } = e.detail;
-    this.$value1.innerText = value.join('--');
+    this.$value1.textContent = value.join('--');
   }
 
   handleInput(e: CustomEvent) {
     const { value } = e.detail;
-    this.$value2.innerText = value;
+    this.$value2.textContent = value;
   }
 
   handleDebug(e: CustomEvent) {

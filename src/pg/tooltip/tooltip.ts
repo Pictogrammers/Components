@@ -141,7 +141,7 @@ export default class PgTooltip extends HTMLElement {
   @Part() $tooltipArrow: HTMLDivElement;
 
   render(changes) {
-    this.$tooltipText.innerText = this.text;
+    this.$tooltipText.textContent = this.text;
     this.style.position = 'absolute';
     if (changes.visible) {
       this.style.display = this.visible ? 'block' : 'none';

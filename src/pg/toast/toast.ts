@@ -39,13 +39,15 @@ export default class PgToast extends PgOverlay {
   toasts: any[] = [];
 
   connectedCallback() {
+    // Position toast
+    // close toast
     this.$button.addEventListener('click', () => {
 
     });
   }
 
   render() {
-    this.$message.innerText = this.message;
+    this.$message.textContent = this.message;
     this.$loading.classList.toggle('hide', !this.loading);
     this.$button.classList.toggle('error', this.type === 'error');
     this.$button.classList.toggle('warning', this.type === 'warning');

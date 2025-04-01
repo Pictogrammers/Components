@@ -38,6 +38,8 @@ export default class PgTreeItem extends HTMLElement {
     this.$input.addEventListener('keydown', this.#handleKeyDown.bind(this));
     this.$items.addEventListener('select', this.#handleSelect.bind(this));
     this.$items.addEventListener('rename', this.#handleRename.bind(this));
+    this.$items.addEventListener('up', this.#handleUp.bind(this));
+    this.$items.addEventListener('down', this.#handleDown.bind(this));
     forEach({
       container: this.$actions,
       items: this.actions,
@@ -95,6 +97,14 @@ export default class PgTreeItem extends HTMLElement {
     e.detail.indexes.unshift(this.index);
   }
 
+  #handleUp(e: any) {
+    e.detail.indexes.unshift(this.index);
+  }
+
+  #handleDown(e: any) {
+    e.detail.indexes.unshift(this.index);
+  }
+
   #handleSelect(e: any) {
     e.detail.indexes.unshift(this.index);
   }
@@ -138,6 +148,22 @@ export default class PgTreeItem extends HTMLElement {
         this.$input.classList.add('hide');
         this.$input.value = this.label;
         this.$button.focus();
+        break;
+      case 'ArrowUp':
+        this.dispatchEvent(new CustomEvent('up', {
+          bubbles: true,
+          composed: true,
+          detail: { indexes: [this.index] }
+        }));
+        e.preventDefault();
+        break;
+      case 'ArrowDown':
+        this.dispatchEvent(new CustomEvent('down', {
+          bubbles: true,
+          composed: true,
+          detail: { indexes: [this.index] }
+        }));
+        e.preventDefault();
         break;
     }
   }
