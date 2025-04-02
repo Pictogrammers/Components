@@ -17,6 +17,7 @@ export default class PgTreeItem extends HTMLElement {
   @Prop() index: number;
   @Prop() label: string = '';
   @Prop() selected: boolean = false;
+  @Prop() expanded: boolean = false;
   @Prop() icon: { path: string } = { path: noIcon };
   @Prop() actions: any[] = [];
   @Prop() items: any[] = [];
@@ -34,9 +35,11 @@ export default class PgTreeItem extends HTMLElement {
     this.$item.addEventListener('action', this.#handleAction.bind(this));
     this.$labelButton.addEventListener('dblclick', this.#handleDoubleClick.bind(this));
     this.$labelButton.addEventListener('click', this.#handleClick.bind(this));
+    this.$iconButton.addEventListener('dblclick', this.#handleIconDoubleClick.bind(this));
+    this.$iconButton.addEventListener('click', this.#handleIconClick.bind(this));
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
-    this.$input.addEventListener('keydown', this.#handleKeyDown.bind(this));
+    this.$input.addEventListener('keydown', this.#handleInputKeyDown.bind(this));
     this.$items.addEventListener('select', this.#handleSelect.bind(this));
     this.$items.addEventListener('rename', this.#handleRename.bind(this));
     this.$items.addEventListener('up', this.#handleUp.bind(this));
@@ -48,13 +51,23 @@ export default class PgTreeItem extends HTMLElement {
         return PgTreeButtonIcon;
       }
     });
-    forEach({
-      container: this.$items,
-      items: this.items,
-      type: (item) => {
-        return PgTreeItem;
-      }
-    });
+    if (this.expanded) {
+      this.#initItems();
+    }
+  }
+
+  #initItemsOnce = true;
+  #initItems() {
+    if (this.#initItemsOnce) {
+      forEach({
+        container: this.$items,
+        items: this.items,
+        type: (item) => {
+          return PgTreeItem;
+        }
+      });
+      this.#initItemsOnce = false;
+    }
   }
 
   render(changes) {
@@ -70,6 +83,33 @@ export default class PgTreeItem extends HTMLElement {
     if (changes.items) {
       this.$items.classList.toggle('hide', this.items.length === 0);
     }
+    if (changes.expanded) {
+      if (this.expanded) {
+        this.#initItems();
+      }
+    }
+  }
+
+  #handleIconDoubleClick() {
+    this.dispatchEvent(new CustomEvent('select', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        type: 'icondoubleclick',
+        indexes: [this.index]
+      }
+    }));
+  }
+
+  #handleIconClick() {
+    this.dispatchEvent(new CustomEvent('select', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        type: 'icon',
+        indexes: [this.index]
+      }
+    }));
   }
 
   #handleClick() {
@@ -77,6 +117,7 @@ export default class PgTreeItem extends HTMLElement {
       bubbles: true,
       composed: true,
       detail: {
+        type: 'label',
         indexes: [this.index]
       }
     }));
@@ -138,7 +179,28 @@ export default class PgTreeItem extends HTMLElement {
     }));
   }
 
-  #handleKeyDown(e: KeyboardEvent) {
+  #handleIconKeyDown(e: KeyboardEvent) {
+    switch (e.key ) {
+      case 'ArrowUp':
+        this.dispatchEvent(new CustomEvent('up', {
+          bubbles: true,
+          composed: true,
+          detail: { indexes: [this.index] }
+        }));
+        e.preventDefault();
+        break;
+      case 'ArrowDown':
+        this.dispatchEvent(new CustomEvent('down', {
+          bubbles: true,
+          composed: true,
+          detail: { indexes: [this.index] }
+        }));
+        e.preventDefault();
+        break;
+    }
+  }
+
+  #handleInputKeyDown(e: KeyboardEvent) {
     switch (e.key ) {
       case 'Enter':
         this.#handleBlur();
@@ -156,6 +218,9 @@ export default class PgTreeItem extends HTMLElement {
           composed: true,
           detail: { indexes: [this.index] }
         }));
+        this.$labelButton.classList.remove('hide');
+        this.$actions.classList.remove('hide');
+        this.$input.classList.add('hide');
         e.preventDefault();
         break;
       case 'ArrowDown':
@@ -164,6 +229,9 @@ export default class PgTreeItem extends HTMLElement {
           composed: true,
           detail: { indexes: [this.index] }
         }));
+        this.$labelButton.classList.remove('hide');
+        this.$actions.classList.remove('hide');
+        this.$input.classList.add('hide');
         e.preventDefault();
         break;
     }
