@@ -6,5 +6,12 @@
   display: flex;
   background: transparent;
   border: 0;
-  padding: 0;
+  padding: 0.125rem;
+  margin: -0.125rem;
+  border-radius: 0.125rem;
+}
+
+[part="button"]:hover {
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  background-color: rgba(255, 255, 255, 0.2);
 }
