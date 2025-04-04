@@ -22,6 +22,7 @@ export default class PgTreeItem extends HTMLElement {
   @Prop() actions: any[] = [];
   @Prop() items: any[] = [];
 
+  @Part() $toggle: HTMLButtonElement;
   @Part() $item: HTMLDivElement;
   @Part() $input: HTMLInputElement;
   @Part() $iconButton: HTMLButtonElement;
@@ -32,6 +33,7 @@ export default class PgTreeItem extends HTMLElement {
   @Part() $items: HTMLDivElement;
 
   connectedCallback() {
+    this.$toggle.addEventListener('click', this.#handleToggleClick.bind(this));
     this.$item.addEventListener('action', this.#handleAction.bind(this));
     this.$labelButton.addEventListener('dblclick', this.#handleDoubleClick.bind(this));
     this.$labelButton.addEventListener('click', this.#handleClick.bind(this));
@@ -40,6 +42,7 @@ export default class PgTreeItem extends HTMLElement {
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
     this.$input.addEventListener('keydown', this.#handleInputKeyDown.bind(this));
+    this.$items.addEventListener('toggle', this.#handleToggle.bind(this));
     this.$items.addEventListener('select', this.#handleSelect.bind(this));
     this.$items.addEventListener('rename', this.#handleRename.bind(this));
     this.$items.addEventListener('up', this.#handleUp.bind(this));
@@ -81,13 +84,25 @@ export default class PgTreeItem extends HTMLElement {
       this.$item.classList.toggle('selected', this.selected);
     }
     if (changes.items) {
-      this.$items.classList.toggle('hide', this.items.length === 0);
+      this.$item.classList.toggle('items', this.items.length !== 0);
     }
     if (changes.expanded) {
       if (this.expanded) {
         this.#initItems();
       }
+      this.$item.classList.toggle('expanded', this.expanded);
+      this.$items.classList.toggle('expanded', this.expanded);
     }
+  }
+
+  #handleToggleClick() {
+    this.dispatchEvent(new CustomEvent('toggle', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index]
+      }
+    }));
   }
 
   #handleIconDoubleClick() {
@@ -133,6 +148,10 @@ export default class PgTreeItem extends HTMLElement {
         actionIndex: e.detail.index
       }
     }));
+  }
+
+  #handleToggle(e: any) {
+    e.detail.indexes.unshift(this.index);
   }
 
   #handleRename(e: any) {

@@ -22,6 +22,17 @@ export default class PgTree extends HTMLElement {
         return PgTreeItem;
       }
     });
+    this.addEventListener('toggle', (e: any) => {
+      const { indexes } = e.detail;
+      let item = this.#getItem(indexes);
+      item.expanded = !item.expanded;
+    })
+  }
+
+  #getItem(indexes: number[]) {
+    return indexes.reduce((item: any, index) => {
+      return item.items[index];
+    }, this);
   }
 
   render(changes) {

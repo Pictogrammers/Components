@@ -29,7 +29,14 @@ function createItem(label, expanded = false) {
       enabled: false
     }],
     items: [{
-      label: 'Sub Item'
+      label: 'Sub Item 1'
+    }, {
+      label: 'Sub Item 2',
+      items: [{
+        label: 'Sub Item ?',
+      }]
+    }, {
+      label: 'Sub Item 3'
     }]
   };
 }
