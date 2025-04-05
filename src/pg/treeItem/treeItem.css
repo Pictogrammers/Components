@@ -102,6 +102,7 @@
   display: none;
   flex-direction: column;
   --x: calc(var(--y) + 1);
+  gap: 0.25rem;
 }
 [part=items].expanded {
   display: flex;
