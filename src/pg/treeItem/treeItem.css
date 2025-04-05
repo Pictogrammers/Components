@@ -59,20 +59,33 @@
 }
 
 [part=item]:hover {
-  background: var(--pg-tree-item-background-hover, #453C4F);
-}
-[part=item]:hover [part=iconButton] {
-  --pg-icon-color: var(--pg-tree-item-color-hover, #FFF);
-}
-[part=item]:hover [part=label] {
-  color: var(--pg-tree-item-color-hover, #FFFFFF);
-}
-[part=item]:hover [part=actions] {
-  --pg-icon-color: var(--pg-tree-item-color-hover, #FFFFFF);
+  background: var(--pg-tree-item-background-hover, rgb(69, 60, 79, 0.1));
 }
 
-[part=item].selected {
-  background: var(--pg-tree-item-background-selected, #453C4F);
+[part=item].items.selected {
+  background-color: var(--pg-tree-item-background-selected, rgb(69, 60, 79, 0.1));
+}
+[part=item].items.selected [part=toggle] {
+  position: relative;
+  border-radius: 0.125rem;
+  background-color: var(--pg-tree-item-background-selected, #453C4F);
+  background-image: url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M 11,17L 13,17L 19,11L 17,9L 12,14L 7,9L 5,11' fill='white' /></svg>") !important;
+}
+
+[part=item].selected:not(.items) {
+  position: relative;
+  background-color: var(--pg-tree-item-background-selected, rgb(69, 60, 79, 0.1));
+}
+[part=item].selected:not(.items)::before {
+  position: absolute;
+  content: ' ';
+  display: flex;
+  left: calc(0.125rem + 0.5rem * var(--x));
+  top: 0.125rem;
+  bottom: 0.125rem;
+  width: 1rem;
+  border-radius: 0.125rem;
+  background: #453C4F;
 }
 
 [part=item]:not(.items) {
@@ -109,8 +122,8 @@
 }
 
 [part=toggle]:hover {
-  box-shadow: 0 0 1px rgba(255, 255, 255, 0.5) inset;
-  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.5);
   border-radius: 0.125rem;
 }
 
@@ -123,7 +136,7 @@
   display: flex;
   background-image: url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M 11,17L 13,17L 19,11L 17,9L 12,14L 7,9L 5,11' fill='rgb(69 60 79)' /></svg>");
 }
-
+/*
 [part=item].items:not(.expanded):hover [part=toggle] {
   display: flex;
   background-image: url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M 17,13L 17,11L 11,5L 9,7L 14,12L 9,17L 11,19' fill='white' /></svg>");
@@ -133,3 +146,4 @@
   display: flex;
   background-image: url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M 11,17L 13,17L 19,11L 17,9L 12,14L 7,9L 5,11' fill='white' /></svg>");
 }
+  */
