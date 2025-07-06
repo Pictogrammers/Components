@@ -35,10 +35,13 @@ export default class PgTreeItem extends HTMLElement {
   connectedCallback() {
     this.$toggle.addEventListener('click', this.#handleToggleClick.bind(this));
     this.$item.addEventListener('action', this.#handleAction.bind(this));
+    this.$item.addEventListener('pointerenter', this.#handlePointerEnter.bind(this));
+    this.$item.addEventListener('pointerleave', this.#handlePointerLeave.bind(this));
     this.$labelButton.addEventListener('dblclick', this.#handleDoubleClick.bind(this));
     this.$labelButton.addEventListener('click', this.#handleClick.bind(this));
     this.$iconButton.addEventListener('dblclick', this.#handleIconDoubleClick.bind(this));
     this.$iconButton.addEventListener('click', this.#handleIconClick.bind(this));
+    this.$iconButton.addEventListener('keydown', this.#handleIconKeyDown.bind(this));
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
     this.$input.addEventListener('keydown', this.#handleInputKeyDown.bind(this));
@@ -105,7 +108,11 @@ export default class PgTreeItem extends HTMLElement {
     }));
   }
 
-  #handleIconDoubleClick() {
+  #handleIconDoubleClick(e: MouseEvent) {
+    const { ctrlKey, shiftKey } = e;
+    if (ctrlKey || shiftKey) {
+      return;
+    }
     this.dispatchEvent(new CustomEvent('select', {
       bubbles: true,
       composed: true,
@@ -127,12 +134,39 @@ export default class PgTreeItem extends HTMLElement {
     }));
   }
 
-  #handleClick() {
+  #handleClick(e: MouseEvent) {
+    if (this.#ignoreNextClick) {
+      this.#ignoreNextClick = false;
+      return;
+    }
+    const { ctrlKey, shiftKey } = e;
     this.dispatchEvent(new CustomEvent('select', {
       bubbles: true,
       composed: true,
       detail: {
         type: 'label',
+        indexes: [this.index],
+        ctrlKey,
+        shiftKey
+      }
+    }));
+  }
+
+  #handlePointerEnter() {
+    this.dispatchEvent(new CustomEvent('enter', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index]
+      }
+    }));
+  }
+
+  #handlePointerLeave() {
+    this.dispatchEvent(new CustomEvent('leave', {
+      bubbles: true,
+      composed: true,
+      detail: {
         indexes: [this.index]
       }
     }));
@@ -174,12 +208,26 @@ export default class PgTreeItem extends HTMLElement {
     e.preventDefault();
   }
 
-  #handleDoubleClick(e) {
+  #ignoreNextClick = false;
+  #handleDoubleClick(e: MouseEvent) {
+    const { ctrlKey, shiftKey } = e;
+    if (ctrlKey || shiftKey) {
+      return;
+    }
     this.$labelButton.classList.add('hide');
     this.$actions.classList.add('hide');
     this.$input.classList.remove('hide');
     this.$input.value = this.label;
     this.$input.select();
+    this.#ignoreNextClick = true;
+    this.dispatchEvent(new CustomEvent('select', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        type: 'rename',
+        indexes: [this.index]
+      }
+    }));
     e.preventDefault();
   }
 

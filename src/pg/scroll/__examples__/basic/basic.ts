@@ -70,7 +70,7 @@ export default class XPgScrollBasic extends HTMLElement {
       }
       this.$scrollList.style.transform = `translateY(${-1 * offsetY % 44}px)`;
     });
-    function overflow(overflowText) {
+    const overflow = (overflowText) => {
       if (overflowText === 'auto') {
         this.$overflowContainer.style.overflow = 'auto';
         this.$overflowContainer.style.height = '300px';

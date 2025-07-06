@@ -15,8 +15,7 @@ export default class PgTabs extends HTMLElement {
   @Part() $tabset: HTMLUListElement;
   @Part() $slot: HTMLSlotElement;
 
-  @Prop()
-  #tabs: any[] = [];
+  @Prop() tabs: any[] = [];
 
   #selectedTab: number = 0;
   #focusedTab: number = 0;
@@ -26,11 +25,10 @@ export default class PgTabs extends HTMLElement {
     this.$slot.addEventListener('slotchange', this.handleSlotChange.bind(this));
     forEach({
       container: this.$tabset,
-      items: this.#tabs,
-      type: (tab: any) => {
+      items: this.tabs,
+      type(tab: any) {
         return PgPartialTab;
       },
-      // @ts-ignore
       connect: ($tab, tab, $tabs: PgPartialTab[]) => {
         $tab.addEventListener('select', (e: any) => {
           const { index } = e.detail;
@@ -43,9 +41,9 @@ export default class PgTabs extends HTMLElement {
         });
         $tab.addEventListener('arrowleft', (e: any) => {
           const { index } = e.detail;
-          if (this.#tabs.length > 1) {
+          if (this.tabs.length > 1) {
             if (index === 0) {
-              this.#focusedTab = this.#tabs.length - 1;
+              this.#focusedTab = this.tabs.length - 1;
             } else {
               this.#focusedTab = index - 1;
             }
@@ -54,8 +52,8 @@ export default class PgTabs extends HTMLElement {
         });
         $tab.addEventListener('arrowright',  (e: any) => {
           const { index } = e.detail;
-          if (this.#tabs.length > 1) {
-            if (index === this.#tabs.length - 1) {
+          if (this.tabs.length > 1) {
+            if (index === this.tabs.length - 1) {
               this.#focusedTab = 0;
             } else {
               this.#focusedTab++;
@@ -69,7 +67,7 @@ export default class PgTabs extends HTMLElement {
 
   #handleTab(e: CustomEvent) {
     const { detail } = e;
-    this.#tabs.push(detail);
+    this.tabs.push(detail);
     e.stopPropagation();
   }
 

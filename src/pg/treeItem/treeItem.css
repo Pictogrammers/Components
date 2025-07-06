@@ -23,12 +23,13 @@
   background: transparent;
   border: 0;
   color: var(--pg-tree-item-color, #453C4F);
-  padding: 0;
   --pg-icon-color: var(--pg-tree-item-color, #453C4F);
   flex: 1;
   align-items: center;
   font-family: var(--pg-font-family);
   font-size: var(--pg-tree-item-font-size, 1rem);
+  margin: -0.25rem -0.75rem -0.25rem -0.25rem;
+  padding: 0 0.75rem 0 0.25rem;
 }
 
 [part=input] {
@@ -55,7 +56,8 @@
 
 [part=item] {
   user-select: none;
-  padding-left: calc((var(--x) * 0.5rem) + 0.25rem)
+  padding-left: calc((var(--x) * 0.5rem) + 0.25rem);
+  transition: background-color 0.1s ease-out;
 }
 
 [part=item]:hover {
