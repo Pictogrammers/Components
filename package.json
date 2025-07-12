@@ -25,7 +25,7 @@
     "remarkable": "^2.0.1"
   },
   "devDependencies": {
-    "@pictogrammers/element": "0.0.59",
+    "@pictogrammers/element": "0.0.60",
     "@pictogrammers/element-jest": "^0.1.8",
     "@pictogrammers/element-webpack": "^0.1.49",
     "cross-env": "^7.0.3",

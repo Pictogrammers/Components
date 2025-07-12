@@ -29,17 +29,19 @@ export default class PgTabs extends HTMLElement {
       type(tab: any) {
         return PgPartialTab;
       },
-      connect: ($tab, tab, $tabs: PgPartialTab[]) => {
+      connect: ($tab: PgPartialTab, tab) => {
         $tab.addEventListener('select', (e: any) => {
+          const $tabs = Array.from(this.$tabset.children) as PgPartialTab[];
           const { index } = e.detail;
           const elements = this.$slot.assignedElements() as PgTab[];
           elements[this.#selectedTab].hide();
           $tabs[this.#selectedTab].selected = false;
           elements[index].show();
-          $tabs[index].selected = true;
+          $tab.selected = true;
           this.#selectedTab = index;
         });
         $tab.addEventListener('arrowleft', (e: any) => {
+          const $tabs = this.$slot.assignedElements() as PgPartialTab[];
           const { index } = e.detail;
           if (this.tabs.length > 1) {
             if (index === 0) {
@@ -51,6 +53,7 @@ export default class PgTabs extends HTMLElement {
           }
         });
         $tab.addEventListener('arrowright',  (e: any) => {
+          const $tabs = this.$slot.assignedElements() as PgPartialTab[];
           const { index } = e.detail;
           if (this.tabs.length > 1) {
             if (index === this.tabs.length - 1) {
