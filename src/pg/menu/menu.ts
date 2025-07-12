@@ -17,6 +17,8 @@ export default class PgMenu extends HTMLElement {
 
   @Part() $items: HTMLDivElement;
 
+  previousIndex = -1;
+
   connectedCallback() {
     forEach({
       container: this.$items,
@@ -24,12 +26,17 @@ export default class PgMenu extends HTMLElement {
       type: (item) => {
         return item.type ?? PgMenuItem;
       },
-      create: ($item, item) => {
+      create: ($item: any, item) => {
         $item.addEventListener('select', (e: any) => {
           const { index } = e.detail;
           this.dispatchEvent(new CustomEvent('select', {
             detail: { index, item }
           }));
+          if (this.previousIndex !== -1) {
+            this.items[this.previousIndex].checked = false;
+          }
+          $item.checked = true;
+          this.previousIndex = index;
         });
         $item.addEventListener('up', (e: any) => {
           const { index } = e.detail;
@@ -49,6 +56,9 @@ export default class PgMenu extends HTMLElement {
             this.focus(index + 1);
           }
         });
+        if (item.checked) {
+          this.previousIndex = $item.index;
+        }
       }
     });
   }

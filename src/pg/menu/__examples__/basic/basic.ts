@@ -14,8 +14,7 @@ export default class XPgMenuBasic extends HTMLElement {
   connectedCallback() {
     this.$menu.items = [{
       label: 'Item 1',
-      value: 'item1',
-      checked: true
+      value: 'item1'
     },
     {
       label: 'Item 2',
