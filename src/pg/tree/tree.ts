@@ -35,25 +35,24 @@ export default class PgTree extends HTMLElement {
       e.stopPropagation();
       const { indexes, type, ctrlKey, shiftKey } = e.detail;
       const item = this.#getItem(indexes);
-      const selectedCount = this.#selected.size;
+      const selectedCount = this.#selectedIndexes.size;
       const unproxyItem = getProxyValue(item);
-      if (!ctrlKey && selectedCount && !this.#selected.has(unproxyItem)) {
-        this.#selected.forEach((x: any) => x.selected = false);
-        this.#selected.clear();
+      if (!ctrlKey && selectedCount && !this.#selectedIndexes.has(unproxyItem)) {
+        this.#selectedIndexes.forEach((x: any) => this.#getItem(x).selected = false);
         this.#selectedIndexes.clear();
       }
       item.selected = type === 'rename' ? true : !item.selected;
       if (item.selected) {
-        this.#selected.add(item);
         this.#selectedIndexes.set(unproxyItem, indexes);
       } else {
-        this.#selected.delete(item);
         this.#selectedIndexes.delete(unproxyItem);
       }
       // Dispatch Event
       this.dispatchEvent(new CustomEvent('select', {
         detail: {
-          items: this.#selected
+          items: Array.from(this.#selectedIndexes).map(([key, value]) => {
+            return this.#getItem(value);
+          })
         }
       }));
     });

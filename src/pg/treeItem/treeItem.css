@@ -94,6 +94,22 @@
   padding-left: calc((var(--x) * 0.5rem) + 1.25rem)
 }
 
+[part=item].dragging {
+  position: relative;
+  opacity: 0.5;
+}
+[part=item].dragging::after {
+  position: absolute;
+  content: ' ';
+  display: flex;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 0.25rem;
+  border: 2px dashed #453C4F;
+}
+
 [part=actions] {
   display: flex;
   gap: 0.25rem;

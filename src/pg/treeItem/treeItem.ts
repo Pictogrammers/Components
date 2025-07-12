@@ -37,6 +37,8 @@ export default class PgTreeItem extends HTMLElement {
     this.$item.addEventListener('action', this.#handleAction.bind(this));
     this.$item.addEventListener('pointerenter', this.#handlePointerEnter.bind(this));
     this.$item.addEventListener('pointerleave', this.#handlePointerLeave.bind(this));
+    this.$item.addEventListener('dragstart', this.#handleDragStart.bind(this));
+    this.$item.addEventListener('dragend', this.#handleDragEnd.bind(this));
     this.$labelButton.addEventListener('dblclick', this.#handleDoubleClick.bind(this));
     this.$labelButton.addEventListener('click', this.#handleClick.bind(this));
     this.$iconButton.addEventListener('dblclick', this.#handleIconDoubleClick.bind(this));
@@ -302,6 +304,61 @@ export default class PgTreeItem extends HTMLElement {
         e.preventDefault();
         break;
     }
+  }
+
+  #handleDragStart(event) {
+    this.$item.classList.toggle('dragging', true);
+    // Generate drag image showing selected item count
+    const size = window.devicePixelRatio;
+    const canvas = document.createElement('canvas');
+    document.body.append(canvas);
+    // Larger than required!
+    canvas.width = 100 * size;
+    canvas.height = 40 * size;
+    canvas.style.width = `${canvas.width / size}px`;
+    // overlap cursor offset
+    const offsetInline = 10;
+    const fontSize = 16;
+    const paddingBlock = 6;
+    const paddingInline = 6;
+    var ctx = canvas.getContext('2d');
+    if (ctx) {
+      const text = '0';
+      ctx.font = `bold ${fontSize * size}px Segoe UI`;
+      const textSize = ctx.measureText(text);
+      ctx.fillStyle = '#453C4F';
+      ctx.beginPath();
+      ctx.roundRect(
+        (offsetInline) * size,
+        0,
+        (textSize.width + (paddingInline * 2)) * size,
+        (fontSize + (paddingBlock * 2)) * size,
+        8 + (size * 2)
+      );
+      ctx.fill();
+      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.roundRect(
+        (offsetInline + 2) * size,
+        2 * size,
+        ((textSize.width + (paddingInline * 2) - 4) * size),
+        ((fontSize + (paddingBlock * 2) - 4) * size),
+        8
+      );
+      ctx.fill();
+      ctx.fillStyle = '#453C4F';
+      ctx.fillText(
+        text,
+        (offsetInline + paddingInline + 4) * size,
+        (fontSize + paddingBlock - 2) * size
+      );
+    }
+
+    event.dataTransfer.setDragImage(canvas, 0, 0);
+  }
+
+  #handleDragEnd(event) {
+    this.$item.classList.toggle('dragging', false);
   }
 
 }

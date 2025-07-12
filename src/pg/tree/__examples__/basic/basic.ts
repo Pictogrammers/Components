@@ -3,6 +3,7 @@ import PgTree from '../../tree';
 
 import template from './basic.html';
 import PgTreeButtonIcon from '../../../treeButtonIcon/treeButtonIcon';
+import PgTreeItem from 'pg/treeItem/treeItem';
 
 const IconAccount = 'M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z';
 const IconFile = 'M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z';
@@ -89,8 +90,8 @@ export default class XPgTreeBasic extends HTMLElement {
       // action clicked
     });
     this.$tree.addEventListener('select', (e: any) => {
-      console.log(e.detail.items.size);
-      this.#selectedItems = Array.from(e.detail.items);
+      console.log(e.detail.items.length);
+      this.#selectedItems = e.detail.items;
     });
     this.$tree.items = [
       createItem('Item 1', true),
@@ -109,9 +110,8 @@ export default class XPgTreeBasic extends HTMLElement {
 
     let updatedTimes = 0;
     this.$updateItem.addEventListener('click', () => {
-      this.#selectedItems.forEach((selected) => {
-        const item = this.#getItem(selected);
-        item.label = `Updated ${updatedTimes++}`;
+      this.#selectedItems.forEach((selected: PgTreeItem) => {
+        selected.label = `Updated ${updatedTimes++}`;
       });
     });
   }
