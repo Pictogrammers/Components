@@ -41,7 +41,7 @@ export default class PgTabs extends HTMLElement {
           this.#selectedTab = index;
         });
         $tab.addEventListener('arrowleft', (e: any) => {
-          const $tabs = this.$slot.assignedElements() as PgPartialTab[];
+          const $tabs = Array.from(this.$tabset.children) as PgPartialTab[];
           const { index } = e.detail;
           if (this.tabs.length > 1) {
             if (index === 0) {
@@ -53,7 +53,7 @@ export default class PgTabs extends HTMLElement {
           }
         });
         $tab.addEventListener('arrowright',  (e: any) => {
-          const $tabs = this.$slot.assignedElements() as PgPartialTab[];
+          const $tabs = Array.from(this.$tabset.children) as PgPartialTab[];
           const { index } = e.detail;
           if (this.tabs.length > 1) {
             if (index === this.tabs.length - 1) {
