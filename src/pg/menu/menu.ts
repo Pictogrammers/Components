@@ -33,7 +33,7 @@ export default class PgMenu extends HTMLElement {
             detail: { index, item }
           }));
           if (this.previousIndex !== -1) {
-            this.items[this.previousIndex].checked = false;
+            (this.$items.children[this.previousIndex] as PgMenuItem).checked = false;
           }
           $item.checked = true;
           this.previousIndex = index;

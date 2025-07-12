@@ -24,14 +24,6 @@ export default class XPgMenuBasic extends HTMLElement {
   }
 
   #handleSelect(e: any) {
-    this.$menu.items.forEach(item => {
-      if (item.checked && item.index !== e.detail.index) {
-        item.checked = false;
-      }
-      if (!item.checked && item.index === e.detail.index) {
-        item.checked = true;
-      }
-    })
     // update clicked result
     this.$result.textContent = JSON.stringify(e.detail);
   }
