@@ -309,6 +309,7 @@ export default class PgTreeItem extends HTMLElement {
     }
   }
 
+  #canvas;
   #handleDragStart(event) {
     let dragCount = 0;
     this.dispatchEvent(new CustomEvent('itemdragstart', {
@@ -370,6 +371,7 @@ export default class PgTreeItem extends HTMLElement {
       );
     }
     event.dataTransfer.setDragImage(canvas, 0, 0);
+    this.#canvas = canvas;
   }
 
   #handleDragEnd(event) {
@@ -379,6 +381,7 @@ export default class PgTreeItem extends HTMLElement {
       detail: { indexes: [this.index] }
     }));
     this.$item.classList.toggle('dragging', false);
+    this.#canvas.remove();
   }
 
 
