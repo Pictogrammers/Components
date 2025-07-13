@@ -47,11 +47,14 @@ export default class PgTreeItem extends HTMLElement {
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
     this.$input.addEventListener('keydown', this.#handleInputKeyDown.bind(this));
+    // Append Indexes
     this.$items.addEventListener('toggle', this.#handleToggle.bind(this));
     this.$items.addEventListener('select', this.#handleSelect.bind(this));
     this.$items.addEventListener('rename', this.#handleRename.bind(this));
     this.$items.addEventListener('up', this.#handleUp.bind(this));
     this.$items.addEventListener('down', this.#handleDown.bind(this));
+    this.$items.addEventListener('itemdragstart', this.#handleItemDragStart.bind(this));
+    this.$items.addEventListener('itemdragend', this.#handleItemDragEnd.bind(this));
     forEach({
       container: this.$actions,
       items: this.actions,
@@ -307,6 +310,19 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleDragStart(event) {
+    let dragCount = 0;
+    this.dispatchEvent(new CustomEvent('itemdragstart', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        ctrlKey: event.ctrlKey,
+        shiftKey: event.shiftKey,
+        indexes: [this.index],
+        callback: (count) => {
+          dragCount = count;
+        }
+      }
+    }));
     this.$item.classList.toggle('dragging', true);
     // Generate drag image showing selected item count
     const size = window.devicePixelRatio;
@@ -323,7 +339,7 @@ export default class PgTreeItem extends HTMLElement {
     const paddingInline = 6;
     var ctx = canvas.getContext('2d');
     if (ctx) {
-      const text = '0';
+      const text = `${dragCount}`;
       ctx.font = `bold ${fontSize * size}px Segoe UI`;
       const textSize = ctx.measureText(text);
       ctx.fillStyle = '#453C4F';
@@ -353,12 +369,25 @@ export default class PgTreeItem extends HTMLElement {
         (fontSize + paddingBlock - 2) * size
       );
     }
-
     event.dataTransfer.setDragImage(canvas, 0, 0);
   }
 
   #handleDragEnd(event) {
+    this.dispatchEvent(new CustomEvent('itemdragend', {
+      bubbles: true,
+      composed: true,
+      detail: { indexes: [this.index] }
+    }));
     this.$item.classList.toggle('dragging', false);
+  }
+
+
+  #handleItemDragStart(e: any) {
+    e.detail.indexes.unshift(this.index);
+  }
+
+  #handleItemDragEnd(e: any) {
+    e.detail.indexes.unshift(this.index);
   }
 
 }

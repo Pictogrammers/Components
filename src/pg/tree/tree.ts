@@ -73,6 +73,19 @@ export default class PgTree extends HTMLElement {
         });*/
       }
     });
+    this.addEventListener('itemdragstart', (e: any) => {
+      const { indexes, callback, ctrlKey, shiftKey } = e.detail;
+      console.log('testing', indexes);
+      const item = this.#getItem(indexes);
+      const unproxyItem = getProxyValue(item);
+      if (!ctrlKey && this.#selectedIndexes.size) {
+        this.#selectedIndexes.forEach((x: any) => this.#getItem(x).selected = false);
+        this.#selectedIndexes.clear();
+      }
+      item.selected = true;
+      this.#selectedIndexes.set(unproxyItem, indexes);
+      callback(this.#selectedIndexes.size);
+    });
   }
 
   #getItem(indexes: number[]) {
