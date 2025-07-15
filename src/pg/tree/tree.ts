@@ -15,7 +15,6 @@ export default class PgTree extends HTMLElement {
 
   @Part() $items: HTMLDivElement;
 
-  #selected = new Set();
   #selectedIndexes = new Map();
 
   connectedCallback() {
@@ -85,6 +84,7 @@ export default class PgTree extends HTMLElement {
       item.selected = true;
       this.#selectedIndexes.set(unproxyItem, indexes);
       callback(this.#selectedIndexes.size);
+      this.#calculateDragExcludes();
     });
   }
 
@@ -102,5 +102,13 @@ export default class PgTree extends HTMLElement {
 
   unselect(indexes: number[]) {
 
+  }
+
+  #calculateDragExcludes() {
+    const exclude: string[] = [];
+    this.#selectedIndexes.forEach((indexes) => {
+      exclude.push(indexes.join(','));
+    });
+    return exclude;
   }
 }
