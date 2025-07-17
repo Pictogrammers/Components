@@ -72,7 +72,7 @@ export default class PgTree extends HTMLElement {
         });*/
       }
     });
-    this.addEventListener('itemdragstart', (e: any) => {
+    this.$items.addEventListener('itemdragstart', (e: any) => {
       const { indexes, callback, ctrlKey, shiftKey } = e.detail;
       console.log('testing', indexes);
       const item = this.#getItem(indexes);
@@ -85,6 +85,10 @@ export default class PgTree extends HTMLElement {
       this.#selectedIndexes.set(unproxyItem, indexes);
       callback(this.#selectedIndexes.size);
       this.#calculateDragExcludes();
+      this.$items.classList.toggle('dragging', true);
+    });
+    this.$items.addEventListener('itemdragend', (e: any) => {
+      this.$items.classList.toggle('dragging', false);
     });
   }
 

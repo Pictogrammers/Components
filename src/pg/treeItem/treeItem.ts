@@ -31,6 +31,9 @@ export default class PgTreeItem extends HTMLElement {
   @Part() $labelButton: HTMLButtonElement;
   @Part() $actions: HTMLDivElement;
   @Part() $items: HTMLDivElement;
+  @Part() $dropabove: HTMLDivElement;
+  @Part() $dropon: HTMLDivElement;
+  @Part() $dropbelow: HTMLDivElement;
 
   connectedCallback() {
     this.$toggle.addEventListener('click', this.#handleToggleClick.bind(this));
@@ -55,6 +58,13 @@ export default class PgTreeItem extends HTMLElement {
     this.$items.addEventListener('down', this.#handleDown.bind(this));
     this.$items.addEventListener('itemdragstart', this.#handleItemDragStart.bind(this));
     this.$items.addEventListener('itemdragend', this.#handleItemDragEnd.bind(this));
+    // Drag
+    this.$dropabove.addEventListener('dragenter', this.#handleDropAboveEnter.bind(this));
+    this.$dropabove.addEventListener('dragleave', this.#handleDropAboveLeave.bind(this));
+    this.$dropon.addEventListener('dragenter', this.#handleDropOnEnter.bind(this));
+    this.$dropon.addEventListener('dragleave', this.#handleDropOnLeave.bind(this));
+    this.$dropbelow.addEventListener('dragenter', this.#handleDropBelowEnter.bind(this));
+    this.$dropbelow.addEventListener('dragleave', this.#handleDropBelowLeave.bind(this));
     forEach({
       container: this.$actions,
       items: this.actions,
@@ -391,6 +401,36 @@ export default class PgTreeItem extends HTMLElement {
 
   #handleItemDragEnd(e: any) {
     e.detail.indexes.unshift(this.index);
+  }
+
+  #handleDropAboveEnter(e: any) {
+    console.log('darg above');
+    e.target.classList.toggle('drop', true);
+  }
+
+  #handleDropAboveLeave(e: any) {
+    console.log('darg leave');
+    e.target.classList.toggle('drop', false);
+  }
+
+  #handleDropOnEnter(e: any) {
+    console.log('darg above');
+    e.target.classList.toggle('drop', true);
+  }
+
+  #handleDropOnLeave(e: any) {
+    console.log('darg leave');
+    e.target.classList.toggle('drop', false);
+  }
+
+  #handleDropBelowEnter(e: any) {
+    console.log('darg above');
+    e.target.classList.toggle('drop', true);
+  }
+
+  #handleDropBelowLeave(e: any) {
+    console.log('darg leave');
+    e.target.classList.toggle('drop', false);
   }
 
 }
