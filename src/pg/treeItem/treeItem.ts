@@ -58,13 +58,21 @@ export default class PgTreeItem extends HTMLElement {
     this.$items.addEventListener('down', this.#handleDown.bind(this));
     this.$items.addEventListener('itemdragstart', this.#handleItemDragStart.bind(this));
     this.$items.addEventListener('itemdragend', this.#handleItemDragEnd.bind(this));
-    // Drag
+    this.$items.addEventListener('itemdropenter', this.#handleItemDropEnter.bind(this));
+    // Drop
     this.$dropabove.addEventListener('dragenter', this.#handleDropAboveEnter.bind(this));
     this.$dropabove.addEventListener('dragleave', this.#handleDropAboveLeave.bind(this));
+    this.$dropabove.addEventListener('dragover', this.#handleDropOver.bind(this));
+    this.$dropabove.addEventListener('drop', this.#handleDrop.bind(this));
     this.$dropon.addEventListener('dragenter', this.#handleDropOnEnter.bind(this));
     this.$dropon.addEventListener('dragleave', this.#handleDropOnLeave.bind(this));
+    this.$dropon.addEventListener('dragover', this.#handleDropOver.bind(this));
+    this.$dropon.addEventListener('drop', this.#handleDrop.bind(this));
     this.$dropbelow.addEventListener('dragenter', this.#handleDropBelowEnter.bind(this));
     this.$dropbelow.addEventListener('dragleave', this.#handleDropBelowLeave.bind(this));
+    this.$dropbelow.addEventListener('dragover', this.#handleDropOver.bind(this));
+    this.$dropbelow.addEventListener('drop', this.#handleDrop.bind(this));
+
     forEach({
       container: this.$actions,
       items: this.actions,
@@ -219,6 +227,10 @@ export default class PgTreeItem extends HTMLElement {
     e.detail.indexes.unshift(this.index);
   }
 
+  #handleItemDropEnter(e: any) {
+    e.detail.indexes.unshift(this.index);
+  }
+
   #handleContextMenu(e) {
     e.preventDefault();
   }
@@ -344,7 +356,7 @@ export default class PgTreeItem extends HTMLElement {
     canvas.height = 40 * size;
     canvas.style.width = `${canvas.width / size}px`;
     // overlap cursor offset
-    const offsetInline = 10;
+    const offsetInline = 20;
     const fontSize = 16;
     const paddingBlock = 6;
     const paddingInline = 6;
@@ -394,7 +406,6 @@ export default class PgTreeItem extends HTMLElement {
     this.#canvas.remove();
   }
 
-
   #handleItemDragStart(e: any) {
     e.detail.indexes.unshift(this.index);
   }
@@ -405,7 +416,20 @@ export default class PgTreeItem extends HTMLElement {
 
   #handleDropAboveEnter(e: any) {
     console.log('darg above');
+    this.dispatchEvent(new CustomEvent('itemdropenter', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index],
+        callback: (isValid) => {
+          console.log('is valid', isValid);
+          e.dataTransfer.dropEffect = 'move';
+        }
+      }
+    }));
     e.target.classList.toggle('drop', true);
+    e.dataTransfer.setData("text", 'test');
+    e.dataTransfer.effectAllowed = 'move';
   }
 
   #handleDropAboveLeave(e: any) {
@@ -414,7 +438,18 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleDropOnEnter(e: any) {
-    console.log('darg above');
+    console.log('darg on');
+    this.dispatchEvent(new CustomEvent('itemdropenter', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index],
+        callback: (isValid) => {
+          console.log('is valid', isValid);
+          e.dataTransfer.dropEffect = 'move';
+        }
+      }
+    }));
     e.target.classList.toggle('drop', true);
   }
 
@@ -424,13 +459,35 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleDropBelowEnter(e: any) {
-    console.log('darg above');
+    console.log('darg below');
+    this.dispatchEvent(new CustomEvent('itemdropenter', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index],
+        callback: (isValid, setDropEffect) => {
+          console.log('is valid', isValid);
+          if (isValid) {
+            e.dataTransfer.dropEffect = 'move';
+          }
+        }
+      }
+    }));
     e.target.classList.toggle('drop', true);
   }
 
   #handleDropBelowLeave(e: any) {
     console.log('darg leave');
     e.target.classList.toggle('drop', false);
+  }
+
+  #handleDropOver(e: any) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  #handleDrop(e: any) {
+    console.log('dropped!!!');
   }
 
 }

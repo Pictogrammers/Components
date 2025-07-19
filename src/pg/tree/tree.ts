@@ -74,7 +74,7 @@ export default class PgTree extends HTMLElement {
     });
     this.$items.addEventListener('itemdragstart', (e: any) => {
       const { indexes, callback, ctrlKey, shiftKey } = e.detail;
-      console.log('testing', indexes);
+      console.log('drag valid', indexes);
       const item = this.#getItem(indexes);
       const unproxyItem = getProxyValue(item);
       if (!ctrlKey && this.#selectedIndexes.size) {
@@ -84,11 +84,22 @@ export default class PgTree extends HTMLElement {
       item.selected = true;
       this.#selectedIndexes.set(unproxyItem, indexes);
       callback(this.#selectedIndexes.size);
-      this.#calculateDragExcludes();
       this.$items.classList.toggle('dragging', true);
     });
     this.$items.addEventListener('itemdragend', (e: any) => {
       this.$items.classList.toggle('dragging', false);
+    });
+    this.$items.addEventListener('itemdropenter', this.#handleDropEnter.bind(this));
+  }
+
+  #handleDropEnter(e: any) {
+    const { indexes, callback } = e.detail;
+    const excludes = this.#calculateDragExcludes();
+    console.log('valid???', indexes, excludes);
+    const joined = indexes.join(',') as string;
+    const isInvalid = excludes.some(exclude => joined.startsWith(exclude));
+    callback(!isInvalid, (dropEffect) => {
+      e.dataTransfer.effectAllowed = dropEffect;
     });
   }
 
