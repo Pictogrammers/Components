@@ -439,6 +439,7 @@ export default class PgTreeItem extends HTMLElement {
     e.target.classList.toggle('drop', false);
   }
 
+  #dragOnTimer;
   #handleDropOnEnter(e: any) {
     console.log('darg on');
     this.dispatchEvent(new CustomEvent('itemdropenter', {
@@ -453,6 +454,9 @@ export default class PgTreeItem extends HTMLElement {
       }
     }));
     e.target.classList.toggle('drop', true);
+    this.#dragOnTimer = setTimeout(() => {
+      this.#handleToggleClick();
+    }, 1500);
   }
 
   #handleDropOnLeave(e: any) {
