@@ -181,22 +181,6 @@
   padding-left: calc((var(--x) * 0.5rem) + 1.25rem)
 }
 
-[part=item].dragging {
-  position: relative;
-}
-[part=item].dragging::after {
-  position: absolute;
-  content: ' ';
-  display: flex;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  border-radius: 0.25rem;
-  background: rgba(255, 255, 255, 0.5);
-  user-select: none;
-}
-
 [part=actions] {
   display: flex;
   gap: 0.25rem;
@@ -259,10 +243,37 @@
   border-radius: 0.25rem;
 }
 
+[part=item].dragging::after {
+  content: ' ';
+  display: flex;
+  grid-column: 1 / 5;
+  grid-row: 1;
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.5);
+  user-select: none;
+  margin: -0.25rem;
+}
+[part=items].dragging {
+  --pg-_is-index-dragging: true
+}
+
 @container style(--pg-_is-dragging: false) {
   [part=dropabove],
   [part=dropon],
   [part=dropbelow] {
     display: none;
+  }
+}
+
+@container style(--pg-_is-index-dragging: true) {
+  [part=item]::after {
+    content: ' ';
+    display: flex;
+    grid-column: 1 / 5;
+    grid-row: 1;
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.5);
+    user-select: none;
+    margin: -0.25rem;
   }
 }

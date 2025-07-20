@@ -347,6 +347,7 @@ export default class PgTreeItem extends HTMLElement {
       }
     }));
     this.$item.classList.toggle('dragging', true);
+    this.$items.classList.toggle('dragging', true);
     // Generate drag image showing selected item count
     const size = window.devicePixelRatio;
     const canvas = document.createElement('canvas');
@@ -403,6 +404,7 @@ export default class PgTreeItem extends HTMLElement {
       detail: { indexes: [this.index] }
     }));
     this.$item.classList.toggle('dragging', false);
+    this.$items.classList.toggle('dragging', false);
     this.#canvas.remove();
   }
 
