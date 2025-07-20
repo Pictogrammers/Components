@@ -96,6 +96,9 @@
   margin: 0.125rem -0.25rem;
   z-index: 1;
 }
+[part=item]:not(.items) [part=dropon] {
+  display: none;
+}
 [part=item].items.expanded [part=dropbelow] {
   display: none;
 }
@@ -219,8 +222,8 @@
   --pg-_is-index-dragging: true;
 }
 [part=item].dragging [part=dropabove],
-[part=item].dragging  [part=dropon],
-[part=item].dragging  [part=dropbelow] {
+[part=item].dragging [part=dropon],
+[part=item].dragging [part=dropbelow] {
   display: none;
 }
 

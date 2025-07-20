@@ -460,6 +460,7 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleDropOnLeave(e: any) {
+    clearTimeout(this.#dragOnTimer);
     console.log('darg leave');
     e.target.classList.toggle('drop', false);
   }
