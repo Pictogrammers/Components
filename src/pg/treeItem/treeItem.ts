@@ -494,6 +494,7 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleDrop(e: any) {
+    e.target.classList.toggle('drop', false);
     console.log('dropped!!!');
   }
 
