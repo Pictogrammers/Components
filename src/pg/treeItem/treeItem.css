@@ -146,7 +146,7 @@
   background: #453C4F;
 }
 
-[part=item]:not(.items).selected [part=selected] {
+[part=item]:not(.dragging):not(.items).selected [part=selected] {
   visibility: visible;
 }
 
