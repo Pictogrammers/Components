@@ -2,12 +2,15 @@
 
 The `pg-menu` component renders a menu list. Menus can be used inline, but are usually created by a parent component. For example:
 
-- `button-menu` - Button Menu
-- `button-icon-menu` - Button Icon Menu
+- `pg-button-menu` - Button Menu
+  - Default item `type` is `PgMenuItem`
+- `pg-button-icon-menu` - Button Icon Menu
+  - Default item `type` is `PgMenuItem`
 - `PgMenuOverlay` Utility overlay for menus.
+  - The item `type` is required.
 
 ```typescript
-import '@pictogrammers/components/pgMenu.js';
+import '@pictogrammers/components/pg/menu';
 ```
 
 ```html
@@ -16,15 +19,19 @@ import '@pictogrammers/components/pgMenu.js';
 
 | Attributes | Tested   | Description |
 | ---------- | -------- | ----------- |
-| `items`    |          | Set items list. |
+| `items`    |          | Set items list. Ex: `{ type: PgMenuItem }` |
 
 ```typescript
+import PgMenuItem from '@pictogrammers/components/pg/menuItem';
+
+// ...
 @Part() $menu: PgMenu;
 
 connectedCallback() {
   this.$menu.items = [{
     label: 'Item 1',
-    value: 'item1'
+    value: 'item1',
+    type: PgMenuItem
   }];
 }
 ```

@@ -1,9 +1,10 @@
 import { Component, Prop, Part, forEach } from '@pictogrammers/element';
 
-import template from './treeItem.html';
-import style from './treeItem.css';
 import PgIcon from '../icon/icon';
 import PgTreeButtonIcon from '../treeButtonIcon/treeButtonIcon';
+
+import template from './treeItem.html';
+import style from './treeItem.css';
 
 const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
 

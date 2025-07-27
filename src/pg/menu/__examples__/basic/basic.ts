@@ -23,7 +23,14 @@ export default class XPgMenuBasic extends HTMLElement {
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
   }
 
+  previousItem: any = null;
   #handleSelect(e: any) {
+    const { item } = e.detail;
+    if (this.previousItem !== null) {
+      this.previousItem.checked = false;
+    }
+    item.checked = true;
+    this.previousItem = item;
     // update clicked result
     this.$result.textContent = JSON.stringify(e.detail);
   }

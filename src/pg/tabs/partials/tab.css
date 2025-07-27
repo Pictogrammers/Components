@@ -30,25 +30,13 @@
   border-color: var(--pg-tab-border, #453C4F);
 }
 
-[part="button"]:active::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  bottom: 0;
-  left: -1px;
-  border-radius: 0.25rem 0.25rem 0 0;
-  box-shadow: 0 0 0 3px var(--pg-focus-color, rgb(79, 143, 249, 0.6));
+[part="button"].selected:focus-visible {
+  color: #197BE0;
+  border-color: rgb(79, 143, 249);
 }
 
-[part="button"]:focus::before {
-  pointer-events: none;
-  content: '';
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  bottom: 0;
-  left: -1px;
-  border-radius: 0.25rem 0.25rem 0 0;
-  box-shadow: 0 0 0 3px var(--pg-focus-color, rgb(79, 143, 249, 0.5));
+[part="button"]:not(.selected):focus-visible {
+  background: var(--pg-focus-color, rgb(79, 143, 249, 0.15));
+  border-color: rgb(79, 143, 249);
+  color: #197BE0;
 }

@@ -112,7 +112,7 @@
   z-index: 1;
 }
 
-[part=item]:hover {
+[part=item]:not(.dragging):hover {
   background: var(--pg-tree-item-background-hover, rgb(69, 60, 79, 0.1));
 }
 [part=item].items.selected {
@@ -221,6 +221,7 @@
   background: rgba(255, 255, 255, 0.5);
   user-select: none;
   margin: -0.25rem;
+  border: 2px dashed rgb(79, 143, 249);
 }
 [part=items].dragging {
   --pg-_is-index-dragging: true;

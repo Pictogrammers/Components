@@ -1,4 +1,5 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
+import PgMenuItem from '../../../menuItem/menuItem';
 import PgOverlayMenu from '../../overlayMenu';
 
 import template from './basic.html';
@@ -25,11 +26,13 @@ export default class XPgOverlayMenuBasic extends HTMLElement {
     if (this.#menuOpen) { return; }
     const items = [{
       label: 'Item 1',
-      value: 'item1'
+      value: 'item1',
+      type: PgMenuItem
     },
     {
       label: 'Item 2',
-      value: 'item2'
+      value: 'item2',
+      type: PgMenuItem
     }];
     this.#menuOpen = true;
     const result = await PgOverlayMenu.open({
