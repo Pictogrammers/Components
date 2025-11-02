@@ -5,6 +5,13 @@ import PgTreeItem from '../treeItem/treeItem';
 import template from './tree.html';
 import style from './tree.css';
 
+export type SelectedTreeItem = {
+  indexes: number[];
+  remove: () => void;
+  getData: () => any;
+  getParentData: () => any;
+}
+
 @Component({
   selector: 'pg-tree',
   style,
@@ -49,27 +56,21 @@ export default class PgTree extends HTMLElement {
       // Dispatch Event
       this.dispatchEvent(new CustomEvent('select', {
         detail: {
-          items: Array.from(this.#selectedIndexes).map(([key, value]) => {
-            return this.#getItem(value);
-          })
+          items: [...this.#selectedIndexes.values()].map((indexes: any) => {
+            return this.#wrap(indexes);
+          }),
         }
       }));
+      //Array.from(this.#selectedIndexes).map(([key, value]) => {
+      //      return this.#getItem(value);
+      //    })
     });
     this.$items.addEventListener('keydown', (e: any) => {
       if (e.key === 'Delete') {
-        this.items[0].items.pop();
-        /*this.#selected.forEach((item: any) => {
-          const ind = this.#selectedIndexes.get(item);
-          ind.reduce((item: any, index, i) => {
-            console.log(item.item, index, i, ind.length, arguments);
-            if (i === ind.length - 1) {
-              item.items.pop();
-              //item.items.slice(index, 1);
-              return;
-            }
-            return item.items[index];
-          }, this);
-        });*/
+        this.#selectedIndexes.forEach((indexes: number[]) => {
+          this.#removeItem(indexes);
+        });
+        this.#selectedIndexes.clear();
       }
     });
     this.$items.addEventListener('itemdragstart', (e: any) => {
@@ -118,10 +119,44 @@ export default class PgTree extends HTMLElement {
     });
   }
 
+  #removeItem(indexes: number[]) {
+    const deleteIndex = indexes[indexes.length - 1];
+    const tempIndexes = indexes.slice(0, indexes.length - 1);
+    const item = tempIndexes.reduce((item: any, index) => {
+      return item.items[index];
+    }, this);
+    item.items.splice(deleteIndex, 1);
+  }
+
   #getItem(indexes: number[]) {
     return indexes.reduce((item: any, index) => {
       return item.items[index];
     }, this);
+  }
+
+  /**
+   * Appends helper methods for selected
+   *
+   * @param indexes indexes
+   */
+  #wrap(indexes: number[]) {
+    return {
+      indexes,
+      remove: () => {
+        this.#removeItem(indexes);
+        this.#selectedIndexes.clear();
+      },
+      getData: () => {
+        return this.#getItem(indexes);
+      },
+      getParentData: () => {
+        const parent = indexes.slice(0, indexes.length - 1);
+        if (parent.length === 0) {
+          return this;
+        }
+        return this.#getItem(parent);
+      }
+    }
   }
 
   render(changes) {

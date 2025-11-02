@@ -42,7 +42,7 @@ export default class PgToast extends PgOverlay {
     // Position toast
     // close toast
     this.$button.addEventListener('click', () => {
-
+      this.remove();
     });
   }
 

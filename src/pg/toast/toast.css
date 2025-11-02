@@ -1,4 +1,7 @@
 [part~=button] {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
   display: flex;
   background: #737E9E;
   box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.4);
