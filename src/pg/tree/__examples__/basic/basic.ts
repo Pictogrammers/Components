@@ -70,9 +70,10 @@ export default class XPgTreeBasic extends HTMLElement {
 
   connectedCallback() {
     this.$tree.addEventListener('action', (e: any) => {
+      const item = e.detail.item as SelectedTreeItem;
       // action clicked
-      const { index, actionIndex } = e.detail;
-      const action = this.$tree.items[index].actions[actionIndex];
+      const { actionIndex } = e.detail;
+      const action = item.getData().actions[actionIndex];
       const { enabled } = action;
       if (actionIndex === 0 && enabled) {
         action.icon = IconEyeOff;

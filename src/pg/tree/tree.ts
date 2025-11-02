@@ -32,6 +32,16 @@ export default class PgTree extends HTMLElement {
         return PgTreeItem;
       }
     });
+    this.$items.addEventListener('action', (e: any) => {
+      e.stopPropagation();
+      console.log(e.detail);
+      this.dispatchEvent(new CustomEvent('action', {
+        detail: {
+          actionIndex: e.detail.actionIndex,
+          item: this.#wrap(e.detail.indexes)
+        }
+      }));
+    });
     this.$items.addEventListener('toggle', (e: any) => {
       const { indexes } = e.detail;
       let item = this.#getItem(indexes);
@@ -61,9 +71,6 @@ export default class PgTree extends HTMLElement {
           }),
         }
       }));
-      //Array.from(this.#selectedIndexes).map(([key, value]) => {
-      //      return this.#getItem(value);
-      //    })
     });
     this.$items.addEventListener('keydown', (e: any) => {
       if (e.key === 'Delete') {

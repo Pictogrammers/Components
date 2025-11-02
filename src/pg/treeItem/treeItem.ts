@@ -38,7 +38,7 @@ export default class PgTreeItem extends HTMLElement {
 
   connectedCallback() {
     this.$toggle.addEventListener('click', this.#handleToggleClick.bind(this));
-    this.$item.addEventListener('action', this.#handleAction.bind(this));
+    this.$item.addEventListener('action', this.#handleItemAction.bind(this));
     this.$item.addEventListener('pointerenter', this.#handlePointerEnter.bind(this));
     this.$item.addEventListener('pointerleave', this.#handlePointerLeave.bind(this));
     this.$item.addEventListener('dragstart', this.#handleDragStart.bind(this));
@@ -52,6 +52,7 @@ export default class PgTreeItem extends HTMLElement {
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
     this.$input.addEventListener('keydown', this.#handleInputKeyDown.bind(this));
     // Append Indexes
+    this.$items.addEventListener('action', this.#handleAction.bind(this));
     this.$items.addEventListener('toggle', this.#handleToggle.bind(this));
     this.$items.addEventListener('select', this.#handleSelect.bind(this));
     this.$items.addEventListener('rename', this.#handleRename.bind(this));
@@ -196,16 +197,20 @@ export default class PgTreeItem extends HTMLElement {
     }));
   }
 
-  #handleAction(e) {
+  #handleItemAction(e) {
     e.stopPropagation();
     this.dispatchEvent(new CustomEvent('action', {
       bubbles: true,
       composed: true,
       detail: {
-        index: this.index,
+        indexes: [this.index],
         actionIndex: e.detail.index
       }
     }));
+  }
+
+  #handleAction(e) {
+    e.detail.indexes.unshift(this.index);
   }
 
   #handleToggle(e: any) {
