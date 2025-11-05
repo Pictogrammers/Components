@@ -1,0 +1,9 @@
+:host {
+  display: contents;
+}
+
+[part=divider] {
+  margin-top: 0.25rem;
+  border-top: 1px solid var(--pg-menu-divider-color, rgba(69, 60, 79, 0.5));
+  margin-bottom: 0.25rem;
+}

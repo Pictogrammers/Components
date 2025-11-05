@@ -1,6 +1,8 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
 import PgMenu from '../../menu';
 
+import PgMenuDivider from '../../../menuDivider/menuDivider';
+
 import template from './basic.html';
 
 @Component({
@@ -19,6 +21,13 @@ export default class XPgMenuBasic extends HTMLElement {
     {
       label: 'Item 2',
       value: 'item2'
+    },
+    {
+      type: PgMenuDivider
+    },
+    {
+      label: 'Item 3',
+      value: 'item3'
     }];
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
   }
