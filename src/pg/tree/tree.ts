@@ -12,6 +12,11 @@ export type SelectedTreeItem = {
   getParentData: () => any;
 }
 
+function move(arr, fromIndex, toIndex) {
+  const [element] = arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
+}
+
 @Component({
   selector: 'pg-tree',
   style,
@@ -34,11 +39,20 @@ export default class PgTree extends HTMLElement {
     });
     this.$items.addEventListener('action', (e: any) => {
       e.stopPropagation();
-      console.log(e.detail);
       this.dispatchEvent(new CustomEvent('action', {
         detail: {
           actionIndex: e.detail.actionIndex,
           item: this.#wrap(e.detail.indexes)
+        }
+      }));
+    });
+    this.$items.addEventListener('move', (e: any) => {
+      const { indexes, position } = e.detail;
+      e.stopPropagation();
+      this.dispatchEvent(new CustomEvent('move', {
+        detail: {
+          indexes,
+          position
         }
       }));
     });
@@ -162,6 +176,9 @@ export default class PgTree extends HTMLElement {
           return this;
         }
         return this.#getItem(parent);
+      },
+      move: (newIndexes) => {
+
       }
     }
   }

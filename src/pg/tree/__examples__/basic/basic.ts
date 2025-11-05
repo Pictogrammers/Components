@@ -90,16 +90,21 @@ export default class XPgTreeBasic extends HTMLElement {
         action.enabled = true;
       }
     });
+    this.$tree.addEventListener('move', (e: any) => {
+      console.log('move', e.detail.indexes, e.detail.position);
+      this.#selectedItems.forEach((item) => {
+
+      });
+    });
     this.$tree.addEventListener('rename', (e: any) => {
       const { indexes, label } = e.detail;
       const item = this.#getItem(indexes);
       item.label = label;
     });
     this.$tree.addEventListener('menu', (e: any) => {
-      // action clicked
+      // menu
     });
     this.$tree.addEventListener('select', (e: any) => {
-      console.log(e.detail.items.length);
       this.#selectedItems = e.detail.items;
     });
     this.$tree.items = [

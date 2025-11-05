@@ -53,6 +53,7 @@ export default class PgTreeItem extends HTMLElement {
     this.$input.addEventListener('keydown', this.#handleInputKeyDown.bind(this));
     // Append Indexes
     this.$items.addEventListener('action', this.#handleAction.bind(this));
+    this.$items.addEventListener('move', this.#handleMove.bind(this));
     this.$items.addEventListener('toggle', this.#handleToggle.bind(this));
     this.$items.addEventListener('select', this.#handleSelect.bind(this));
     this.$items.addEventListener('rename', this.#handleRename.bind(this));
@@ -62,18 +63,18 @@ export default class PgTreeItem extends HTMLElement {
     this.$items.addEventListener('itemdragend', this.#handleItemDragEnd.bind(this));
     this.$items.addEventListener('itemdropenter', this.#handleItemDropEnter.bind(this));
     // Drop
-    this.$dropabove.addEventListener('dragenter', this.#handleDropAboveEnter.bind(this));
-    this.$dropabove.addEventListener('dragleave', this.#handleDropAboveLeave.bind(this));
-    this.$dropabove.addEventListener('dragover', this.#handleDropOver.bind(this));
-    this.$dropabove.addEventListener('drop', this.#handleDrop.bind(this));
-    this.$dropon.addEventListener('dragenter', this.#handleDropOnEnter.bind(this));
-    this.$dropon.addEventListener('dragleave', this.#handleDropOnLeave.bind(this));
-    this.$dropon.addEventListener('dragover', this.#handleDropOver.bind(this));
-    this.$dropon.addEventListener('drop', this.#handleDrop.bind(this));
-    this.$dropbelow.addEventListener('dragenter', this.#handleDropBelowEnter.bind(this));
-    this.$dropbelow.addEventListener('dragleave', this.#handleDropBelowLeave.bind(this));
-    this.$dropbelow.addEventListener('dragover', this.#handleDropOver.bind(this));
-    this.$dropbelow.addEventListener('drop', this.#handleDrop.bind(this));
+    this.$dropabove.addEventListener('dragenter', this.#handleDragAboveEnter.bind(this));
+    this.$dropabove.addEventListener('dragleave', this.#handleDragAboveLeave.bind(this));
+    this.$dropabove.addEventListener('dragover', this.#handleDragOver.bind(this));
+    this.$dropabove.addEventListener('drop', this.#handleDragAbove.bind(this));
+    this.$dropon.addEventListener('dragenter', this.#handleDragOnEnter.bind(this));
+    this.$dropon.addEventListener('dragleave', this.#handleDragOnLeave.bind(this));
+    this.$dropon.addEventListener('dragover', this.#handleDragOver.bind(this));
+    this.$dropon.addEventListener('drop', this.#handleDropOn.bind(this));
+    this.$dropbelow.addEventListener('dragenter', this.#handleDragBelowEnter.bind(this));
+    this.$dropbelow.addEventListener('dragleave', this.#handleDragBelowLeave.bind(this));
+    this.$dropbelow.addEventListener('dragover', this.#handleDragOver.bind(this));
+    this.$dropbelow.addEventListener('drop', this.#handleDropBelow.bind(this));
 
     forEach({
       container: this.$actions,
@@ -210,6 +211,10 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleAction(e) {
+    e.detail.indexes.unshift(this.index);
+  }
+
+  #handleMove(e) {
     e.detail.indexes.unshift(this.index);
   }
 
@@ -422,16 +427,16 @@ export default class PgTreeItem extends HTMLElement {
     e.detail.indexes.unshift(this.index);
   }
 
-  #handleDropAboveEnter(e: any) {
-    console.log('darg above');
+  #handleDragAboveEnter(e: any) {
     this.dispatchEvent(new CustomEvent('itemdropenter', {
       bubbles: true,
       composed: true,
       detail: {
         indexes: [this.index],
         callback: (isValid) => {
-          console.log('is valid', isValid);
-          e.dataTransfer.dropEffect = 'move';
+          if (isValid) {
+            e.dataTransfer.dropEffect = 'move';
+          }
         }
       }
     }));
@@ -440,22 +445,22 @@ export default class PgTreeItem extends HTMLElement {
     e.dataTransfer.effectAllowed = 'move';
   }
 
-  #handleDropAboveLeave(e: any) {
+  #handleDragAboveLeave(e: any) {
     console.log('darg leave');
     e.target.classList.toggle('drop', false);
   }
 
   #dragOnTimer;
-  #handleDropOnEnter(e: any) {
-    console.log('darg on');
+  #handleDragOnEnter(e: any) {
     this.dispatchEvent(new CustomEvent('itemdropenter', {
       bubbles: true,
       composed: true,
       detail: {
         indexes: [this.index],
         callback: (isValid) => {
-          console.log('is valid', isValid);
-          e.dataTransfer.dropEffect = 'move';
+          if (isValid) {
+            e.dataTransfer.dropEffect = 'move';
+          }
         }
       }
     }));
@@ -465,21 +470,19 @@ export default class PgTreeItem extends HTMLElement {
     }, 1500);
   }
 
-  #handleDropOnLeave(e: any) {
+  #handleDragOnLeave(e: any) {
     clearTimeout(this.#dragOnTimer);
     console.log('darg leave');
     e.target.classList.toggle('drop', false);
   }
 
-  #handleDropBelowEnter(e: any) {
-    console.log('darg below');
+  #handleDragBelowEnter(e: any) {
     this.dispatchEvent(new CustomEvent('itemdropenter', {
       bubbles: true,
       composed: true,
       detail: {
         indexes: [this.index],
-        callback: (isValid, setDropEffect) => {
-          console.log('is valid', isValid);
+        callback: (isValid) => {
           if (isValid) {
             e.dataTransfer.dropEffect = 'move';
           }
@@ -489,19 +492,50 @@ export default class PgTreeItem extends HTMLElement {
     e.target.classList.toggle('drop', true);
   }
 
-  #handleDropBelowLeave(e: any) {
+  #handleDragBelowLeave(e: any) {
     console.log('darg leave');
     e.target.classList.toggle('drop', false);
   }
 
-  #handleDropOver(e: any) {
+  #handleDragOver(e: any) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   }
 
-  #handleDrop(e: any) {
+  #handleDragAbove(e: any) {
     e.target.classList.toggle('drop', false);
-    console.log('dropped!!!');
+    this.dispatchEvent(new CustomEvent('move', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index],
+        position: 'before'
+      }
+    }));
+  }
+
+  #handleDropOn(e: any) {
+    e.target.classList.toggle('drop', false);
+    this.dispatchEvent(new CustomEvent('move', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index],
+        position: 'on'
+      }
+    }));
+  }
+
+  #handleDropBelow(e: any) {
+    e.target.classList.toggle('drop', false);
+    this.dispatchEvent(new CustomEvent('move', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index],
+        position: 'after'
+      }
+    }));
   }
 
 }
