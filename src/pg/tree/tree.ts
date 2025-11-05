@@ -51,7 +51,7 @@ export default class PgTree extends HTMLElement {
       e.stopPropagation();
       this.dispatchEvent(new CustomEvent('move', {
         detail: {
-          indexes,
+          item: this.#wrap(e.detail.indexes),
           position
         }
       }));
@@ -177,8 +177,21 @@ export default class PgTree extends HTMLElement {
         }
         return this.#getItem(parent);
       },
-      move: (newIndexes) => {
-
+      move: (item, position) => {
+        console.log(item, position);
+        const index = item.indexes[item.indexes.length - 1];
+        const parent = item.indexes.slice(0, item.indexes.length - 1);
+        const cache = this.#getItem(indexes);
+        this.#removeItem(indexes);
+        if (position === 'on') {
+          this.#getItem(item.indexes).items.push(cache);
+          this.#getItem(item.indexes).expanded = true;
+        } else if (parent.length === 0) {
+          this.items.splice(position === 'after' ? index + 1 : index, 0, cache);
+        } else {
+          this.#getItem(parent).items.splice(position === 'after' ? index + 1 : index, 0, cache);
+        }
+        this.#selectedIndexes.clear();
       }
     }
   }

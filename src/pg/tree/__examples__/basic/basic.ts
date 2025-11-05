@@ -91,9 +91,8 @@ export default class XPgTreeBasic extends HTMLElement {
       }
     });
     this.$tree.addEventListener('move', (e: any) => {
-      console.log('move', e.detail.indexes, e.detail.position);
-      this.#selectedItems.forEach((item) => {
-
+      this.#selectedItems.forEach((item: any) => {
+        item.move(e.detail.item, e.detail.position);
       });
     });
     this.$tree.addEventListener('rename', (e: any) => {
