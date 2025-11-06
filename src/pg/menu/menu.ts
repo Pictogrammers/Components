@@ -33,30 +33,34 @@ export default class PgMenu extends HTMLElement {
         });
         $item.addEventListener('up', (e: any) => {
           const { index } = e.detail;
-          let first = this.items[0].disabled ? 1 : 0;
-          if (index === first) {
-            this.focus(this.items.length - 1);
-          } else {
-            this.focus(index - 1);
-          }
+          this.#focus(index - 1, -1, index);
         });
         $item.addEventListener('down', (e: any) => {
           const { index } = e.detail;
-          if (index === this.items.length - 1) {
-            let first = this.items[0].disabled ? 1 : 0;
-            this.focus(first);
-          } else {
-            this.focus(index + 1);
-          }
+          this.#focus(index + 1, 1, index);
         });
       }
     });
   }
 
-  focus(index) {
-    if (index === -1) {
-      index = this.items[0].disabled ? 1 : 0;
+  #focus(index, fallback, initIndex) {
+    if (index === initIndex) {
+      return;
     }
+    if (index === -1) {
+      return this.#focus(this.items.length - 1, fallback, initIndex);
+    }
+    if (index >= this.items.length) {
+      return this.#focus(0, fallback, initIndex);
+    }
+    const item = this.$items.children[index] as any;
+    if (item.focusable === false || this.items[index].disabled) {
+      return this.#focus(index + fallback, fallback, initIndex);
+    }
+    item?.focus();
+  }
+
+  focus(index) {
     const item = this.$items.children[index] as HTMLElement;
     item?.focus();
   }

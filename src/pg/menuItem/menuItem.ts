@@ -11,6 +11,8 @@ const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
   template
 })
 export default class PgMenuItem extends HTMLElement {
+  static delegatesFocus = true;
+
   @Prop() index: number;
   @Prop() label: string = '';
   @Prop() checked: boolean = false;
