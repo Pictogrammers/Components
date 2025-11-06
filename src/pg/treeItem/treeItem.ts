@@ -45,6 +45,7 @@ export default class PgTreeItem extends HTMLElement {
     this.$item.addEventListener('dragend', this.#handleDragEnd.bind(this));
     this.$labelButton.addEventListener('dblclick', this.#handleDoubleClick.bind(this));
     this.$labelButton.addEventListener('click', this.#handleClick.bind(this));
+    this.$labelButton.addEventListener('keydown', this.#handleKeyDownLabel.bind(this));
     this.$iconButton.addEventListener('dblclick', this.#handleIconDoubleClick.bind(this));
     this.$iconButton.addEventListener('click', this.#handleIconClick.bind(this));
     this.$iconButton.addEventListener('keydown', this.#handleIconKeyDown.bind(this));
@@ -86,6 +87,10 @@ export default class PgTreeItem extends HTMLElement {
     if (this.expanded) {
       this.#initItems();
     }
+  }
+
+  disconnectedCallback() {
+    console.log('disconnect', this.index);
   }
 
   #initItemsOnce = true;
@@ -178,6 +183,14 @@ export default class PgTreeItem extends HTMLElement {
     }));
   }
 
+  #handleKeyDownLabel(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      this.#enableRename();
+      e.preventDefault();
+    }
+    // todo arrow keys
+  }
+
   #handlePointerEnter() {
     this.dispatchEvent(new CustomEvent('enter', {
       bubbles: true,
@@ -246,12 +259,7 @@ export default class PgTreeItem extends HTMLElement {
     e.preventDefault();
   }
 
-  #ignoreNextClick = false;
-  #handleDoubleClick(e: MouseEvent) {
-    const { ctrlKey, shiftKey } = e;
-    if (ctrlKey || shiftKey) {
-      return;
-    }
+  #enableRename() {
     this.$labelButton.classList.add('hide');
     this.$actions.classList.add('hide');
     this.$input.classList.remove('hide');
@@ -266,6 +274,15 @@ export default class PgTreeItem extends HTMLElement {
         indexes: [this.index]
       }
     }));
+  }
+
+  #ignoreNextClick = false;
+  #handleDoubleClick(e: MouseEvent) {
+    const { ctrlKey, shiftKey } = e;
+    if (ctrlKey || shiftKey) {
+      return;
+    }
+    this.#enableRename();
     e.preventDefault();
   }
 
@@ -273,7 +290,7 @@ export default class PgTreeItem extends HTMLElement {
     this.$labelButton.classList.remove('hide');
     this.$actions.classList.remove('hide');
     this.$input.classList.add('hide');
-    this.$labelButton.focus();
+    this.$labelButton.click();
     this.dispatchEvent(new CustomEvent('rename', {
       bubbles: true,
       composed: true,
@@ -315,7 +332,7 @@ export default class PgTreeItem extends HTMLElement {
         this.$actions.classList.remove('hide');
         this.$input.classList.add('hide');
         this.$input.value = this.label;
-        this.$labelButton.focus();
+        this.$labelButton.click();
         break;
       case 'ArrowUp':
         this.dispatchEvent(new CustomEvent('up', {

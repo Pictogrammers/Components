@@ -192,6 +192,7 @@ export default class PgTree extends HTMLElement {
           this.#getItem(parent).items.splice(position === 'after' ? index + 1 : index, 0, cache);
         }
         this.#selectedIndexes.clear();
+        this.$items.classList.toggle('dragging', false);
       }
     }
   }
