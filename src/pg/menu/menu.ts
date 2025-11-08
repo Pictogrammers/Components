@@ -61,8 +61,12 @@ export default class PgMenu extends HTMLElement {
   }
 
   focus(index) {
-    const item = this.$items.children[index] as HTMLElement;
-    item?.focus();
+    if (index === -1) {
+      this.#focus(0, 1, this.items.length - 1);
+    } else {
+      const item = this.$items.children[index] as HTMLElement;
+      item?.focus();
+    }
   }
 
   /**
