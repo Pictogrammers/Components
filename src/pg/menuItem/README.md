@@ -1,6 +1,8 @@
 # `<pg-menu>`
 
-The `pg-menu-item` is usually rendered as a child of the `pg-menu`.
+The `pg-menu-item` is usually rendered as a child of the `pg-menu` as a `type: PgMenuItem`.
+
+## Usage
 
 ```typescript
 import '@pictogrammers/components/pgMenuItem.js';
@@ -13,3 +15,13 @@ import '@pictogrammers/components/pgMenuItem.js';
 | Attributes | Tested   | Description |
 | ---------- | -------- | ----------- |
 | `label`    |          | Item label. |
+| `checked`  |          | Item checked. |
+| `disabled` |          | Item disabled. |
+
+## Events
+
+```typescript
+this.$item.addEventListener('select', (e: any) => {
+  const { index } = e.detail;
+});
+```

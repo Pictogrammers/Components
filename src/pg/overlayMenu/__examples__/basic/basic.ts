@@ -1,5 +1,7 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
+
 import PgMenuItem from '../../../menuItem/menuItem';
+import PgMenuDivider from '../../../menuDivider/menuDivider';
 import PgOverlayMenu from '../../overlayMenu';
 
 import template from './basic.html';
@@ -32,6 +34,14 @@ export default class XPgOverlayMenuBasic extends HTMLElement {
     {
       label: 'Item 2',
       value: 'item2',
+      type: PgMenuItem
+    },
+    {
+      type: PgMenuDivider
+    },
+    {
+      label: 'Item 3',
+      value: 'item3',
       type: PgMenuItem
     }];
     this.#menuOpen = true;
