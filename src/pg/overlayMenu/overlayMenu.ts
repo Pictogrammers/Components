@@ -1,4 +1,5 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
+
 import PgMenu from '../menu/menu';
 import PgOverlay from '../overlay/overlay';
 
@@ -70,7 +71,8 @@ export default class PgOverlayMenu extends PgOverlay {
       }
     }
     // ToDo: update to CSS Variables
-    this.$overlay.style.translate = `${x}px ${y}px`;
+    this.$overlay.style.setProperty('--pg-overlay-menu-_x', `${x}px`);
+    this.$overlay.style.setProperty('--pg-overlay-menu-_y', `${y}px`);
     // Focus
     this.$menu.focus(index);
   }

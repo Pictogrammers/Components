@@ -1,6 +1,12 @@
 # Overlay Menu
 
-The `PgOverlayMenu` creates a menu creates an overlay menu above a source element. For standard menu lists use the `PgMenuItem` for the check.
+The `PgOverlayMenu` creates an overlay menu above a source element. For standard menu lists use the `PgMenuItem` for the check.
+
+Components that use `PgOverlayMenu` include:
+
+- `pg-input-select`
+
+## Usage
 
 ```typescript
 import PgMenuItem from '@pictogrammers/components/pg/menuItem';
