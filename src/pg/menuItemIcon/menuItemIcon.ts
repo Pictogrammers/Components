@@ -41,7 +41,7 @@ export default class PgMenuItemIcon extends HTMLElement {
   }
 
   connectedCallback() {
-    this.$label.addEventListener('click', () => {
+    this.$button.addEventListener('click', () => {
       this.checked = true;
       this.dispatchEvent(new CustomEvent('select', {
         detail: { index: this.index }

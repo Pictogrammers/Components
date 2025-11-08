@@ -72,3 +72,7 @@
 [part=button]:focus-visible:not(:hover)::after {
   background: var(--pg-focus-background-color, rgb(79, 143, 249, 0.1));
 }
+
+[part=icon] {
+  margin-inline-end: 0.25rem;
+}
