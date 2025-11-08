@@ -39,10 +39,9 @@ export default class PgOverlayMenu extends PgOverlay {
       });
     }
     this.$overlay.addEventListener('toggle', this.#toggle.bind(this));
-    // Position (replace with css once Firefox supports it)
+    // Position
     const rect = this.source?.getBoundingClientRect();
-    let x = rect?.left ?? 0, y = rect?.top ?? 0;
-    this.$overlay.style.minWidth = `${rect?.width}px`;
+    let x = 0, y = 0;
     const value = this.value === null || typeof this.value !== 'object'
       ? this.value
       : this.value.value;
@@ -70,6 +69,7 @@ export default class PgOverlayMenu extends PgOverlay {
         y += (rect.height - height) / 2;
       }
     }
+    // ToDo: update to CSS Variables
     this.$overlay.style.translate = `${x}px ${y}px`;
     // Focus
     this.$menu.focus(index);
