@@ -1,25 +1,21 @@
 # `<pg-menu>`
 
-The `PgMenuItem` is used with the `pg-menu` as a `type: PgMenuItem`.
-
-For icon support use `PgMenuItemIcon`.
+The `PgMenuItemIcon` is the `PgMenuItem` with icon support. The `pg-menu` can use both in the same list, but this component has the overhead of includig `PgIcon`.
 
 ## Usage
 
 ```typescript
-import '@pictogrammers/components/pgMenuItem.js';
+import '@pictogrammers/components/pgMenuItemIcon.js';
 ```
 
-```typescript
-this.$items = [{
-  type: PgMenuItem,
-  label: 'Item 1'
-}];
+```html
+<pg-menu-item></pg-menu-item>
 ```
 
 | Attributes | Tested   | Description |
 | ---------- | -------- | ----------- |
 | `label`    |          | Item label. |
+| `icon`     |          | Item icon. |
 | `checked`  |          | Item checked. |
 | `disabled` |          | Item disabled. |
 
