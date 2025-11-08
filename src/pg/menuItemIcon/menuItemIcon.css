@@ -24,6 +24,7 @@
 [part=button]:not(:disabled):hover {
   background: var(--pg-menu-item-selected-background, #453C4F);
   color: #FFFFFF;
+  --pg-icon-color: #FFFFFF;
 }
 
 [part=button]:not(:disabled):active {
@@ -32,6 +33,7 @@
 
 [part=button]:disabled {
   color: var(--pg-menu-item-disabled-color, rgb(69, 60, 79, 0.75));
+  --pg-icon-color: var(--pg-menu-item-disabled-color, rgb(69, 60, 79, 0.75));
 }
 
 [part=button].checked::before {

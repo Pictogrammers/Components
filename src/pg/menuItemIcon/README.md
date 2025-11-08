@@ -8,8 +8,12 @@ The `PgMenuItemIcon` is the `PgMenuItem` with icon support. The `pg-menu` can us
 import '@pictogrammers/components/pgMenuItemIcon.js';
 ```
 
-```html
-<pg-menu-item></pg-menu-item>
+```typescript
+this.$items = [{
+  type: PgMenuItemIcon,
+  icon: '',
+  label: 'Item 1'
+}];
 ```
 
 | Attributes | Tested   | Description |

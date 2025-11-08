@@ -16,13 +16,14 @@ export default class PgMenuItemIcon extends HTMLElement {
   static delegatesFocus = true;
 
   @Prop() index: number;
-  @Prop() icon: string = '';
+  @Prop() icon: string = 'M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z';
   @Prop() label: string = '';
   @Prop() checked: boolean = false;
   @Prop() disabled: boolean = false;
 
   @Part() $icon: PgIcon;
-  @Part() $label: HTMLButtonElement;
+  @Part() $button: HTMLButtonElement;
+  @Part() $label: HTMLSpanElement;
 
   render(changes) {
     if (changes.icon) {
@@ -32,10 +33,10 @@ export default class PgMenuItemIcon extends HTMLElement {
       this.$label.textContent = this.label;
     }
     if (changes.disabled) {
-      this.$label.disabled = this.disabled;
+      this.$button.disabled = this.disabled;
     }
     if (changes.checked) {
-      this.$label.classList.toggle('checked', this.checked);
+      this.$button.classList.toggle('checked', this.checked);
     }
   }
 
