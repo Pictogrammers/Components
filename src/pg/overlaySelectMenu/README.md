@@ -1,10 +1,10 @@
 # Overlay Menu
 
-The `PgOverlayMenu` creates an overlay menu above a source element. For standard menu lists use the `PgMenuItem` for the check.
+The `PgOverlaySelectMenu` creates an overlay menu above a source element. For standard menu lists use the `PgMenuItem` for the check.
 
-Components that use `PgOverlayMenu` include:
+Components that use `PgOverlaySelectMenu` include:
 
-- `pg-button-menu`
+- `pg-input-select`
 
 ## Usage
 

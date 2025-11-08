@@ -1,5 +1,5 @@
 import { Component, Prop, Part, forEach } from '@pictogrammers/element';
-import PgOverlayMenu from '../overlayMenu/overlayMenu';
+import PgOverlaySelectMenu from '../overlaySelectMenu/overlaySelectMenu';
 
 import template from './inputSelect.html';
 import style from './inputSelect.css';
@@ -41,7 +41,7 @@ export default class PgInputSelect extends HTMLElement {
   async #handleClick() {
     if (this.#menuOpen) { return; }
     this.#menuOpen = true;
-    const result = await PgOverlayMenu.open({
+    const result = await PgOverlaySelectMenu.open({
       source: this.$button,
       default: this.default,
       value: this.options.find(x => x.value === this.value) ?? null,

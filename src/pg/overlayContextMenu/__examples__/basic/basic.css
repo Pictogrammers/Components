@@ -1,0 +1,16 @@
+p {
+  margin: 0.5rem 0;
+}
+
+[part=area] {
+  display: flex;
+  width: 20rem;
+  height: 6rem;
+  border: 1px dashed rgb(79, 143, 249);
+  border-radius: 1rem;
+  align-items: center;
+  justify-content: center;
+  background: var(--pg-focus-background-color, rgba(79, 143, 249, 0.1));
+  color: rgba(79, 143, 249, 0.75);
+  text-shadow: 0 0 4px #fff;
+}

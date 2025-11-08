@@ -1,10 +1,10 @@
 # Overlay Menu
 
-The `PgOverlayMenu` creates an overlay menu above a source element. For standard menu lists use the `PgMenuItem` for the check.
+The `PgOverlayContextMenu` creates an overlay menu above a source element. For standard menu lists use the `PgMenuItem` for the check.
 
-Components that use `PgOverlayMenu` include:
+Components that use `PgOverlayContextMenu` include:
 
-- `pg-button-menu`
+- `pg-input-select`
 
 ## Usage
 
@@ -15,7 +15,7 @@ import PgMenuItem from '@pictogrammers/components/pg/menuItem';
 handleSourceClick() {
   if (this.#isOpen) { return; }
   this.#isOpen = true;
-  const result = await PgOverlayMenu.open({
+  const result = await PgOverlayContextMenu.open({
     source: this.$element,
     items: [{
       label: 'Item 1',
