@@ -6,6 +6,9 @@ import PgOverlay from '../overlay/overlay';
 import template from './overlayContextMenu.html';
 import style from './overlayContextMenu.css';
 
+// Only allow a single open context menu
+const stack: PgOverlayContextMenu[] = [];
+
 @Component({
   selector: 'pg-overlay-context-menu',
   template,
@@ -16,6 +19,8 @@ export default class PgOverlayContextMenu extends PgOverlay {
   @Part() $menu: PgMenu;
 
   @Prop() source: HTMLElement | null = null;
+  @Prop() x: number = 0;
+  @Prop() y: number = 0;
   @Prop() default: any = null;
   @Prop() items: any[] = [];
   @Prop() value: any = null;
@@ -31,6 +36,8 @@ export default class PgOverlayContextMenu extends PgOverlay {
   }
 
   connectedCallback() {
+    stack.pop()?.close();
+    stack.push(this);
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
     this.$overlay.popover = 'auto';
     if (this.source !== null) {
@@ -42,39 +49,13 @@ export default class PgOverlayContextMenu extends PgOverlay {
     this.$overlay.addEventListener('toggle', this.#toggle.bind(this));
     // Position
     const rect = this.source?.getBoundingClientRect();
-    let x = 0, y = 0;
-    const value = this.value === null || typeof this.value !== 'object'
-      ? this.value
-      : this.value.value;
-    // value is an item in the items list
-    const index = this.value === null
-      ? -1
-      : this.items.findIndex(x => x.value === value);
-    if (index !== -1) {
-      const height = this.$menu.getItemHeight(index);
-      // Overlap item
-      y -= this.$menu.getItemOffset(0, index);
-      if (rect?.height !== height && rect?.height) {
-        y += (rect.height - height) / 2;
-      }
-    } else if (this.items.length > 0) {
-      // insert default if defined
-      if (this.default) {
-        this.default.checked = true;
-        this.$menu.items.unshift(this.default);
-      }
-      // focus first item
-      const height = this.$menu.getItemHeight(0);
-      y -= this.$menu.getItemOffset(0, 0);
-      if (rect?.height !== height && rect?.height) {
-        y += (rect.height - height) / 2;
-      }
-    }
+    const x =  this.x - (rect?.left || 0),
+      y = this.y - (rect?.top || 0);
     // ToDo: update to CSS Variables
     this.$overlay.style.setProperty('--pg-overlay-menu-_x', `${x}px`);
     this.$overlay.style.setProperty('--pg-overlay-menu-_y', `${y}px`);
     // Focus
-    this.$menu.focus(index);
+    this.$menu.focus(0);
   }
 
   #toggle(e: ToggleEvent) {
@@ -85,6 +66,7 @@ export default class PgOverlayContextMenu extends PgOverlay {
   }
 
   disconnectedCallback() {
+
   }
 
   #handleSelect(e: any) {

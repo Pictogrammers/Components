@@ -1,11 +1,14 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
 
-import PgMenuItem from '../../../menuItem/menuItem';
+import PgMenuItemIcon from '../../../menuItemIcon/menuItemIcon';
 import PgMenuDivider from '../../../menuDivider/menuDivider';
 import PgOverlayContextMenu from '../../overlayContextMenu';
 
 import template from './basic.html';
 import style from './basic.css';
+
+const IconFile = 'M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z';
+const IconFolder = 'M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z';
 
 @Component({
   selector: 'x-pg-overlay-context-menu-basic',
@@ -23,31 +26,33 @@ export default class XPgOverlayContextMenuBasic extends HTMLElement {
 
   #value = null;
 
-  #menuOpen = false;
-  async #handleContextMenu(e: any) {
-    if (this.#menuOpen) { return; }
+  async #handleContextMenu(e: MouseEvent) {
     e.preventDefault();
     const items = [{
-      label: 'Item 1',
+      label: 'Add File',
       value: 'item1',
-      type: PgMenuItem
+      icon: IconFile,
+      type: PgMenuItemIcon
     },
     {
-      label: 'Item 2',
+      label: 'Add Folder',
       value: 'item2',
-      type: PgMenuItem
+      icon: IconFolder,
+      type: PgMenuItemIcon
     },
     {
       type: PgMenuDivider
     },
     {
-      label: 'Item 3',
+      label: 'More Items',
       value: 'item3',
-      type: PgMenuItem
+      icon: IconFile,
+      type: PgMenuItemIcon
     }];
-    this.#menuOpen = true;
     const result = await PgOverlayContextMenu.open({
       source: this.$area,
+      x: e.clientX,
+      y: e.clientY,
       value: this.#value,
       items,
       oninput: (value) => {
@@ -57,7 +62,6 @@ export default class XPgOverlayContextMenuBasic extends HTMLElement {
     if (result !== undefined) {
       this.#value = result;
     }
-    this.$result.textContent = result;
-    this.#menuOpen = false;
+    this.$result.textContent = JSON.stringify(result);
   }
 }

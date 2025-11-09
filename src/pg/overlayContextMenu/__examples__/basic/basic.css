@@ -10,7 +10,14 @@ p {
   border-radius: 1rem;
   align-items: center;
   justify-content: center;
+  cursor: default;
   background: var(--pg-focus-background-color, rgba(79, 143, 249, 0.1));
   color: rgba(79, 143, 249, 0.75);
   text-shadow: 0 0 4px #fff;
+  box-sizing: border-box;
+  outline: 0;
+}
+
+[part=area]:focus {
+  border-width: 2px;
 }

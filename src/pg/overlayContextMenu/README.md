@@ -12,11 +12,13 @@ Components that use `PgOverlayContextMenu` include:
 import PgMenuItem from '@pictogrammers/components/pg/menuItem';
 
 #isOpen: false;
-handleSourceClick() {
+handleSourceClick(e: MouseEvent) {
   if (this.#isOpen) { return; }
   this.#isOpen = true;
   const result = await PgOverlayContextMenu.open({
     source: this.$element,
+    x: e.clientX,
+    y: e.clientY,
     items: [{
       label: 'Item 1',
       value: 'item1',

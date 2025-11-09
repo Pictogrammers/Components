@@ -47,7 +47,7 @@ export default class PgMenuItemIcon extends HTMLElement {
         detail: { index: this.index }
       }));
     });
-    this.$label.addEventListener('keydown', (e: KeyboardEvent) => {
+    this.$button.addEventListener('keydown', (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowDown':
           this.dispatchEvent(new CustomEvent('down', {
@@ -66,7 +66,7 @@ export default class PgMenuItemIcon extends HTMLElement {
   }
 
   focus() {
-    this.$label.focus();
+    this.$button.focus();
   }
 
   getHeight(): number {
