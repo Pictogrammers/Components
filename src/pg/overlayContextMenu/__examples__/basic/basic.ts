@@ -27,6 +27,7 @@ export default class XPgOverlayContextMenuBasic extends HTMLElement {
   #value = null;
 
   async #handleContextMenu(e: MouseEvent) {
+    console.log('context');
     e.preventDefault();
     const items = [{
       label: 'Add File',
@@ -54,10 +55,7 @@ export default class XPgOverlayContextMenuBasic extends HTMLElement {
       x: e.clientX,
       y: e.clientY,
       value: this.#value,
-      items,
-      oninput: (value) => {
-        this.$input.textContent = value;
-      }
+      items
     });
     if (result !== undefined) {
       this.#value = result;

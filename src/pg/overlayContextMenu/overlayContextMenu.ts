@@ -8,6 +8,7 @@ import style from './overlayContextMenu.css';
 
 // Only allow a single open context menu
 const stack: PgOverlayContextMenu[] = [];
+const stack2: PgOverlayContextMenu[] = [];
 
 @Component({
   selector: 'pg-overlay-context-menu',
@@ -36,8 +37,10 @@ export default class PgOverlayContextMenu extends PgOverlay {
   }
 
   connectedCallback() {
+    console.log('connected');
     stack.pop()?.close();
     stack.push(this);
+    stack2.push(this);
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
     this.$overlay.popover = 'auto';
     if (this.source !== null) {
@@ -61,12 +64,16 @@ export default class PgOverlayContextMenu extends PgOverlay {
   #toggle(e: ToggleEvent) {
     if (e.newState === 'closed') {
       this.close();
-      this.source?.focus();
+      console.log('open', stack2.length);
+      if (stack2.length === 0) {
+        this.source?.focus();
+      }
     }
   }
 
   disconnectedCallback() {
-
+    console.log('disconnected');
+    stack2.pop();
   }
 
   #handleSelect(e: any) {
