@@ -1,5 +1,6 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
+import PgOverlaySubMenu from '../overlaySubMenu/overlaySubMenu'
 import PgIcon from '../icon/icon';
 
 import template from './menuItemIcon.html';
@@ -20,6 +21,7 @@ export default class PgMenuItemIcon extends HTMLElement {
   @Prop() label: string = '';
   @Prop() checked: boolean = false;
   @Prop() disabled: boolean = false;
+  @Prop() items: any[] = [];
 
   @Part() $icon: PgIcon;
   @Part() $button: HTMLButtonElement;
@@ -38,14 +40,28 @@ export default class PgMenuItemIcon extends HTMLElement {
     if (changes.checked) {
       this.$button.classList.toggle('checked', this.checked);
     }
+    if (changes.items) {
+      this.$button.classList.toggle('more', this.items.length > 0);
+    }
   }
 
   connectedCallback() {
-    this.$button.addEventListener('click', () => {
-      this.checked = true;
-      this.dispatchEvent(new CustomEvent('select', {
-        detail: { index: this.index }
-      }));
+    this.$button.addEventListener('click', async () => {
+      if (this.items.length > 0) {
+        //this.$button.getBoundingClientRect();
+        const result = await PgOverlaySubMenu.open({
+          source: this.$button,
+          x: 0,
+          y: 0,
+          value: this.items[0],
+          items: this.items
+        });
+      } else {
+        this.checked = true;
+        this.dispatchEvent(new CustomEvent('select', {
+          detail: { index: this.index }
+        }));
+      }
     });
     this.$button.addEventListener('keydown', (e: KeyboardEvent) => {
       switch (e.key) {

@@ -3,19 +3,19 @@ import { Component, Part, Prop } from '@pictogrammers/element';
 import PgMenu from '../menu/menu';
 import PgOverlay from '../overlay/overlay';
 
-import template from './overlayContextMenu.html';
-import style from './overlayContextMenu.css';
+import template from './overlaySubMenu.html';
+import style from './overlaySubMenu.css';
 
 // Only allow a single open context menu
-const stack: PgOverlayContextMenu[] = [];
-const stack2: PgOverlayContextMenu[] = [];
+const stack: PgOverlaySubMenu[] = [];
+const stack2: PgOverlaySubMenu[] = [];
 
 @Component({
-  selector: 'pg-overlay-context-menu',
+  selector: 'pg-overlay-sub-menu',
   template,
   style
 })
-export default class PgOverlayContextMenu extends PgOverlay {
+export default class PgOverlaySubMenu extends PgOverlay {
   @Part() $overlay: HTMLDivElement;
   @Part() $menu: PgMenu;
 
@@ -51,8 +51,8 @@ export default class PgOverlayContextMenu extends PgOverlay {
     this.$overlay.addEventListener('toggle', this.#toggle.bind(this));
     // Position
     const rect = this.source?.getBoundingClientRect();
-    const x =  this.x - (rect?.left || 0),
-      y = this.y - (rect?.top || 0);
+    const x = 0, y = 0; // this.x - (rect?.left || 0),
+    //  y = this.y - (rect?.top || 0);
     // ToDo: update to CSS Variables
     this.$overlay.style.setProperty('--pg-overlay-menu-_x', `${x}px`);
     this.$overlay.style.setProperty('--pg-overlay-menu-_y', `${y}px`);
@@ -71,7 +71,7 @@ export default class PgOverlayContextMenu extends PgOverlay {
 
   #toggle(e: ToggleEvent) {
     if (e.newState === 'closed') {
-      this.close();
+      //this.close();
       if (stack2.length === 0 && this.#ignore) {
         console.log(e);
         this.source?.focus();

@@ -9,8 +9,8 @@
   background: transparent;
   overflow: visible;
   --pg-menu-box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.25);
-  top: anchor(top);
-  left: anchor(left);
+  top: calc(anchor(top) - 0.25rem);
+  left: calc(anchor(right) - 0.25rem);
   min-width: 10rem;
-  margin: var(--pg-overlay-menu-_y, 0) 0 0 var(--pg-overlay-menu-_x, 0);
+  translate: var(--pg-overlay-menu-_x, 0) var(--pg-overlay-menu-_y, 0);
 }

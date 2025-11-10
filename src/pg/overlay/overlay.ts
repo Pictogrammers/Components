@@ -1,4 +1,4 @@
-import { Component } from '@pictogrammers/element';
+import { Component, Prop } from '@pictogrammers/element';
 
 const layers: Set<HTMLElement> = new Set();
 const promises: Map<HTMLElement, (value: any) => void> = new Map();

@@ -17,6 +17,7 @@ export default class PgMenuItem extends HTMLElement {
   @Prop() label: string = '';
   @Prop() checked: boolean = false;
   @Prop() disabled: boolean = false;
+  @Prop() items: any[] = [];
 
   @Part() $label: HTMLButtonElement;
 
