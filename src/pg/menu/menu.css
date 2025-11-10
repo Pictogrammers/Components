@@ -13,3 +13,7 @@
   background-color: var(--pg-menu-background-color, #FFFFFF);
   box-shadow: var(--pg-menu-box-shadow, none);
 }
+
+[part=items].check {
+  --pg-menu-_has-check: true;
+}

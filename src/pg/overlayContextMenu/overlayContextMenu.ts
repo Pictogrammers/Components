@@ -28,10 +28,10 @@ export default class PgOverlayContextMenu extends PgOverlay {
 
   render(changes) {
     if (changes.items) {
-      if (this.value !== null) {
-        this.items.forEach(item => item.checked = false);
-        this.items.find(item => item.value === this.value.value).checked = true;
-      }
+      //if (this.value !== null) {
+      //  this.items.forEach(item => item.checked = false);
+      //  this.items.find(item => item.value === this.value.value).checked = true;
+      //}
       this.$menu.items = this.items;
     }
   }
@@ -41,6 +41,7 @@ export default class PgOverlayContextMenu extends PgOverlay {
     stack.push(this);
     stack2.push(this);
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
+    this.$menu.addEventListener('close', this.#handleClose.bind(this));
     this.$overlay.popover = 'auto';
     if (this.source !== null) {
       // @ts-ignore
@@ -82,6 +83,11 @@ export default class PgOverlayContextMenu extends PgOverlay {
   disconnectedCallback() {
     stack2.pop();
     document.removeEventListener('pointerdown', this.#handleDown);
+  }
+
+  #handleClose(e: any) {
+    this.close();
+    this.source?.focus();
   }
 
   #handleSelect(e: any) {

@@ -25,10 +25,21 @@ export default class PgMenu extends HTMLElement {
         return item.type ?? PgMenuItem;
       },
       create: ($item: any, item) => {
+        $item.addEventListener('close', (e: any) => {
+          const { depth } = e.detail;
+          this.dispatchEvent(new CustomEvent('close', {
+            detail: {
+              depth
+            }
+          }));
+        });
         $item.addEventListener('select', (e: any) => {
           const { index } = e.detail;
           this.dispatchEvent(new CustomEvent('select', {
-            detail: { index, item }
+            detail: {
+              indexes: [index],
+              item
+            }
           }));
         });
         $item.addEventListener('up', (e: any) => {
@@ -40,6 +51,10 @@ export default class PgMenu extends HTMLElement {
           this.#focus(index + 1, 1, index);
         });
       }
+    });
+    this.$items.addEventListener('hasCheck', (e: any) => {
+      e.stopPropagation();
+      this.$items.classList.toggle('check', true);
     });
   }
 

@@ -31,11 +31,15 @@ export default class PgMenuItem extends HTMLElement {
     if (changes.checked) {
       this.$label.classList.toggle('checked', this.checked);
     }
+    if (changes.checked) {
+      if (this.checked === true) {
+        this.dispatchEvent(new CustomEvent('hasCheck', { bubbles: true }));
+      }
+    }
   }
 
   connectedCallback() {
     this.$label.addEventListener('click', () => {
-      this.checked = true;
       this.dispatchEvent(new CustomEvent('select', {
         detail: { index: this.index }
       }));
@@ -52,6 +56,10 @@ export default class PgMenuItem extends HTMLElement {
           this.dispatchEvent(new CustomEvent('up', {
             detail: { index: this.index }
           }));
+          e.preventDefault();
+          break;
+        case 'Escape':
+          this.dispatchEvent(new CustomEvent('close'));
           e.preventDefault();
           break;
       }

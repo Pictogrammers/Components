@@ -43,12 +43,16 @@ export default class PgMenuItemIcon extends HTMLElement {
     if (changes.items) {
       this.$button.classList.toggle('more', this.items.length > 0);
     }
+    if (changes.checked) {
+      if (this.checked === true) {
+        this.dispatchEvent(new CustomEvent('hasCheck', { bubbles: true }));
+      }
+    }
   }
 
   connectedCallback() {
     this.$button.addEventListener('click', async () => {
       if (this.items.length > 0) {
-        //this.$button.getBoundingClientRect();
         const result = await PgOverlaySubMenu.open({
           source: this.$button,
           x: 0,
@@ -56,14 +60,31 @@ export default class PgMenuItemIcon extends HTMLElement {
           value: this.items[0],
           items: this.items
         });
+        if (result === null) {
+          this.focus();
+        } else if (result) {
+          this.dispatchEvent(new CustomEvent('select', {
+            detail: {
+              item: result
+            }
+          }));
+        } else {
+          this.dispatchEvent(new CustomEvent('close', {
+            detail: {
+              depth: -1
+            }
+          }));
+        }
       } else {
-        this.checked = true;
         this.dispatchEvent(new CustomEvent('select', {
-          detail: { index: this.index }
+          detail: {
+            index: this.index,
+            item: this.items[this.index]
+          }
         }));
       }
     });
-    this.$button.addEventListener('keydown', (e: KeyboardEvent) => {
+    this.$button.addEventListener('keydown', async (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowDown':
           this.dispatchEvent(new CustomEvent('down', {
@@ -74,6 +95,49 @@ export default class PgMenuItemIcon extends HTMLElement {
         case 'ArrowUp':
           this.dispatchEvent(new CustomEvent('up', {
             detail: { index: this.index }
+          }));
+          e.preventDefault();
+          break;
+        case 'ArrowLeft':
+          this.dispatchEvent(new CustomEvent('close', {
+            detail: {
+              depth: 1
+            }
+          }));
+          e.preventDefault();
+          break;
+        case 'ArrowRight':
+          if (this.items.length > 0) {
+            const result = await PgOverlaySubMenu.open({
+              source: this.$button,
+              x: 0,
+              y: 0,
+              value: this.items[0],
+              items: this.items
+            });
+            if (result === null) {
+              this.focus();
+            } else if (result) {
+              this.dispatchEvent(new CustomEvent('select', {
+                detail: {
+                  item: result
+                }
+              }));
+            } else {
+              this.dispatchEvent(new CustomEvent('close', {
+                detail: {
+                  depth: -1
+                }
+              }));
+            }
+          }
+          e.preventDefault();
+          break;
+        case 'Escape':
+          this.dispatchEvent(new CustomEvent('close', {
+            detail: {
+              depth: -1
+            }
           }));
           e.preventDefault();
           break;

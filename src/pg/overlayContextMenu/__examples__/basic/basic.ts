@@ -57,19 +57,19 @@ export default class XPgOverlayContextMenuBasic extends HTMLElement {
           value: 'left',
           icon: IconLeft,
           type: PgMenuItemIcon,
-          check: true
+          checked: true
       }, {
           label: 'Center',
           value: 'center',
           icon: IconCenter,
           type: PgMenuItemIcon,
-          check: false
+          checked: false
       }, {
           label: 'Right',
           value: 'right',
           icon: IconRight,
           type: PgMenuItemIcon,
-          check: false
+          checked: false
       }]
     }];
     const result = await PgOverlayContextMenu.open({
