@@ -1,0 +1,12 @@
+:host {
+  display: contents;
+}
+
+[part=grid] {
+  display: grid;
+  grid-template-columns: auto;
+}
+
+[part=header] {
+  display: flex;
+}
