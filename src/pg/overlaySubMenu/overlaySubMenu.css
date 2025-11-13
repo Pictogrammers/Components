@@ -13,4 +13,16 @@
   left: calc(anchor(right) - 0.25rem);
   min-width: 10rem;
   translate: var(--pg-overlay-menu-_x, 0) var(--pg-overlay-menu-_y, 0);
+  position-try-fallbacks: --custom-right, --custom-left;
+  inset: auto;
+}
+
+@position-try --custom-right {
+  top: calc(anchor(top) - 0.25rem);
+  left: calc(anchor(right) - 0.25rem);
+}
+
+@position-try --custom-left {
+  top: calc(anchor(top) - 0.25rem);
+  left: calc(anchor(left) - anchor-size(width) + 0.25rem);
 }
