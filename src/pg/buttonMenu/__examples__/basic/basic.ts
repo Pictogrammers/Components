@@ -13,6 +13,7 @@ export default class XPgButtonMenuBasic extends HTMLElement {
   @Part() $value: HTMLSpanElement;
 
   connectedCallback() {
+    this.$menu.label = 'Options';
     this.$menu.items = [{
       value: 'item1',
       label: 'Item 1'

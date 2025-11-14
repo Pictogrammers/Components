@@ -6,3 +6,7 @@ span {
   align-self: center;
   display: flex;
 }
+
+[part=collapse] {
+  display: none;
+}

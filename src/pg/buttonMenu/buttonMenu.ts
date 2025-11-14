@@ -1,6 +1,7 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
 
 import PgMenuItem from '../menuItem/menuItem';
+import PgIcon from '../icon/icon';
 import PgOverlayMenu from '../overlayMenu/overlayMenu';
 
 import '../button/button';
@@ -9,7 +10,8 @@ import PgButton from '../button/button';
 import template from './buttonMenu.html';
 import style from './buttonMenu.css';
 
-const t = [true, 'true', ''];
+const IconExpand = 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z';
+const IconCollapse = 'M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z';
 
 @Component({
   selector: 'pg-button-menu',
@@ -19,29 +21,28 @@ const t = [true, 'true', ''];
 export default class PgButtonMenu extends HTMLElement {
   @Prop() items: any[] = [];
   @Prop() value: any = null;
+  @Prop() label: string = '';
+  @Prop() default: any = null;
 
   @Part() $button: PgButton;
-  @Part() $expand: HTMLSlotElement;
-  @Part() $collapse: HTMLSlotElement;
+  @Part() $icon: PgIcon;
+  @Part() $label: HTMLSpanElement;
 
   connectedCallback() {
-    this.$button.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.#handleClick();
-      // open menu
-      /*this.dispatchEvent(
-        new CustomEvent('click', {
-          detail: {
-            active: this.active
-          }
-        })
-      );*/
-    });
+    this.$button.addEventListener('click', this.#handleClick.bind(this));
+  }
+
+  render(changes) {
+    if (changes.label) {
+      this.$label.textContent = this.label;
+    }
   }
 
   #menuOpen = false;
   async #handleClick() {
-    if (this.#menuOpen) { return; }
+    this.#menuOpen = !this.#menuOpen;
+    this.$icon.path = this.#menuOpen ? IconCollapse : IconExpand;
+    if (!this.#menuOpen) { return; }
     const items = this.items.map((item) => {
       return {
         type: PgMenuItem,
@@ -49,21 +50,19 @@ export default class PgButtonMenu extends HTMLElement {
         value: item.value
       };
     });
-    this.#menuOpen = true;
-    /*
+    // Create Menu
+    const result = await PgOverlayMenu.open({
+      source: this,
+      default: this.default ?? items[0],
+      value: items.find(x => x.value === this.value) ?? null,
+      items: items
+    });
     if (result !== undefined) {
-      this.#value = result;
-    }
-    this.$result.textContent = result;
-    */
-    this.#menuOpen = false;
-  }
-
-
-  render(changes) {
-    if (changes.active) {
-      this.$expand.style.display = this.$button.active ? 'flex' : 'none';
-      this.$collapse.style.display = this.$button.active ? 'none' : 'flex';
+      this.dispatchEvent(new CustomEvent('change', {
+        detail: {
+          value: result.value
+        }
+      }));
     }
   }
 }
