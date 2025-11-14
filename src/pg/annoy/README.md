@@ -11,8 +11,3 @@ import '@pictogrammers/components/pgAnnoy';
 ```
 
 A `localStorage` variable switches between the list of items below.
-
-- `contextMenu` - Right Click Menu
-- `extension` - Chrome / Firefox Extension
-- `react` - React Component
-- `upgrade` - Read the upgrade guide

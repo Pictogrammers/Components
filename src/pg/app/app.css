@@ -4,9 +4,105 @@
 
 [part=grid] {
   display: grid;
-  grid-template-columns: auto;
+  grid-template-columns: auto 0.5rem 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100%;
 }
 
 [part=header] {
   display: flex;
+  grid-column: 1 / 4;
+  grid-row: 1;
+  border-bottom: 2px solid #453C4F;
+}
+
+[part=header] > button {
+  display: flex;
+  border: 0;
+  padding: 0.5rem;
+  background-color: transparent;
+  border-right: 1px solid rgba(69, 60, 79, 0.5);
+  outline: none;
+}
+
+[part=header] > button:hover {
+  background-color: rgba(69, 60, 79, 0.10);
+}
+
+[part=header] > button:focus-visible {
+  position: relative;
+}
+
+[part=header] > button:focus-visible::before {
+  pointer-events: none;
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  bottom: 3px;
+  left: 3px;
+  box-shadow: 0 0 0 3px var(--pg-focus-color, rgba(79, 143, 249, 0.5));
+}
+
+[part=header] > button.selected {
+  --pg-icon-color: rgb(79, 143, 249);
+}
+
+[part=header] > button.selected:hover {
+  background-color: #fff;
+}
+
+[part=side] {
+  display: flex;
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 10rem;
+  max-width: 20rem;
+}
+
+slot[name=main] {
+  display: flex;
+  grid-column: 3;
+  grid-row: 2;
+}
+
+[part=resize] {
+  display: flex;
+  grid-column: 2;
+  grid-row: 2;
+  border: 0;
+  padding: 0;
+  cursor: ew-resize;
+  border-left: 1px solid #453C4F;
+  border-right: 1px solid #453C4F;
+  background-color: transparent;
+}
+
+[part=resize].dragging {
+  background-color: var(--pg-focus-color, rgb(79, 143, 249, 0.5))
+}
+
+[part=home] {
+  display: flex;
+  grid-column: 1 / 4;
+  grid-row: 2;
+  background-color: #fff;
+  position: relative;
+}
+
+[part=home]::before {
+  content: ' ';
+  position: absolute;
+  top: -2px;
+  width: 2.5rem;
+  height: 2px;
+  background-color: #fff;
+}
+
+[part=home].selected {
+  background-color: #fff;
+}
+
+.hide {
+  display: none;
 }
