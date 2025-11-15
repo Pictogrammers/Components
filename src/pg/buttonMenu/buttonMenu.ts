@@ -57,6 +57,7 @@ export default class PgButtonMenu extends HTMLElement {
       value: items.find(x => x.value === this.value) ?? null,
       items: items
     });
+    this.$icon.path = IconExpand;
     if (result !== undefined) {
       this.dispatchEvent(new CustomEvent('change', {
         detail: {
@@ -64,5 +65,6 @@ export default class PgButtonMenu extends HTMLElement {
         }
       }));
     }
+    this.#menuOpen = false;
   }
 }
