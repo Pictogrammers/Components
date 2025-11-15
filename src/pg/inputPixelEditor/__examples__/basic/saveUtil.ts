@@ -16,8 +16,12 @@ export async function saveFile(blob) {
         },
       ],
     };
-    // @ts-ignore
-    return await window.showSaveFilePicker(opts);
+    try {
+      // @ts-ignore
+      return await window.showSaveFilePicker(opts);
+    } catch (e) {
+      console.log('no save');
+    }
   }
   const downloadelem = document.createElement("a");
   const url = URL.createObjectURL(blob);

@@ -90,33 +90,41 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     });
     this.$file.addEventListener('change', this.handleFile.bind(this));
     this.$saveSvg.addEventListener('click', async () => {
-      // @ts-ignore
-      const handle = await window.showSaveFilePicker({
-        suggestedName: 'Canvas',
-        types: [{
-          description: 'SVG Document',
-          accept: {'image/svg+xml': ['.svg']},
-        }],
-      });
-      const writable = await handle.createWritable();
-      await writable.write(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${this.$width.value} ${this.$height.value}">`);
-      await writable.write(`<path d="${'test'}" />`);
-      await writable.write('</svg>');
-      await writable.close();
+      try {
+        // @ts-ignore
+        const handle = await window.showSaveFilePicker({
+          suggestedName: 'Canvas',
+          types: [{
+            description: 'SVG Document',
+            accept: {'image/svg+xml': ['.svg']},
+          }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${this.$width.value} ${this.$height.value}">`);
+        await writable.write(`<path d="${'test'}" />`);
+        await writable.write('</svg>');
+        await writable.close();
+      } catch (e: any) {
+        // no save
+      }
     });
     this.$savePng.addEventListener('click', async () => {
-      // @ts-ignore
-      const handle = await window.showSaveFilePicker({
-        suggestedName: 'CanvasName',
-        types: [{
-          description: 'SVG Document',
-          accept: {'image/svg+xml': ['.svg']},
-        }],
-      });
-      const writable = await handle.createWritable();
-      await writable.write('something');
-      await writable.write
-      await writable.close();
+      try {
+        // @ts-ignore
+        const handle = await window.showSaveFilePicker({
+          suggestedName: 'CanvasName',
+          types: [{
+            description: 'SVG Document',
+            accept: {'image/svg+xml': ['.svg']},
+          }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write('something');
+        await writable.write
+        await writable.close();
+      } catch (e: any) {
+        // no save
+      }
     });
   }
 
