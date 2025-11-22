@@ -43,19 +43,12 @@ export default class PgButtonMenu extends HTMLElement {
     this.#menuOpen = !this.#menuOpen;
     this.$icon.path = this.#menuOpen ? IconCollapse : IconExpand;
     if (!this.#menuOpen) { return; }
-    const items = this.items.map((item) => {
-      return {
-        type: PgMenuItem,
-        label: item.label,
-        value: item.value
-      };
-    });
     // Create Menu
     const result = await PgOverlayMenu.open({
       source: this,
-      default: this.default ?? items[0],
-      value: items.find(x => x.value === this.value) ?? null,
-      items: items
+      default: this.default ?? this.items[0],
+      value: this.items.find(x => x.value === this.value) ?? null,
+      items: this.items
     });
     this.$icon.path = IconExpand;
     if (result !== undefined) {

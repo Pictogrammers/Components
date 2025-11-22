@@ -43,4 +43,8 @@ export default class PgButton extends HTMLElement {
       this.$button.classList.toggle('block', this.block);
     }
   }
+
+  getBoundingClientRect(): DOMRect {
+    return this.$button.getBoundingClientRect();
+  }
 }

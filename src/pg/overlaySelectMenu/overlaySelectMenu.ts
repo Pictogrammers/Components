@@ -26,11 +26,12 @@ export default class PgOverlaySelectMenu extends PgOverlay {
         this.items.forEach(item => item.checked = false);
         this.items.find(item => item.value === this.value.value).checked = true;
       }
-      this.$menu.items = this.items;
     }
   }
 
   connectedCallback() {
+    // Pass throughs are binded once, do not do this in render
+    this.$menu.items = this.items;
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
     this.$overlay.popover = 'auto';
     if (this.source !== null) {
