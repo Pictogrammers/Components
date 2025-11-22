@@ -47,8 +47,7 @@ export default class XPgModificationBasic extends HTMLElement {
           "user": {
               "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
               "name": "Austin Andrews",
-              "github": "templarian",
-              "twitter": "Templarian"
+              "github": "templarian"
           },
           "icon": null,
           "version": {

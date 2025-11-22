@@ -43,8 +43,7 @@
   font-weight: bold;
 }
 
-[part="github"] svg,
-[part="twitter"] svg {
+[part="github"] svg {
   width: 1.5rem;
   height: 1.5rem;
 }
@@ -55,13 +54,6 @@
   color: #333;
 }
 
-[part="twitter"] {
-  grid-row: 2;
-  grid-column: 3;
-  color: #333;
-}
-
-[part="github"]:hover,
-[part="twitter"]:hover {
+[part="github"]:hover {
   color: #4f8ff9;
 }

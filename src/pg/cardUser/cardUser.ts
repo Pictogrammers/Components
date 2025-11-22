@@ -21,16 +21,12 @@ export default class PgCardUser extends HTMLElement {
   @Part() $user: HTMLDivElement;
   @Part() $name: HTMLDivElement;
   @Part() $github: HTMLAnchorElement;
-  @Part() $twitter: HTMLAnchorElement;
   @Part() $iconCountValue: HTMLDivElement;
   @Part() $avatar: PgAvatar;
 
   connectedCallback() {
     addTooltip(this.$github, () => {
       return `View ${this.user?.github} on GitHub`;
-    });
-    addTooltip(this.$twitter, () => {
-      return `View ${this.user?.twitter} on Twitter`;
     });
   }
 
@@ -41,8 +37,6 @@ export default class PgCardUser extends HTMLElement {
       this.$iconCountValue.innerText = `${this.user.iconCount}`;
       this.$github.href = `https://github.com/${this.user.github}`;
       this.$github.style.setProperty('display', this.user.github ? null : 'none');
-      this.$twitter.href = `https://github.com/${this.user.twitter}`;
-      this.$twitter.style.setProperty('display', this.user.twitter ? null : 'none');
       this.$user.style.setProperty('display', null);
       this.$loading.style.setProperty('display', 'none');
     } else {

@@ -20,7 +20,6 @@ export default class XPgCardUserBasic extends HTMLElement {
       "description": "Hello, I am a developer that gets bored and makes icons, then websites for icons, then more icons. Open Source is pretty awesome.",
       "base64": AVATAR,
       "github": "Templarian",
-      "twitter": "Templarian",
       "iconCount": 928,
       "website": "http:\/\/templarian.com",
       "sponsored": true,

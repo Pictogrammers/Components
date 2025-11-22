@@ -30,8 +30,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": null,
     "version": {
@@ -56,8 +55,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -66,8 +64,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -87,8 +84,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -97,8 +93,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -118,8 +113,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -128,8 +122,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -149,8 +142,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -159,8 +151,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -180,8 +171,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -190,8 +180,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -211,8 +200,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -221,8 +209,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -242,8 +229,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -252,8 +238,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -273,8 +258,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -283,8 +267,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -304,8 +287,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -314,8 +296,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -335,8 +316,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -345,8 +325,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -366,8 +345,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -376,8 +354,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42
@@ -397,8 +374,7 @@ export const modifications: any[] = [
     "user": {
       "id": "c4ea5584-07e3-11e4-bf19-842b2b6cfe1b",
       "name": "Austin Andrews",
-      "github": "templarian",
-      "twitter": "Templarian"
+      "github": "templarian"
     },
     "icon": {
       "id": "AB147073-9D20-4DA1-A108-3856FC1764C1",
@@ -407,8 +383,7 @@ export const modifications: any[] = [
       "user": {
         "id": "79c44334-2d86-11e5-8ac4-842b2b6cfe1b",
         "name": "First Last",
-        "github": "GitHubUser",
-        "twitter": "TwitterName"
+        "github": "GitHubUser"
       }
     },
     "issue": 42

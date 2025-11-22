@@ -2,7 +2,6 @@ export class User {
 
   public id: string | null = null;
   public github: string | null = null;
-  public twitter: string | null = null;
   public name: string | null = null;
   public base64: string | null = null;
   public iconCount: number | null = null;
@@ -15,7 +14,6 @@ export class User {
   from(user: User): User {
       this.id = user.id;
       this.github = user.github;
-      this.twitter = user.twitter;
       this.name = user.name;
       if (typeof user.base64 === 'string') {
           if (user.base64.match(/^data/)) {
