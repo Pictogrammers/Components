@@ -1,6 +1,6 @@
 # Material Design Icons - Website Components
 
-> Note this repo is for the components used in the Material Design Icons website. If you want components for your own project look here:
+> Note this repo is for the components used in the Material Design Icons apps. If you want components for your own project look here:
 >
 > - [React](https://github.com/Templarian/MaterialDesign-React/)
 > - [Web Component](https://github.com/Templarian/MaterialDesign-WebComponent/)
@@ -22,7 +22,7 @@ npm start
 
 Open http://localhost:3000 (port could vary)
 
-To build just the components.
+To build the components.
 
 ```bash
 npm run build
