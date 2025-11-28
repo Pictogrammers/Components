@@ -11,7 +11,7 @@ import {
   copyFolderSync,
   copyFolderContentsSync,
   eachComponent
-} from './utils';
+} from './utils.js';
 import { execSync } from "child_process";
 
 // publish/
@@ -26,10 +26,10 @@ folder('publish');
 // Copy README.md to publish/README.md
 copyFileSync('README.md', 'publish/README.md');
 console.log(`Done: "README.md" copied to "publish/README.md`);
-copyFolderSync('dist', 'publish');
-removeFolder('publish/dist/api');
-remove('publish/dist/index.html');
-remove('publish/dist/main.js.LICENSE.txt');
+//copyFolderSync('dist', 'publish');
+//removeFolder('publish/dist/api');
+//remove('publish/dist/index.html');
+//remove('publish/dist/main.js.LICENSE.txt');
 // Write publish/package.json
 const pkg = JSON.parse(read('package.json'));
 delete pkg.private;
@@ -57,6 +57,8 @@ eachComponent('publish', ({ cls, namespace, component }) => {
   }
 });
 console.log(`Done: injecting "index.ts" into each component`);
-// Cleanup
+// Overwrite index.html
+copyFileSync('dist/index.html', 'publish/index.html');
+copyFileSync('dist/main.js', 'publish/main.js');
 // Final Message
 console.log(`Done! Please run "cd publish" and "npm publish".`);

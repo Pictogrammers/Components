@@ -1,11 +1,11 @@
-# Material Design Icons - Website Components
+# Pictogrammers - Components
 
-> Note this repo is for the components used in the Material Design Icons apps. If you want components for your own project look here:
+> Note this repo is for the components used in various Pictogrammers apps. If you are looking for icon related components for your own project look here:
 >
 > - [React](https://github.com/Templarian/MaterialDesign-React/)
 > - [Web Component](https://github.com/Templarian/MaterialDesign-WebComponent/)
 
-The website is made of many components, view the `src/pg` folder to see the source.
+Components here are in various stages of development, view the `src/pg` folder to see the source.
 
 - [View the Components](https://pictogrammers.github.io/@pictogrammers/components/)
 
@@ -15,7 +15,6 @@ To run the demo application locally use the following NPM commands.
 
 ```bash
 npm install
-npm test
 npm start
 # npm start [pgButton|pg-button, ...]
 ```
@@ -38,7 +37,7 @@ npm run publish
 
 ### Web Components
 
-Web Components with a very basic wrapper. The only magic is...
+Web Components with a [very basic wrapper](https://github.com/Pictogrammers/Element/). The only magic is...
 
 - `@Prop() foo = 'Hello World`;
   - Calls `this.render()` on change.

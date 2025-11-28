@@ -125,5 +125,5 @@ export const example = [
   '| Row 3                | Row 3    |',
   '| Row 4                | Row 4    |',
   '',
-  'Done, but `code` blocks would be useful.'
+  'End of document, and `code` blocks also work.'
 ].join('\n');

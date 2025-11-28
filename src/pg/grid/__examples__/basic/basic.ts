@@ -11,7 +11,7 @@ import template from './basic.html';
   template
 })
 export default class XPgGridBasic extends HTMLElement {
-
+/*
   @Prop() fontId = 'D051337E-BC7E-11E5-A4E9-842B2B6CFE1B';
 
   @Part() $button0: HTMLButtonElement;

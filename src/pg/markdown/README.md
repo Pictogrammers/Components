@@ -8,6 +8,20 @@ import '@pictogrammers/components/pg/markdown';
 
 ## Usage
 
-| Events | Description |
-| ------ | ----------- |
-| `onchange` | `event = { detail: { r, g, b, hex } }` |
+All markdown formatting is supported. Code blocks support:
+
+- css
+- groovy
+- javascript
+- json
+- jsx
+- tsx
+- java
+- markup (aka html, xml)
+- typescript
+- sass
+- scss
+- yaml (with a custom viewer)
+- php
+- bash
+- markdown

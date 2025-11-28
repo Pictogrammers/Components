@@ -12,7 +12,7 @@ export default class XPgDatabaseBasic extends HTMLElement {
 
   @Prop() fontId = 'D051337E-BC7E-11E5-A4E9-842B2B6CFE1B';
 
-  @Part() $database: PgDatabase;
+  //@Part() $database: PgDatabase;
 
   @Part() $count: HTMLSpanElement;
   @Part() $total: HTMLSpanElement;
@@ -20,8 +20,8 @@ export default class XPgDatabaseBasic extends HTMLElement {
   icons: Icon[] = [];
 
   connectedCallback() {
-    this.$database.addEventListener('sync', this.handleSync.bind(this));
-    this.$database.font = this.fontId;
+    //this.$database.addEventListener('sync', this.handleSync.bind(this));
+    //this.$database.font = this.fontId;
   }
 
   async handleSync(e: CustomEvent) {
