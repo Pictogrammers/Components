@@ -147,14 +147,6 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.handlePointerDown.bind(this)
     );
     this.$canvas.addEventListener(
-      'pointerup',
-      this.handlePointerUp.bind(this)
-    );
-    this.$canvas.addEventListener(
-      'pointermove',
-      this.handlePointerMove.bind(this)
-    );
-    this.$canvas.addEventListener(
       'pointerenter',
       this.handlePointerEnter.bind(this)
     );
@@ -266,11 +258,13 @@ export default class PgInputPixelEditor extends HTMLElement {
   };
 
   #setPixel(x: number, y: number, color: number) {
-    if (x > this.width) {
-      throw new Error(`Invalid x; ${x} > ${this.width}`);
+    if (x >= this.width || x < 0) {
+      return;
+      // throw new Error(`Invalid x; ${x} > ${this.width} or ${x} < 0`);
     }
-    if (y > this.height) {
-      throw new Error(`Invalid y; ${y} > ${this.height}`);
+    if (y >= this.height || y < 0) {
+      return;
+      // throw new Error(`Invalid y; ${y} > ${this.height} or ${x} < 0`);
     }
     const totalSize = this.size + this.gridSize;
     // Edit Layer
@@ -306,7 +300,6 @@ export default class PgInputPixelEditor extends HTMLElement {
       x * totalSize, y * totalSize, this.size + 2, this.size + 2,
       x * totalSize, y * totalSize, this.size + 2, this.size + 2
     );
-    console.log('draw pixel(x, y, color, data):', x, y, color, this.#data[this.#layer][y][x]);
     // Verify this is the only place setting pixel data!
     this.#data[this.#layer][y][x] = color;
     this.#delayedChange();
@@ -411,6 +404,9 @@ export default class PgInputPixelEditor extends HTMLElement {
     event?.preventDefault();
   }
 
+  #handlePointerMoveCache;
+  #handlePointerUpCache;
+
   handlePointerDown(event: MouseEvent) {
     if (event.buttons !== 1 && event.buttons !== 32) {
       event.preventDefault();
@@ -443,6 +439,28 @@ export default class PgInputPixelEditor extends HTMLElement {
         break;
     }
     console.log(this.#inputMode, newX, newY);
+    // track movement
+    this.#handlePointerMoveCache = this.handlePointerMove.bind(this);
+    document.addEventListener('pointermove', this.#handlePointerMoveCache);
+    // pointer outside
+    this.#handlePointerUpCache = this.handlePointerUp.bind(this);
+    document.addEventListener('pointerup', this.#handlePointerUpCache);
+  }
+
+  #pointerOutside = false;
+  handlePointerUpGlobal() {
+    if (this.#pointerOutside) {
+      this.handlePointerUp({
+        clientX: 100,
+        clientY: 100
+      } as any);
+      this.cleanupPointerGlobal();
+    }
+  }
+
+  cleanupPointerGlobal() {
+    document.removeEventListener('pointermove', this.#handlePointerMoveCache);
+    document.removeEventListener('pointerup', this.#handlePointerUpCache);
   }
 
   handlePointerUp(event: MouseEvent) {
@@ -450,11 +468,11 @@ export default class PgInputPixelEditor extends HTMLElement {
     const totalSize = this.size + this.gridSize;
     let newX = Math.floor((event.clientX - rect.left) / totalSize);
     let newY = Math.floor((event.clientY - rect.top) / totalSize);
-    if (newX >= this.width) { newX = this.width - 1; }
-    if (newY >= this.height) { newY = this.height - 1; }
-    if (this.#startX === -1 && this.#startY === -1) {
-      return;
-    }
+    //if (newX >= this.width) { newX = this.width - 1; }
+    //if (newY >= this.height) { newY = this.height - 1; }
+    //if (this.#startX === -1 && this.#startY === -1) {
+    //  return;
+    //}
     // Single Tap
     if (newX === this.#startX && newY === this.#startY && this.#startColor === 1) {
       switch (this.#inputMode) {
@@ -495,6 +513,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#x = -1;
     this.#y = -1;
     this.#isPressed = false;
+    this.cleanupPointerGlobal();
   }
 
   handlePointerMove(event: PointerEvent) {
@@ -518,7 +537,7 @@ export default class PgInputPixelEditor extends HTMLElement {
         for (const evt of events) {
           let tX = Math.floor((evt.clientX - rect.left) / totalSize);
           let tY = Math.floor((evt.clientY - rect.top) / totalSize);
-          if (tX >= this.width || tY >= this.height || (tX === x && tY === y)) {
+          if (tX === x && tY === y) {
             continue;
           }
           points.push([tX, tY]);
@@ -527,8 +546,6 @@ export default class PgInputPixelEditor extends HTMLElement {
         let newX = Math.floor((event.clientX - rect.left) / totalSize);
         let newY = Math.floor((event.clientY - rect.top) / totalSize);
         if (newX === x && newY === y) { return; }
-        if (newX >= this.width) { newX = this.width - 1; }
-        if (newY >= this.height) { newY = this.height - 1; }
         points.push([newX, newY]);
       }
       // Is Eraser
@@ -575,6 +592,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       // editing layer to main canvas
       this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
     }
+    this.#pointerOutside = false;
   }
 
   handlePointerLeave(event: MouseEvent) {
@@ -584,6 +602,8 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#context.drawImage(this.#baseLayer, 0, 0);
       // editing layer to main canvas
       this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
+    } else if (this.#isEditing) {
+      this.#pointerOutside = true;
     }
   }
 

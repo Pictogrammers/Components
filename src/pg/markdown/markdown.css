@@ -1,6 +1,10 @@
 :host {
-  display: block;
+  display: contents;
   color: #453C4F;
+}
+
+[part=content] {
+  display: contents;
 }
 
 h1 {

@@ -13,34 +13,15 @@ export default config({
     return createIndex(components, mode);
   },
   watch: [],
-  copy: [
-    { from: "src/theme-ui3.css", to: `theme-ui3.css` }
-  ],
+  //copy: [
+    //{ from: "src/theme-ui3.css", to: `theme-ui3.css` }
+  //],
   before: (components, args, mode) => {
     // Components + GreenText(# of Components)
     console.log('Components', bold(green(components.length)));
-    const filteredComponents = args;
-    if (filteredComponents.length) {
-      let exists = [], invalid = [];
-      components.forEach(({ name }) => {
-        if (filteredComponents.includes(name)) {
-          exists.push(name);
-        } else {
-          invalid.push(name);
-        }
-      });
-      console.log(' +', ...(exists.map(name => green(name))));
-      console.log(' -', ...(invalid.map(name => red(name))));
-      // Remove invalid components
-      for(let i = components.length - 1; i >= 0; i--) {
-        if (invalid.includes(components[i].name)) {
-          components.splice(i, 1);
-        }
-      }
-    }
   },
   after: (components, args, mode) => {
-    // Nothing
+    import('./scripts/publish.js');
   }
 });
 

@@ -54,6 +54,7 @@
 
 [part=side] {
   display: flex;
+  flex-direction: column;
   grid-column: 1;
   grid-row: 2;
   min-width: 10rem;
@@ -62,6 +63,7 @@
 
 slot[name=main] {
   display: flex;
+  flex-direction: column;
   grid-column: 3;
   grid-row: 2;
 }
@@ -84,6 +86,7 @@ slot[name=main] {
 
 [part=home] {
   display: flex;
+  flex-direction: column;
   grid-column: 1 / 4;
   grid-row: 2;
   background-color: #fff;
