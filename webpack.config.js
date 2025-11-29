@@ -40,6 +40,9 @@ export default config({
       }
     }
   },
+  update: (files) => {
+    console.log(files);
+  },
   after: (components, args, mode) => {
     // Nothing
   }

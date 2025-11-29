@@ -435,7 +435,6 @@ export default class PgInputPixelEditor extends HTMLElement {
     switch (this.#inputMode) {
       case InputMode.Pixel:
         this.#setPixel(newX, newY, color);
-        this.#data[this.#layer][newY][newX] = color;
         break;
     }
     console.log(this.#inputMode, newX, newY);
@@ -562,7 +561,6 @@ export default class PgInputPixelEditor extends HTMLElement {
         case InputMode.Pixel:
           for (var point of points) {
             this.#setPixel(point[0], point[1], color);
-            data[this.#layer][point[1]][point[0]] = color;
           }
           break;
         case InputMode.Line:

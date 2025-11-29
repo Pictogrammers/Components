@@ -61,7 +61,7 @@
   max-width: 20rem;
 }
 
-slot[name=main] {
+[part=main] {
   display: flex;
   flex-direction: column;
   grid-column: 3;
