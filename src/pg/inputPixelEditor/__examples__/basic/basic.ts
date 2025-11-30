@@ -142,7 +142,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
           const size = content.match(/viewBox="\d+ \d+ (\d+) (\d+)"/) as string[];
           const width = parseInt(size[1], 10);
           const height = parseInt(size[2], 10);
-          const path = (content.match(/d="([^"]+)"/) as string[])[1];
+          const path = (content.match(/\sd="([^"]+)"/) as string[])[1];
           // Render path
           console.log(path, size[1], size[2]);
           this.$input.applyTemplate(maskToBitmap(path, width, height));

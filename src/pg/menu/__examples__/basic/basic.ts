@@ -27,7 +27,11 @@ export default class XPgMenuBasic extends HTMLElement {
     },
     {
       label: 'Item 3',
-      value: 'item3'
+      value: 'item3',
+      items: [{
+        label: 'Item 4',
+        value: 'item4'
+      }]
     }];
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
   }

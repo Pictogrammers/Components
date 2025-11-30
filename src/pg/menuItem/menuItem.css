@@ -77,10 +77,13 @@
   background: var(--pg-focus-background-color, rgb(79, 143, 249, 0.1));
 }
 
+[part=label].more {
+  padding-right: 1.5rem;
+}
 
 [part=label].more::after {
   position: absolute;
-  translate: -0.5rem 0;
+  translate: -0.25rem 0;
   right: 0;
   content: var(--pg-menu-item-check, url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z' fill='rgb(69, 60, 79)' /></svg>"));
   width: 1.5rem;

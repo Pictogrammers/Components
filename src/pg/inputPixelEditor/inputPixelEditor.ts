@@ -447,15 +447,6 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   #pointerOutside = false;
-  handlePointerUpGlobal() {
-    if (this.#pointerOutside) {
-      this.handlePointerUp({
-        clientX: 100,
-        clientY: 100
-      } as any);
-      this.cleanupPointerGlobal();
-    }
-  }
 
   cleanupPointerGlobal() {
     document.removeEventListener('pointermove', this.#handlePointerMoveCache);
@@ -513,6 +504,13 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#y = -1;
     this.#isPressed = false;
     this.cleanupPointerGlobal();
+    if (this.#pointerOutside) {
+      this.#isEditing = false;
+      // base layer to main canvas
+      this.#context.drawImage(this.#baseLayer, 0, 0);
+      // editing layer to main canvas
+      this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
+    }
   }
 
   handlePointerMove(event: PointerEvent) {

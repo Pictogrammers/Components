@@ -1,6 +1,6 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import PgOverlaySubMenu from '../overlaySubMenu/overlaySubMenu'
+import PgOverlaySubMenu from '../overlaySubMenu/overlaySubMenu';
 import PgIcon from '../icon/icon';
 
 import template from './menuItemIcon.html';
