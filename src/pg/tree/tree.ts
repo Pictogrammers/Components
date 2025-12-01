@@ -42,7 +42,7 @@ export default class PgTree extends HTMLElement {
       this.dispatchEvent(new CustomEvent('action', {
         detail: {
           actionIndex: e.detail.actionIndex,
-          item: this.#wrap(e.detail.indexes)
+          item: this.#wrap(e.detail.indexes),
         }
       }));
     });
@@ -52,7 +52,17 @@ export default class PgTree extends HTMLElement {
       this.dispatchEvent(new CustomEvent('move', {
         detail: {
           item: this.#wrap(e.detail.indexes),
-          position
+          position,
+        }
+      }));
+    });
+    this.$items.addEventListener('rename', (e: any) => {
+      const { indexes, label } = e.detail;
+      e.stopPropagation();
+      this.dispatchEvent(new CustomEvent('rename', {
+        detail: {
+          item: this.#wrap(indexes),
+          label,
         }
       }));
     });

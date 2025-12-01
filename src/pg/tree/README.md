@@ -10,6 +10,13 @@ The `pg-tree` is used to render a tree list of items.
 
 While setup for a normal file tree this can be used for any folder structure.
 
+```typescript
+import '@pictogrammers/components/pg/tree';
+import '@pictogrammers/components/pg/treeItem';
+import '@pictogrammers/components/pg/treeButtonIcon';
+import PgTree, { SelectedTreeItem } from '@pictogrammers/components/pg/tree';
+```
+
 ## Events
 
 - select
@@ -21,15 +28,16 @@ While setup for a normal file tree this can be used for any folder structure.
 ```typescript
 this.$tree.addEventListener('select', (e: any) => {
   const { items } = e.detail;
+  // items is a
   this.selectedItems = items;
 });
 ```
 
 ```typescript
 this.$tree.addEventListener('rename', (e: any) => {
-  const { indexes, label } = e.detail;
-  const item = this.#getItem(indexes);
-  item.label = label;
+  const { item, label } = e.detail;
+  const itemData = item.getData();
+  itemData.label = label;
 });
 ```
 

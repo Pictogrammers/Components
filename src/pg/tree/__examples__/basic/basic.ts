@@ -96,9 +96,9 @@ export default class XPgTreeBasic extends HTMLElement {
       });
     });
     this.$tree.addEventListener('rename', (e: any) => {
-      const { indexes, label } = e.detail;
-      const item = this.#getItem(indexes);
-      item.label = label;
+      const { item, label } = e.detail;
+      const itemData = item.getData();
+      itemData.label = label;
     });
     this.$tree.addEventListener('menu', (e: any) => {
       // menu
@@ -152,11 +152,5 @@ export default class XPgTreeBasic extends HTMLElement {
         selected.getData().label = `Updated ${updatedTimes++}`;
       });
     });
-  }
-
-  #getItem(indexes: number[]) {
-    return indexes.reduce((item, index) => {
-      return item.items[index];
-    }, this.$tree);
   }
 }

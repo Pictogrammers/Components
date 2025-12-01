@@ -1,4 +1,4 @@
-# `<pg-button-toggle>`
+# `<pg-button-menu>`
 
 The `pg-button-toggle` component is essentially just a button with swappable slotted content. Commonly used with icons, but using `span` elements will allow assigning text content.
 
@@ -8,27 +8,20 @@ import PgButtonToggle from '@pictogrammers/components/pg/buttonToggle';
 ```
 
 ```html
-<pg-button-toggle>
-  <pg-icon slot="active" path="M...Z"></pg-icon>
-  <pg-icon slot="inactive" path="M...Z"></pg-icon>
-</pg-button-toggle>
+<pg-button-menu part="menu"></pg-button-toggle>
 ```
-
-| Slots       | Tested   | Description |
-| ----------- | -------- | ----------- |
-| default     | &#x2705; | Button contents. |
 
 | Attribute  | Tested   | Description |
 | ---------- | -------- | ----------- |
-| block      |          | block sizing |
-| active     |          | Depressed visual state. |
+| menu      |          | block sizing |
 | start      |          | Internal Only |
 | end        |          | Internal Only |
 | center     |          | Internal Only |
 
 | Events     | Tested   | Description |
 | ---------- | -------- | ----------- |
-| click      | &#x2705; | Standard click. |
+| open       | &#x2705; | Menu open. |
+| close      | &#x2705; | Menu close. |
 
 | CSS Variables       | Default   | Description |
 | ------------------- | --------- | ----------- |
