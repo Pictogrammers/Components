@@ -1,5 +1,6 @@
 :host {
   display: contents;
+  --pg-tree-size: 2;
   --pg-tree-selected-primary: #453C4F;
   --pg-tree-selected-secondary: var(--pg-tree-item-background-selected, rgb(69, 60, 79, 0.1));
   --pg-tree-selected-secondary-hover: var(--pg-tree-item-background-selected, rgb(69, 60, 79, 0.2));

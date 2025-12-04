@@ -1,5 +1,7 @@
 import config from '@pictogrammers/element-webpack';
 
+import { copyFile } from 'fs';
+
 import createIndex from './scripts/createIndex.js';
 
 const bold = (text) => '\x1b[1m' + text + '\x1b[0m';
@@ -41,6 +43,14 @@ export default config({
     }
   },
   update: (files) => {
+    files.forEach((file) => {
+      if (file.startsWith('src')) {
+        // copy src -> dist
+        copyFile(file, file.replace(/^src/, 'publish'), () => {
+          console.log('Copied', file);
+        });
+      }
+    });
     console.log(files);
   },
   after: (components, args, mode) => {

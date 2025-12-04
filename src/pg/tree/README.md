@@ -73,3 +73,12 @@ this.$tree.addEventListener('drop', (e: any) => {
   })
 });
 ```
+
+## Custom Size
+
+Resize from the default 32px height all the way down to 24px tall via a CSS Variable.
+
+```css
+--pg-icon-width: 1rem;
+--pg-icon-height: 1rem;
+```

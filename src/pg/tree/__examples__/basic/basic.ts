@@ -65,6 +65,7 @@ export default class XPgTreeBasic extends HTMLElement {
   @Part() $addFolder: HTMLButtonElement;
   @Part() $removeItem: HTMLButtonElement;
   @Part() $updateItem: HTMLButtonElement;
+  @Part() $height: HTMLInputElement;
 
   #selectedItems = [];
 
@@ -151,6 +152,11 @@ export default class XPgTreeBasic extends HTMLElement {
       this.#selectedItems.forEach((selected: SelectedTreeItem) => {
         selected.getData().label = `Updated ${updatedTimes++}`;
       });
+    });
+
+    this.$height.addEventListener('input', (e) => {
+      const { value } = e.target as HTMLInputElement;
+      this.$tree.style.setProperty('--pg-tree-size', `${value}`);
     });
   }
 }

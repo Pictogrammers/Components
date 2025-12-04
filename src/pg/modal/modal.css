@@ -1,0 +1,40 @@
+.backdrop {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+.dialog {
+  background: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 1rem rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  min-width: 15rem;
+}
+header {
+  border-bottom: 1px solid #ccc;
+  background: #f1f1f1;
+  padding: 0.75rem 1rem;
+}
+header h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  font-weight: normal;
+}
+main {
+  padding: 0.5rem 1rem;
+}
+footer {
+  display: flex;
+  flex-direction: row;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #ccc;
+  background: #f1f1f1;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

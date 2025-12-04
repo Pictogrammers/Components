@@ -2,7 +2,7 @@
   "private": true,
   "name": "@pictogrammers/components",
   "type": "module",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "license": "MIT",
   "author": "Austin Andrews",
   "scripts": {
@@ -25,7 +25,7 @@
     "remarkable": "^2.0.1"
   },
   "devDependencies": {
-    "@pictogrammers/element": "0.0.68",
+    "@pictogrammers/element": "0.0.70",
     "@pictogrammers/element-jest": "^0.1.10",
     "@pictogrammers/element-webpack": "^0.1.56",
     "cross-env": "^7.0.3",

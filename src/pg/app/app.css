@@ -57,7 +57,7 @@
   flex-direction: column;
   grid-column: 1;
   grid-row: 2;
-  min-width: 10rem;
+  min-width: 12rem;
   max-width: 20rem;
 }
 
