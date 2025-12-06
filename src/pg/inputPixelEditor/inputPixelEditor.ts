@@ -4,6 +4,7 @@ import template from './inputPixelEditor.html';
 import style from './inputPixelEditor.css';
 import { InputMode } from './utils/inputMode';
 import cloneGrid from './utils/cloneGrid';
+import getEllipsePixels from './utils/getEllipsePixels';
 import getEllipseOutlinePixels from './utils/getEllipseOutlinePixels';
 import { WHITE } from './utils/constants';
 import getLinePixels from './utils/getLinePixels';
@@ -489,7 +490,7 @@ export default class PgInputPixelEditor extends HTMLElement {
           });
           break;
         case InputMode.Ellipse:
-          getEllipseOutlinePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
+          getEllipsePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
             this.#setPixel(x, y, 1);
           });
           break;
@@ -571,7 +572,7 @@ export default class PgInputPixelEditor extends HTMLElement {
           this.#setPreview(getRectangleOutlinePixels(startX, startY, lastX, lastY), x, y);
           break;
         case InputMode.Ellipse:
-          this.#setPreview(getEllipseOutlinePixels(startX, startY, lastX, lastY), x, y);
+          this.#setPreview(getEllipsePixels(startX, startY, lastX, lastY), x, y);
           break;
         case InputMode.EllipseOutline:
           this.#setPreview(getEllipseOutlinePixels(startX, startY, lastX, lastY), x, y);
