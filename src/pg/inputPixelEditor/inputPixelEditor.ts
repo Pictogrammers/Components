@@ -381,7 +381,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     }));
   }
 
-  #setPenPreview(pixels: Pixel[], previousX: number, previousY: number) {
+  #setPenPreview(pixels: Pixel[], centerX: number, centerY: number, previousX: number, previousY: number) {
     const totalSize = this.size + this.gridSize;
     const actualWidth = this.width * totalSize - this.gridSize;
     const actualHeight = this.height * totalSize - this.gridSize;
@@ -393,10 +393,13 @@ export default class PgInputPixelEditor extends HTMLElement {
         maxY: Math.max(previous.maxY, current.y, previousY)
       };
     }, { minX: this.width, maxX: 0, minY: this.height, maxY: 0 });
-    const x = minX * totalSize;
-    const y = minY * totalSize;
-    const width = (maxX - minX + 1) * totalSize;
-    const height = (maxY - minY + 1) * totalSize;
+    const offsetX = previousX - centerX;
+    const offsetY = previousY - centerY;
+    const x = offsetX < 0 ? (minX + offsetX) * totalSize : minX * totalSize;
+    const y = offsetY < 0 ? (minY + offsetY) * totalSize : minY * totalSize;
+    console.log(offsetX, offsetY, x, y);
+    const width = (maxX - minX + 1 + Math.abs(offsetX)) * totalSize;
+    const height = (maxY - minY + 1 + Math.abs(offsetY)) * totalSize;
     this.#context.clearRect(x, y, width, height);
     // base layer to main canvas
     this.#context.drawImage(
@@ -411,12 +414,12 @@ export default class PgInputPixelEditor extends HTMLElement {
       x, y, width, height
     );
     // preview layer
-    this.#previewLayerContext.clearRect(0, 0, actualWidth, actualHeight);
+    this.#previewLayerContext.clearRect(x, y, width, height);
     pixels.forEach(({ x, y }) => {
       this.#previewLayerContext.fillStyle = '#1B79C8';
       this.#previewLayerContext.fillRect(x * totalSize + 2, y * totalSize + 2, this.size - 4, this.size - 4);
     });
-    // preview layer to main canvas
+    //console.log(x, y, width, height);
     this.#context.drawImage(
       this.#previewLayer,
       x, y, width, height,
@@ -494,7 +497,9 @@ export default class PgInputPixelEditor extends HTMLElement {
     const color = event.buttons === 32 ? 0 : 1;
     switch (this.#inputMode) {
       case InputMode.Pixel:
-        this.#setPixel(newX, newY, color);
+        pixelSizes[3].forEach((arr) => {
+          this.#setPixel(newX + arr[0], newY + arr[1], color);
+        });
         break;
     }
     console.log(this.#inputMode, newX, newY);
@@ -527,7 +532,9 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (newX === this.#startX && newY === this.#startY && this.#startColor === 1) {
       switch (this.#inputMode) {
         case InputMode.Pixel:
-          this.#setPixel(newX, newY, 0);
+          pixelSizes[3].forEach((arr) => {
+            this.#setPixel(newX + arr[0], newY + arr[1], 0);
+          });
           this.#data[this.#layer][newY][newX] = 0;
           break;
       }
@@ -618,7 +625,9 @@ export default class PgInputPixelEditor extends HTMLElement {
       switch (this.#inputMode) {
         case InputMode.Pixel:
           for (var point of points) {
-            this.#setPixel(point[0], point[1], color);
+            pixelSizes[3].forEach((arr) => {
+              this.#setPixel(point[0] + arr[0], point[1] + arr[1], color);
+            });
           }
           break;
         case InputMode.Line:
@@ -654,8 +663,8 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#pointerOutside = false;
   }
 
-  #moveX = 0;
-  #moveY = 0;
+  #moveX = -1;
+  #moveY = -1;
   #handlePointerMovePreviewCache;
   handlePointerMovePreview(event: MouseEvent) {
     const rect = this.$canvas.getBoundingClientRect();
@@ -665,9 +674,11 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (newX === this.#moveX && newY === this.#moveY) { return; }
     if (newX < 0 || newY < 0) { return; }
     this.#setPenPreview(
-      pixelSizes[1].map(arr => ({ x: arr[0] + newX, y: arr[1] + newY })),
-      this.#moveX,
-      this.#moveY
+      pixelSizes[3].map(arr => ({ x: arr[0] + newX, y: arr[1] + newY })),
+      newX,
+      newY,
+      this.#moveX === -1 ? newX : this.#moveX,
+      this.#moveY === -1 ? newY : this.#moveY,
     );
     this.#moveX = newX;
     this.#moveY = newY;
