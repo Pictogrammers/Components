@@ -1,4 +1,5 @@
 export const enum InputMode {
+  Stamp,
   Pixel,
   Line,
   Rectangle,

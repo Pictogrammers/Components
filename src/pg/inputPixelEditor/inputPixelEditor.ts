@@ -16,7 +16,6 @@ import bitmaskToPath from './utils/bitmapToMask';
 import createLayer from './utils/createLayer';
 import diffGrid from './utils/diffGrid';
 import { getGuides } from './utils/getGuides';
-import { pixelSizes } from './utils/pixelSizes';
 
 type Pixel = { x: number, y: number };
 
@@ -100,6 +99,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   @Part() $canvas: HTMLCanvasElement;
 
   // Internal State
+  #inputStamp: number[][] = [];
   #inputMode: InputMode = InputMode.Pixel;
   #isPressed: boolean = false;
   #isEditing: boolean = false;
@@ -497,8 +497,11 @@ export default class PgInputPixelEditor extends HTMLElement {
     const color = event.buttons === 32 ? 0 : 1;
     switch (this.#inputMode) {
       case InputMode.Pixel:
-        pixelSizes[3].forEach((arr) => {
-          this.#setPixel(newX + arr[0], newY + arr[1], color);
+        this.#setPixel(newX, newY, color);
+        break;
+      case InputMode.Stamp:
+        this.#inputStamp.forEach((point) => {
+          this.#setPixel(newX + point[0], newY + point[1], color);
         });
         break;
     }
@@ -532,10 +535,13 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (newX === this.#startX && newY === this.#startY && this.#startColor === 1) {
       switch (this.#inputMode) {
         case InputMode.Pixel:
-          pixelSizes[3].forEach((arr) => {
-            this.#setPixel(newX + arr[0], newY + arr[1], 0);
-          });
+          this.#setPixel(newX, newY, 0);
           this.#data[this.#layer][newY][newX] = 0;
+          break;
+        case InputMode.Stamp:
+          this.#inputStamp.forEach((point) => {
+            this.#setPixel(newX + point[0], newY + point[1], 0);
+          });
           break;
       }
     } else {
@@ -625,7 +631,12 @@ export default class PgInputPixelEditor extends HTMLElement {
       switch (this.#inputMode) {
         case InputMode.Pixel:
           for (var point of points) {
-            pixelSizes[3].forEach((arr) => {
+            this.#setPixel(point[0], point[1], color);
+          }
+          break;
+        case InputMode.Stamp:
+          for (var point of points) {
+            this.#inputStamp.forEach((arr) => {
               this.#setPixel(point[0] + arr[0], point[1] + arr[1], color);
             });
           }
@@ -657,8 +668,10 @@ export default class PgInputPixelEditor extends HTMLElement {
       // editing layer to main canvas
       this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
       // track pointer movement
-      this.#handlePointerMovePreviewCache = this.handlePointerMovePreview.bind(this);
-      this.$canvas.addEventListener('pointermove', this.#handlePointerMovePreviewCache);
+      if (this.#inputMode === InputMode.Stamp) {
+        this.#handlePointerMovePreviewCache = this.handlePointerMovePreview.bind(this);
+        this.$canvas.addEventListener('pointermove', this.#handlePointerMovePreviewCache);
+      }
     }
     this.#pointerOutside = false;
   }
@@ -674,7 +687,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (newX === this.#moveX && newY === this.#moveY) { return; }
     if (newX < 0 || newY < 0) { return; }
     this.#setPenPreview(
-      pixelSizes[3].map(arr => ({ x: arr[0] + newX, y: arr[1] + newY })),
+      this.#inputStamp.map(arr => ({ x: arr[0] + newX, y: arr[1] + newY })),
       newX,
       newY,
       this.#moveX === -1 ? newX : this.#moveX,
@@ -866,6 +879,11 @@ export default class PgInputPixelEditor extends HTMLElement {
   #inputModePixelSize = 1;
   inputModePixelSize(size = 1) {
     this.#inputModePixelSize = size;
+  }
+
+  inputModeStamp(stamp: number[][]) {
+    this.#inputStamp = stamp;
+    this.#inputMode = InputMode.Stamp;
   }
 
   inputModePixel() {

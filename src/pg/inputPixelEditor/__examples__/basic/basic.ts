@@ -1,6 +1,7 @@
 import { Component, Part } from '@pictogrammers/element';
 import PgInputPixelEditor from '../../inputPixelEditor';
 import { maskToBitmap } from '../../utils/maskToBitmap';
+import { patterns } from './constants';
 
 import template from './basic.html';
 import style from './basic.css';
@@ -24,6 +25,10 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $reset: HTMLButtonElement;
   @Part() $clear: HTMLButtonElement;
   @Part() $invert: HTMLButtonElement;
+  @Part() $modeStamp1: HTMLButtonElement;
+  @Part() $modeStamp2: HTMLButtonElement;
+  @Part() $modeStamp3: HTMLButtonElement;
+  @Part() $modeStamp4: HTMLButtonElement;
   @Part() $modePixel: HTMLButtonElement;
   @Part() $modeLine: HTMLButtonElement;
   @Part() $modeRectangle: HTMLButtonElement;
@@ -53,6 +58,17 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$transparent.addEventListener('input', this.handleTransparentChange.bind(this));
     this.$input.addEventListener('input', this.handleInput.bind(this));
     this.$input.addEventListener('debug', this.handleDebug.bind(this));
+    [
+      this.$modeStamp1,
+      this.$modeStamp2,
+      this.$modeStamp3,
+      this.$modeStamp4,
+    ].forEach(($modeStamp) => {
+      $modeStamp.addEventListener('click', (e: any) => {
+        const stamp = e.target.dataset.stamp;
+        this.$input.inputModeStamp(patterns[stamp]);
+      });
+    });
     this.$modePixel.addEventListener('click', () => {
       this.$input.inputModePixel();
     });
