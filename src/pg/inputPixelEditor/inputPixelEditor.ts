@@ -381,10 +381,31 @@ export default class PgInputPixelEditor extends HTMLElement {
     }));
   }
 
-  #setPenPreview(pixels: Pixel[], centerX: number, centerY: number, previousX: number, previousY: number) {
+  #previousPreviewRect = { x: 0, y: 0, width: 1, height: 1 };
+  #clearStampPreview() {
+    const { x, y, width, height } = this.#previousPreviewRect;
+    this.#context.clearRect(x, y, width, height);
+    // base layer to main canvas
+    this.#context.drawImage(
+      this.#baseLayer,
+      x, y, width, height,
+      x, y, width, height
+    );
+    // edit to main canvas
+    this.#context.drawImage(
+      this.#editLayer,
+      x, y, width, height,
+      x, y, width, height
+    );
+    this.#context.drawImage(
+      this.#previewLayer,
+      x, y, width, height,
+      x, y, width, height
+    );
+  }
+
+  #setStampPreview(pixels: Pixel[], centerX: number, centerY: number, previousX: number, previousY: number) {
     const totalSize = this.size + this.gridSize;
-    const actualWidth = this.width * totalSize - this.gridSize;
-    const actualHeight = this.height * totalSize - this.gridSize;
     const { minX, maxX, minY, maxY } = pixels.reduce((previous, current) => {
       return {
         minX: Math.min(previous.minX, current.x, previousX),
@@ -397,7 +418,6 @@ export default class PgInputPixelEditor extends HTMLElement {
     const offsetY = previousY - centerY;
     const x = offsetX < 0 ? (minX + offsetX) * totalSize : minX * totalSize;
     const y = offsetY < 0 ? (minY + offsetY) * totalSize : minY * totalSize;
-    console.log(offsetX, offsetY, x, y);
     const width = (maxX - minX + 1 + Math.abs(offsetX)) * totalSize;
     const height = (maxY - minY + 1 + Math.abs(offsetY)) * totalSize;
     this.#context.clearRect(x, y, width, height);
@@ -419,12 +439,13 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#previewLayerContext.fillStyle = '#1B79C8';
       this.#previewLayerContext.fillRect(x * totalSize + 2, y * totalSize + 2, this.size - 4, this.size - 4);
     });
-    //console.log(x, y, width, height);
     this.#context.drawImage(
       this.#previewLayer,
       x, y, width, height,
       x, y, width, height
     );
+    // Store to clear
+    this.#previousPreviewRect = { x, y, width, height };
     // Debug
     this.dispatchEvent(new CustomEvent('debug', {
       detail: {
@@ -686,7 +707,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     let newY = Math.floor((event.clientY - rect.top) / totalSize);
     if (newX === this.#moveX && newY === this.#moveY) { return; }
     if (newX < 0 || newY < 0) { return; }
-    this.#setPenPreview(
+    this.#setStampPreview(
       this.#inputStamp.map(arr => ({ x: arr[0] + newX, y: arr[1] + newY })),
       newX,
       newY,
@@ -884,6 +905,8 @@ export default class PgInputPixelEditor extends HTMLElement {
   inputModeStamp(stamp: number[][]) {
     this.#inputStamp = stamp;
     this.#inputMode = InputMode.Stamp;
+    // Clear previous pixel
+    this.#clearStampPreview();
   }
 
   inputModePixel() {
