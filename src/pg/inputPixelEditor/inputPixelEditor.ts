@@ -16,6 +16,7 @@ import bitmaskToPath from './utils/bitmapToMask';
 import createLayer from './utils/createLayer';
 import diffGrid from './utils/diffGrid';
 import { getGuides } from './utils/getGuides';
+import { pixelSizes } from './utils/pixelSizes';
 
 type Pixel = { x: number, y: number };
 
@@ -380,6 +381,64 @@ export default class PgInputPixelEditor extends HTMLElement {
     }));
   }
 
+  #setPenPreview(pixels: Pixel[], previousX: number, previousY: number) {
+    const totalSize = this.size + this.gridSize;
+    const actualWidth = this.width * totalSize - this.gridSize;
+    const actualHeight = this.height * totalSize - this.gridSize;
+    const { minX, maxX, minY, maxY } = pixels.reduce((previous, current) => {
+      return {
+        minX: Math.min(previous.minX, current.x, previousX),
+        maxX: Math.max(previous.maxX, current.x, previousX),
+        minY: Math.min(previous.minY, current.y, previousY),
+        maxY: Math.max(previous.maxY, current.y, previousY)
+      };
+    }, { minX: this.width, maxX: 0, minY: this.height, maxY: 0 });
+    const x = minX * totalSize;
+    const y = minY * totalSize;
+    const width = (maxX - minX + 1) * totalSize;
+    const height = (maxY - minY + 1) * totalSize;
+    this.#context.clearRect(x, y, width, height);
+    // base layer to main canvas
+    this.#context.drawImage(
+      this.#baseLayer,
+      x, y, width, height,
+      x, y, width, height
+    );
+    // edit to main canvas
+    this.#context.drawImage(
+      this.#editLayer,
+      x, y, width, height,
+      x, y, width, height
+    );
+    // preview layer
+    this.#previewLayerContext.clearRect(0, 0, actualWidth, actualHeight);
+    pixels.forEach(({ x, y }) => {
+      this.#previewLayerContext.fillStyle = '#1B79C8';
+      this.#previewLayerContext.fillRect(x * totalSize + 2, y * totalSize + 2, this.size - 4, this.size - 4);
+    });
+    // preview layer to main canvas
+    this.#context.drawImage(
+      this.#previewLayer,
+      x, y, width, height,
+      x, y, width, height
+    );
+    // Debug
+    this.dispatchEvent(new CustomEvent('debug', {
+      detail: {
+        x,
+        y,
+        width,
+        height,
+        canvas: this.$canvas,
+        context: this.#context,
+        editLayer: this.#editLayer,
+        noEditLayer: this.#noEditLayer,
+        baseLayer: this.#baseLayer,
+        previewLayer: this.#previewLayer
+      }
+    }));
+  }
+
   handleKeyDown(event: KeyboardEvent) {
     console.log(event.shiftKey, event.ctrlKey, event.altKey, event.key);
     switch (event.key) {
@@ -588,8 +647,30 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#context.drawImage(this.#baseLayer, 0, 0);
       // editing layer to main canvas
       this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
+      // track pointer movement
+      this.#handlePointerMovePreviewCache = this.handlePointerMovePreview.bind(this);
+      this.$canvas.addEventListener('pointermove', this.#handlePointerMovePreviewCache);
     }
     this.#pointerOutside = false;
+  }
+
+  #moveX = 0;
+  #moveY = 0;
+  #handlePointerMovePreviewCache;
+  handlePointerMovePreview(event: MouseEvent) {
+    const rect = this.$canvas.getBoundingClientRect();
+    const totalSize = this.size + this.gridSize;
+    let newX = Math.floor((event.clientX - rect.left) / totalSize);
+    let newY = Math.floor((event.clientY - rect.top) / totalSize);
+    if (newX === this.#moveX && newY === this.#moveY) { return; }
+    if (newX < 0 || newY < 0) { return; }
+    this.#setPenPreview(
+      pixelSizes[1].map(arr => ({ x: arr[0] + newX, y: arr[1] + newY })),
+      this.#moveX,
+      this.#moveY
+    );
+    this.#moveX = newX;
+    this.#moveY = newY;
   }
 
   handlePointerLeave(event: MouseEvent) {
@@ -599,6 +680,8 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#context.drawImage(this.#baseLayer, 0, 0);
       // editing layer to main canvas
       this.#context.drawImage(this.#isEditing ? this.#editLayer : this.#noEditLayer, 0, 0);
+      // remove preview tracking
+      this.$canvas.removeEventListener('pointermove', this.#handlePointerMovePreviewCache);
     } else if (this.#isEditing) {
       this.#pointerOutside = true;
     }
@@ -767,6 +850,11 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   hasRedo() {
     return this.#redoHistory.length !== 0;
+  }
+
+  #inputModePixelSize = 1;
+  inputModePixelSize(size = 1) {
+    this.#inputModePixelSize = size;
   }
 
   inputModePixel() {
