@@ -1,0 +1,7 @@
+:host {
+  display: contents;
+}
+
+[part=label] {
+  display: table-cell;
+}

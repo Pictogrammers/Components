@@ -43,6 +43,8 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $saveSvg: HTMLInputElement;
   @Part() $savePng: HTMLInputElement;
 
+  @Part() $addLayer: HTMLButtonElement;
+
   // MAKE A LIST COMPONENT!!!! [text | delete]
   @Part() $colors: HTMLPreElement;
   @Part() $layers: HTMLPreElement;
@@ -141,6 +143,10 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       } catch (e: any) {
         // no save
       }
+    });
+    this.$addLayer.addEventListener('click', () => {
+      // number[][][]
+      // this.$input.addLayer();
     });
   }
 

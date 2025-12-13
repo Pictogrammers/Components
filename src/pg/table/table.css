@@ -1,0 +1,21 @@
+:host {
+  display: inline-flex;
+  color: var(--pg-icon-color, #222);
+}
+
+[part=table] {
+  display: table;
+  border-spacing: 0;
+}
+
+[part=header] {
+  display: table-header-group;
+}
+
+[part=columns] {
+  display: table-row;
+}
+
+[part=rows] {
+  display: table-row-group;
+}

@@ -1,0 +1,3 @@
+# `PgTableColumn`
+
+See `PgTableRow`.
