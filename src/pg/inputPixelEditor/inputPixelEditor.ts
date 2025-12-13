@@ -393,12 +393,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     );
     // edit to main canvas
     this.#context.drawImage(
-      this.#editLayer,
-      x, y, width, height,
-      x, y, width, height
-    );
-    this.#context.drawImage(
-      this.#previewLayer,
+      this.#noEditLayer,
       x, y, width, height,
       x, y, width, height
     );
@@ -692,6 +687,8 @@ export default class PgInputPixelEditor extends HTMLElement {
       if (this.#inputMode === InputMode.Stamp) {
         this.#handlePointerMovePreviewCache = this.handlePointerMovePreview.bind(this);
         this.$canvas.addEventListener('pointermove', this.#handlePointerMovePreviewCache);
+        this.#handlePointerLeavePreviewCache = this.handlePointerLeavePreview.bind(this);
+        this.$canvas.addEventListener('pointerleave', this.#handlePointerLeavePreviewCache);
       }
     }
     this.#pointerOutside = false;
@@ -716,6 +713,13 @@ export default class PgInputPixelEditor extends HTMLElement {
     );
     this.#moveX = newX;
     this.#moveY = newY;
+  }
+
+  #handlePointerLeavePreviewCache;
+  handlePointerLeavePreview() {
+    this.#clearStampPreview();
+    this.$canvas.removeEventListener('pointermove', this.#handlePointerMovePreviewCache);
+    this.$canvas.removeEventListener('pointerleave', this.#handlePointerLeavePreviewCache);
   }
 
   handlePointerLeave(event: MouseEvent) {
