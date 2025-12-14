@@ -6,7 +6,7 @@ import { InputMode } from './utils/inputMode';
 import cloneGrid from './utils/cloneGrid';
 import getEllipsePixels from './utils/getEllipsePixels';
 import getEllipseOutlinePixels from './utils/getEllipseOutlinePixels';
-import { WHITE } from './utils/constants';
+import { WHITE, Pixel } from './utils/constants';
 import getLinePixels from './utils/getLinePixels';
 import getRectanglePixels from './utils/getRectanglePixels';
 import getRectangleOutlinePixels from './utils/getRectangleOutlinePixels';
@@ -16,8 +16,6 @@ import bitmaskToPath from './utils/bitmapToMask';
 import createLayer from './utils/createLayer';
 import diffGrid from './utils/diffGrid';
 import { getGuides } from './utils/getGuides';
-
-type Pixel = { x: number, y: number };
 
 type Color = [number, number, number, number];
 

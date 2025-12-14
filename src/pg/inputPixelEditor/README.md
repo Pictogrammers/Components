@@ -138,6 +138,7 @@ There are currently 5 differnet layer types.
 
 - `pixel` - Raster artboard of pixels.
   - `path` - pixels
+  - `color` - colorIndex
 - `reference`
   - `id` - uuid of frame
   - `position: [x, y]`
