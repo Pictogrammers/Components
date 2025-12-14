@@ -146,8 +146,11 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     });
     // Layers
     this.$layers.columns = [{
-      label: 'Color',
-      key: 'color'
+      label: 'Name',
+      key: 'name',
+    }, {
+      label: 'Type',
+      key: 'type',
     }];
     this.$addLayer.addEventListener('click', () => {
       // number[][][]
@@ -155,8 +158,17 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     });
     // Colors
     this.$colors.columns = [{
-      label: 'Name',
-      key: 'name'
+      label: 'Red',
+      key: 'r',
+    }, {
+      label: 'Green',
+      key: 'g',
+    }, {
+      label: 'Blue',
+      key: 'b',
+    }, {
+      label: 'Alpha',
+      key: 'a',
     }];
   }
 

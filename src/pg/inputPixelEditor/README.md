@@ -108,9 +108,10 @@ A complete JSON storage for a 10x10 image.
   "layers": [
     {
       "name": "Layer 1",
-      "export": true,
+      "exclude": false,
       "locked": false,
-      "visible": true,
+      "hidden": false,
+      "type": "pixel",
       "opacity": 1
     }
   ],
@@ -130,3 +131,28 @@ A complete JSON storage for a 10x10 image.
   ]
 }
 ```
+
+## Layer Type
+
+There are currently 5 differnet layer types.
+
+- `pixel` - Raster artboard of pixels.
+  - `path` - pixels
+- `reference`
+  - `id` - uuid of frame
+  - `x`
+  - `y`
+- `pattern` - Repeat an existing frame (with optional offset x/y)
+  - `path` - pixels
+  - `id` - uuid of frame
+- `linear` - Linear gradient.
+  - `start: [x, y]`
+  - `end: [x, y]`
+  - `stops: [[stop, colorIndex], [stop, colorIndex]]`
+  - `dither: 'bayer4' | 'bayer8', 'bayer16'`
+- `radial` - Radial gradients.
+  - `start: [x, y]`
+  - `end: [x, y]`
+  - `transform: [1, 0, 0, 0.5, 0, 0]` to create ellipses
+  - `stops: [[stop, colorIndex], [stop, colorIndex]]`
+  - `dither: 'bayer4' | 'bayer8', 'bayer16'`
