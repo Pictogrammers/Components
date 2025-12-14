@@ -1,4 +1,6 @@
-import { Component, Prop, Part } from '@pictogrammers/element';
+import { Component, Prop, Part, forEach } from '@pictogrammers/element';
+
+import PgTableCellText from '../tableCellText/tableCellText';
 
 import template from './tableRow.html';
 import style from './tableRow.css';
@@ -9,12 +11,17 @@ import style from './tableRow.css';
   template
 })
 export default class PgTableRow extends HTMLElement {
-  @Prop() label: string = '';
+  @Prop() items: any = [];
   @Prop() key: string = '';
 
   @Part() $cells: HTMLDivElement;
 
   connectedCallback() {
-
+    forEach({
+      container: this.$cells,
+      items: this.items,
+      type: (item) => item.type ? item.type : PgTableCellText,
+    });
+    console.log(this.items);
   }
 }

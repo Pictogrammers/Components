@@ -1,3 +1,3 @@
-# `PgTableColumn`
+# `PgTableRow`
 
-See `PgTableRow`.
+See `PgTable`.

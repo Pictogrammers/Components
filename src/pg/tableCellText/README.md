@@ -1,0 +1,3 @@
+# `PgTableCellText`
+
+See `PgTable`.
