@@ -5,7 +5,6 @@
 
 [part=table] {
   display: table;
-  border-spacing: 0;
 }
 
 [part=header] {

@@ -21,6 +21,12 @@ import PgTable, { createTableItem } from '@pictogrammers/components/pg/table';
 | columns    |          | []      | Column definition. |
 | data       |          | []      | Data |
 
+| CSS Variable        | Default   | Description |
+| ------------------- | --------- | ----------- |
+| `--pg-tree-font-size`  | `inherit` | Font size |
+| `--pg-tree-border-color`  | `3rem`  | Width       |
+| `--pg-avatar-height` | `3rem`  | Height      |
+
 ## Columns
 
 ```typescript
