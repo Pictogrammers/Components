@@ -140,11 +140,11 @@ There are currently 5 differnet layer types.
   - `path` - pixels
 - `reference`
   - `id` - uuid of frame
-  - `x`
-  - `y`
-- `pattern` - Repeat an existing frame (with optional offset x/y)
+  - `position: [x, y]`
+- `pattern` - Repeat an existing frame
   - `path` - pixels
   - `id` - uuid of frame
+  - `offset [x, y]` - offset pattern
 - `linear` - Linear gradient.
   - `start: [x, y]`
   - `end: [x, y]`
@@ -155,4 +155,4 @@ There are currently 5 differnet layer types.
   - `end: [x, y]`
   - `transform: [1, 0, 0, 0.5, 0, 0]` to create ellipses
   - `stops: [[stop, colorIndex], [stop, colorIndex]]`
-  - `dither: 'bayer4' | 'bayer8', 'bayer16'`
+  - `dither: 'bayer4' | 'bayer8' | 'bayer16'`
