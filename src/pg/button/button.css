@@ -9,7 +9,7 @@
   font-family: var(--pg-font-family);
   font-size: var(--pg-button-font-size, 1rem);
   line-height: var(--pg-button-line-height, 1.5rem);
-  border: 1px solid var(--pg-button-border-color, #453C4F);
+  border: var(--pg-button-border-width, 1px) solid var(--pg-button-border-color, #453C4F);
   background-color: var(--pg-button-background-color, #FFFFFF);
   color: var(--pg-button-color, #453C4F);
   padding: var(--pg-button-padding, 0.25rem 0.5rem);
@@ -19,7 +19,7 @@
 }
 
 [part="button"]:hover {
-  border: 1px solid var(--pg-button-hover-border-color, #453C4F);
+  --pg-button-border-color: var(--pg-button-hover-border-color, #453C4F);
   background-color: var(--pg-button-hover-background-color, #453C4F);
   color: var(--pg-button-hover-color, #FFFFFF);
   --pg-icon-color: var(--pg-button-hover-color, #FFFFFF);

@@ -3,6 +3,7 @@ import { Component, Part, Prop } from '@pictogrammers/element';
 import PgTable, { createTableItem } from '../../table';
 import PgTableCellButtonIcon from '../../../tableCellButtonIcon/tableCellButtonIcon';
 
+import style from './basic.css';
 import template from './basic.html';
 
 const IconStar = 'M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z';
@@ -10,6 +11,7 @@ const IconStar = 'M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.
 
 @Component({
   selector: 'x-pg-table-basic',
+  style,
   template
 })
 export default class XPgTableBasic extends HTMLElement {

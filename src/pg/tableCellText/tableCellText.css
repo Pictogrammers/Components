@@ -4,8 +4,9 @@
 
 [part=label] {
   display: table-cell;
-  border-style: solid;
-  border-width: 1px;
-  border-color: var(--pg-table-border-color, #453C4F);
   padding: 0.125rem 0.5rem;
+  border-top: 0;
+  background: #F1F1F1;
+  border-radius: 0.125rem;
+  vertical-align: middle;
 }
