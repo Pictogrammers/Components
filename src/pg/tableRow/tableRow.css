@@ -2,6 +2,10 @@
   display: contents;
 }
 
+:host(:nth-child(odd)) {
+  --pg-table-row-background-color: #f1f1f1;
+}
+
 [part=cells] {
   display: table-row;
 }

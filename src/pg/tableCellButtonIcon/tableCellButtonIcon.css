@@ -2,6 +2,13 @@
   display: contents;
 }
 
-[part=label] {
+[part=cell] {
   display: table-cell;
+  padding: 0 0.5rem;
+  background-color: var(--pg-table-row-background-color);
+  border-top: 0;
+  border-radius: 0.125rem;
+  vertical-align: middle;
+  justify-items: center;
+  --pg-button-background-color: transparent;
 }
