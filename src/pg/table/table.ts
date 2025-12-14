@@ -19,7 +19,7 @@ export function createTableItem(obj: object) {
   const items: any[] = [];
   keys.forEach((key) => {
     if (typeof obj[key] === 'object' && obj[key] !== null) {
-      if (obj[key].hasOwnProperty('type')) {
+      if (!obj[key].hasOwnProperty('type')) {
         obj[key].type = PgTableCellText;
       }
       items.push({
@@ -60,7 +60,28 @@ export default class PgTable extends HTMLElement {
     forEach({
       container: this.$rows,
       items: this.data,
-      type: () => PgTableRow
+      type: () => PgTableRow,
+      create: ($item, item) => {
+        $item.addEventListener('action', (e: any) => {
+          e.stopPropagation();
+          this.dispatchEvent(new CustomEvent('action', {
+            detail: e.detail,
+          }));
+        })
+      }
     });
+  }
+
+  getCSV() {
+    let text = this.columns.map((column) => {
+      return column.label;
+    }).join(',');
+    text += '\n';
+    text += this.data.map(({ items }) => {
+      return items.map((item) => {
+        return item.value;
+      }).join(',')
+    }).join('\n');
+    return text;
   }
 }

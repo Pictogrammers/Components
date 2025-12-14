@@ -1,0 +1,3 @@
+# `PgTableCellButtonIcon`
+
+See `PgTable`.

@@ -3,7 +3,9 @@
 The `pg-table` component allows a standard way to create static tables. While it has features like the datatable it is much more lightweight lacking features like column resize and edit.
 
 - `TableHeaderText`
-- `TableHeader`
+- `TableCellText`
+- `TableCellButton`
+- `TableCellButtonIcon`
 
 ```typescript
 import '@pictogrammers/components/pg/table';
@@ -64,4 +66,25 @@ this.$table.data = [
     }
   })
 ];
+```
+
+## Events
+
+All events dispatched will be the same `action` name. This allows the insert of `index` as it bubbles to the parent `this.$table` element.
+
+```typescript
+this.$table.addEventListener('action', (e: any) => {
+  const { getColumn, value } = e.detail;
+  getColumn('field1').value = value;
+});
+```
+
+From a custom cell component...
+
+```typescript
+this.dispatchEvent(new CustomEvent('action', {
+  detail {
+    other: 'new value',
+  },
+}))
 ```
