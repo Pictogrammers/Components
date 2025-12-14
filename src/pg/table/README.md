@@ -25,7 +25,7 @@ import PgTable, { createTableItem } from '@pictogrammers/components/pg/table';
 | ------------------- | --------- | ----------- |
 | `--pg-tree-font-size`  | `inherit` | Font size |
 | `--pg-tree-border-color`  | `3rem`  | Width       |
-| `--pg-avatar-height` | `3rem`  | Height      |
+| `--pg-table-row-background-color` | `#f1f1f1`  | Row background |
 
 ## Columns
 

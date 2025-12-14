@@ -5,6 +5,7 @@ import { patterns } from './constants';
 
 import template from './basic.html';
 import style from './basic.css';
+import PgTable from 'pg/table/table';
 
 @Component({
   selector: 'x-pg-input-pixel-editor-basic',
@@ -45,9 +46,8 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
 
   @Part() $addLayer: HTMLButtonElement;
 
-  // MAKE A LIST COMPONENT!!!! [text | delete]
-  @Part() $colors: HTMLPreElement;
-  @Part() $layers: HTMLPreElement;
+  @Part() $colors: PgTable;
+  @Part() $layers: PgTable;
 
   connectedCallback() {
     this.$width.value = '10';
@@ -144,10 +144,20 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
         // no save
       }
     });
+    // Layers
+    this.$layers.columns = [{
+      label: 'Color',
+      key: 'color'
+    }];
     this.$addLayer.addEventListener('click', () => {
       // number[][][]
       // this.$input.addLayer();
     });
+    // Colors
+    this.$colors.columns = [{
+      label: 'Name',
+      key: 'name'
+    }];
   }
 
   handleFile(e) {
