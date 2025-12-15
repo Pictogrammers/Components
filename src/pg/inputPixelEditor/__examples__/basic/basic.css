@@ -24,6 +24,14 @@ label {
 }
 
 h3 {
+  display: flex;
   margin: 0.25rem 0;
   font-size: 1.125rem;
+  align-items: center;
+}
+
+[part=addColor],
+[part=addLayer] {
+  vertical-align: middle;
+  margin-left: 0.5rem;
 }

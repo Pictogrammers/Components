@@ -151,6 +151,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     }, {
       label: 'Type',
       key: 'type',
+    }, {
+      label: 'Selected',
+      key: 'selected',
     }];
     this.$addLayer.addEventListener('click', () => {
       // number[][][]
