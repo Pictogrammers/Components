@@ -19,6 +19,7 @@ export default class XPgMenuItemIconBasic extends HTMLElement {
   @Part() $iconFolder: HTMLButtonElement;
   @Part() $checkedValue: HTMLDivElement;
   @Part() $disabledValue: HTMLDivElement;
+  @Part() $example: HTMLDivElement;
 
   connectedCallback() {
     this.$item.icon = IconFile;
@@ -45,6 +46,12 @@ export default class XPgMenuItemIconBasic extends HTMLElement {
     this.$checkedToggle.addEventListener('change', (e: any) => {
       this.$item.checked = e.target.checked;
       this.$checkedValue.textContent = `${this.$item.checked}`;
+      // simulate check column
+      if (e.target.checked) {
+        this.$example.style.setProperty('--pg-menu-_has-check', 'true');
+      } else {
+        this.$example.style.removeProperty('--pg-menu-_has-check');
+      }
     });
 
     this.$disabledToggle.addEventListener('change', (e: any) => {

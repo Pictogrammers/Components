@@ -1,11 +1,14 @@
 import { Component, Part } from '@pictogrammers/element';
 import PgInputPixelEditor from '../../inputPixelEditor';
+import PgTable, { createTableItem } from '../../../table/table';
+import PgTableCellButtonIcon from '../../../tableCellButtonIcon/tableCellButtonIcon';
 import { maskToBitmap } from '../../utils/maskToBitmap';
 import { patterns } from './constants';
 
 import template from './basic.html';
 import style from './basic.css';
-import PgTable from 'pg/table/table';
+
+const IconTrash = 'M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z';
 
 @Component({
   selector: 'x-pg-input-pixel-editor-basic',
@@ -45,6 +48,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $savePng: HTMLInputElement;
 
   @Part() $addLayer: HTMLButtonElement;
+  @Part() $addColor: HTMLButtonElement;
 
   @Part() $colors: PgTable;
   @Part() $layers: PgTable;
@@ -154,10 +158,12 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     }, {
       label: 'Selected',
       key: 'selected',
+      hideLabel: true,
     }];
     this.$addLayer.addEventListener('click', () => {
       // number[][][]
       // this.$input.addLayer();
+
     });
     // Colors
     this.$colors.columns = [{
@@ -172,7 +178,23 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     }, {
       label: 'Alpha',
       key: 'a',
+    }, {
+      label: 'Delete',
+      key: 'delete',
+      hideLabel: true,
     }];
+    this.$addColor.addEventListener('click', () => {
+      this.$colors.data.push(createTableItem({
+        r: 5,
+        g: 5,
+        b: 5,
+        a: 1,
+        delete: {
+          type: PgTableCellButtonIcon,
+          icon: IconTrash
+        }
+      }));
+    });
   }
 
   handleFile(e) {

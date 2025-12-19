@@ -10,13 +10,21 @@ import style from './tableColumn.css';
 })
 export default class PgTableColumn extends HTMLElement {
   @Prop() label: string = '';
+  @Prop() hideLabel: boolean = false;
   @Prop() key: string = '';
 
   @Part() $label: HTMLDivElement;
 
   render(changes: { [key: string ]: boolean}) {
-    if (changes.label) {
-      this.$label.textContent = this.label;
+    if (changes.label || changes.hideLabel) {
+      console.log(this.label, this.hideLabel);
+      if (this.hideLabel) {
+        this.$label.ariaLabel = this.label;
+        this.$label.textContent = '';
+      } else {
+        this.$label.ariaLabel = null;
+        this.$label.textContent = this.label;
+      }
     }
   }
 }
