@@ -1,30 +1,40 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import PgIcon from '../icon/icon';
+import PgInputCheck from '../inputCheck/inputCheck';
 
-import template from './tableCellText.html';
-import style from './tableCellText.css';
+import template from './tableCellCheck.html';
+import style from './tableCellCheck.css';
 
 @Component({
-  selector: 'pg-table-cell-text',
+  selector: 'pg-table-cell-check',
   style,
-  template
+  template,
 })
 export default class PgTableCellCheck extends HTMLElement {
   @Prop() value: boolean = false;
   @Prop() editable: boolean = false;
   @Prop() key: string = '';
 
-  @Part() $input: HTMLInputElement;
-  @Part() $icon: PgIcon;
+  @Part() $input: PgInputCheck;
 
   connectedCallback() {
-
+    this.$input.addEventListener('change', this.handleChange.bind(this));
   }
 
   render(changes) {
     if (changes.value) {
-      this.$input.checked = this.value;
+      this.$input.value = this.value;
     }
+  }
+
+  handleChange(e: any) {
+    const { value } = e.target;
+    this.dispatchEvent(
+      new CustomEvent('action', {
+        detail: {
+          value,
+        }
+      })
+    );
   }
 }

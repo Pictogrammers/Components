@@ -17,7 +17,6 @@ export default class PgTableColumn extends HTMLElement {
 
   render(changes: { [key: string ]: boolean}) {
     if (changes.label || changes.hideLabel) {
-      console.log(this.label, this.hideLabel);
       if (this.hideLabel) {
         this.$label.ariaLabel = this.label;
         this.$label.textContent = '';

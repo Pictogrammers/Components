@@ -2,7 +2,6 @@ import { Component, Prop, Part, forEach } from '@pictogrammers/element';
 
 import PgTableColumn from '../tableColumn/tableColumn';
 import PgTableRow from '../tableRow/tableRow';
-import PgTableCellText from '../tableCellText/tableCellText';
 
 import template from './table.html';
 import style from './table.css';
@@ -19,18 +18,14 @@ export function createTableItem(obj: object) {
   const items: any[] = [];
   keys.forEach((key) => {
     if (typeof obj[key] === 'object' && obj[key] !== null) {
-      if (!obj[key].hasOwnProperty('type')) {
-        obj[key].type = PgTableCellText;
-      }
       items.push({
         key,
-        ...obj[key]
+        ...obj[key],
       });
     } else {
       items.push({
         key,
-        value: `${obj[key] || ''}`,
-        type: PgTableCellText,
+        value: obj[key],
       });
     }
   });

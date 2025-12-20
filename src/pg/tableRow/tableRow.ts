@@ -1,9 +1,17 @@
 import { Component, Prop, Part, forEach } from '@pictogrammers/element';
 
 import PgTableCellText from '../tableCellText/tableCellText';
+import PgTableCellNumber from '../tableCellNumber/tableCellNumber';
+import PgTableCellCheck from '../tableCellCheck/tableCellCheck';
 
 import template from './tableRow.html';
 import style from './tableRow.css';
+
+const types = new Map<string, any>([
+  ['string', PgTableCellText],
+  ['number', PgTableCellNumber],
+  ['boolean', PgTableCellCheck]
+]);
 
 @Component({
   selector: 'pg-table-row',
@@ -21,14 +29,19 @@ export default class PgTableRow extends HTMLElement {
     forEach({
       container: this.$cells,
       items: this.items,
-      type: (item) => item.type ? item.type : PgTableCellText,
-      create: ($item) => {
+      type: (item) => {
+        return item.type
+          ? item.type
+          : types.get(typeof item.value);
+      },
+      create: ($item, item) => {
         $item.addEventListener('action', (e: any) => {
           e.stopPropagation();
           this.dispatchEvent(new CustomEvent('action', {
             detail: {
               ...e.detail,
               index: this.index,
+              key: item.key,
               getRow() {
                 return this.items;
               },

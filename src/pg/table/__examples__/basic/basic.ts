@@ -24,6 +24,10 @@ export default class XPgTableBasic extends HTMLElement {
   connectedCallback() {
     // this.$table.addEventListener('click', this.handleClick.bind(this));
     this.$table.columns = [{
+      label: 'Select',
+      key: 'selected',
+      hideLabel: true,
+    }, {
       label: 'Name',
       key: 'name'
     }, {
@@ -36,6 +40,7 @@ export default class XPgTableBasic extends HTMLElement {
     }];
     this.$table.data = [
       createTableItem({
+        selected: false,
         name: 'Dipper Pines',
         age: 12,
         favorite: {
@@ -44,6 +49,7 @@ export default class XPgTableBasic extends HTMLElement {
         }
       }),
       createTableItem({
+        selected: false,
         name: 'Mabel Pines',
         age: 12,
         favorite: {
@@ -55,12 +61,19 @@ export default class XPgTableBasic extends HTMLElement {
     this.$pushData.addEventListener('click', this.handlePushData.bind(this));
     this.$deleteLast.addEventListener('click', this.handleDeleteLast.bind(this));
     this.$table.addEventListener('action', (e: any) => {
-      const { getColumn } = e.detail;
-      getColumn('favorite').value = !getColumn('favorite').value;
-      if (getColumn('favorite').value) {
-        getColumn('favorite').icon = IconStar;
-      } else {
-        getColumn('favorite').icon = IconStarOutline;
+      const { getColumn, key } = e.detail;
+      switch(key) {
+        case 'favorite':
+          getColumn('favorite').value = !getColumn('favorite').value;
+          if (getColumn('favorite').value) {
+            getColumn('favorite').icon = IconStar;
+          } else {
+            getColumn('favorite').icon = IconStarOutline;
+          }
+          break;
+        case 'selected':
+          getColumn('selected').value = e.detail.value;
+          break;
       }
       // CSV
       this.$output.textContent = this.$table.getCSV();
