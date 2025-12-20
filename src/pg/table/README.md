@@ -2,10 +2,12 @@
 
 The `pg-table` component allows a standard way to create static tables. While it has features like the datatable it is much more lightweight lacking features like column resize and edit.
 
-- `TableHeaderText`
-- `TableCellText`
-- `TableCellButton`
-- `TableCellButtonIcon`
+- `PgTableHeaderText`
+- `PgTableCellText` - default `string` cell type
+- `PgTableCellNumber` - default `number` cell type
+- `PgTableCellCheck` - default `boolean` cell type
+- `PgTableCellButton`
+- `PgTableCellButtonIcon`
 
 ```typescript
 import '@pictogrammers/components/pg/table';
@@ -23,8 +25,7 @@ import PgTable, { createTableItem } from '@pictogrammers/components/pg/table';
 
 | CSS Variable        | Default   | Description |
 | ------------------- | --------- | ----------- |
-| `--pg-tree-font-size`  | `inherit` | Font size |
-| `--pg-tree-border-color`  | `3rem`  | Width       |
+| `--pg-table-font-size`  | `inherit` | Font size |
 | `--pg-table-row-background-color` | `#f1f1f1`  | Row background |
 
 ## Columns
@@ -50,6 +51,8 @@ this.$table.columns = [{
 ```
 
 ## Data
+
+The `createTableItem` unrolls the `{ key: value }` shorthand to `items: [{ key, value}]` object to support the mutable data.
 
 ```typescript
 const IconStar = 'M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z';
@@ -80,8 +83,9 @@ All events dispatched will be the same `action` name. This allows the insert of 
 
 ```typescript
 this.$table.addEventListener('action', (e: any) => {
-  const { getColumn, value } = e.detail;
-  getColumn('field1').value = value;
+  const { getColumn, value, key } = e.detail;
+  // do custom logic based on key
+  getColumn(key).value = value;
 });
 ```
 
@@ -90,7 +94,7 @@ From a custom cell component...
 ```typescript
 this.dispatchEvent(new CustomEvent('action', {
   detail {
-    other: 'new value',
+    other: 'other data',
   },
 }))
 ```

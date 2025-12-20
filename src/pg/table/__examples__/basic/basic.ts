@@ -64,15 +64,15 @@ export default class XPgTableBasic extends HTMLElement {
       const { getColumn, key } = e.detail;
       switch(key) {
         case 'favorite':
-          getColumn('favorite').value = !getColumn('favorite').value;
-          if (getColumn('favorite').value) {
-            getColumn('favorite').icon = IconStar;
+          getColumn(key).value = !getColumn(key).value;
+          if (getColumn(key).value) {
+            getColumn(key).icon = IconStar;
           } else {
-            getColumn('favorite').icon = IconStarOutline;
+            getColumn(key).icon = IconStarOutline;
           }
           break;
         case 'selected':
-          getColumn('selected').value = e.detail.value;
+          getColumn(key).value = e.detail.value;
           break;
       }
       // CSV

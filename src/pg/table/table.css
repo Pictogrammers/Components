@@ -1,6 +1,5 @@
 :host {
   display: inline-flex;
-  color: var(--pg-icon-color, #222);
 }
 
 [part=table] {
