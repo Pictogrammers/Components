@@ -40,7 +40,7 @@ export default class XPgTableBasic extends HTMLElement {
     }];
     this.$table.data = [
       createTableItem({
-        selected: false,
+        selected: true,
         name: 'Dipper Pines',
         age: 12,
         favorite: {

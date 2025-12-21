@@ -25,6 +25,9 @@ export default class PgTableCellCheck extends HTMLElement {
     if (changes.value) {
       this.$input.value = this.value;
     }
+    if (changes.editable) {
+      this.$input.readOnly = !this.editable;
+    }
   }
 
   handleChange(e: any) {

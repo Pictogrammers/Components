@@ -22,6 +22,11 @@
   background: transparent;
 }
 
+[part="button"].readonly {
+  display: contents;
+  pointer-events: none;
+}
+
 [part="svg"] {
   width: var(--pg-icon-check-size, 1.5rem);
   height: var(--pg-icon-check-size, 1.5rem);

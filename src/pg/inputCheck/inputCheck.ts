@@ -14,6 +14,7 @@ const PATH_CHECKED = 'M19 19L5 19V5H15V3H5C3.89 3 3 3.89 3 5V19C3 20.1 3.89 21 5
 export default class PgInputCheck extends HTMLElement {
   @Prop() value: string | boolean = false;
   @Prop() disabled: boolean = false;
+  @Prop() readOnly: boolean = false;
 
   @Part() $button: HTMLButtonElement;
   @Part() $path: SVGPathElement;
@@ -37,6 +38,9 @@ export default class PgInputCheck extends HTMLElement {
     }
     if (changes.disabled) {
       this.$button.disabled = ['', true, 'true'].includes(this.disabled);
+    }
+    if (changes.readOnly) {
+      this.$button.classList.toggle('readonly', this.readOnly);
     }
   }
 }
