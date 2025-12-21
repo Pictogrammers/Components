@@ -27,6 +27,7 @@ export default class XPgTableBasic extends HTMLElement {
       label: 'Select',
       key: 'selected',
       hideLabel: true,
+      editable: true,
     }, {
       label: 'Name',
       key: 'name'

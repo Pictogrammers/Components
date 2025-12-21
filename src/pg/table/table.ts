@@ -56,7 +56,11 @@ export default class PgTable extends HTMLElement {
       container: this.$rows,
       items: this.data,
       type: () => PgTableRow,
-      create: ($item, item) => {
+      create: ($item: PgTableRow, item) => {
+        if (this.columns.length === 0) {
+          throw 'columns must be set before data';
+        }
+        $item.columns = this.columns;
         $item.addEventListener('action', (e: any) => {
           e.stopPropagation();
           this.dispatchEvent(new CustomEvent('action', {

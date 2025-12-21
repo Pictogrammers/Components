@@ -37,6 +37,7 @@ this.$table.columns = [{
   key: 'check',
   hideLabel: true,
   type: TableHeaderCheck,
+  editable: true
 }, {
   label: 'Name',
   key: 'name'
@@ -49,6 +50,8 @@ this.$table.columns = [{
   hideLabel: true,
 }];
 ```
+
+Adding `editable: true` to any data types will enable editing and trigger the `action` event (see Events below).
 
 ## Data
 
@@ -84,8 +87,13 @@ All events dispatched will be the same `action` name. This allows the insert of 
 ```typescript
 this.$table.addEventListener('action', (e: any) => {
   const { getColumn, value, key } = e.detail;
-  // do custom logic based on key
-  getColumn(key).value = value;
+  switch(key) {
+    case 'selected':
+      getColumn(key).value = value;
+      break;
+    default:
+      throw `unhandled action event for key ${key}`;
+  }
 });
 ```
 

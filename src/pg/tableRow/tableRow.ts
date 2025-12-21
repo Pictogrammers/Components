@@ -20,8 +20,9 @@ const types = new Map<string, any>([
 })
 export default class PgTableRow extends HTMLElement {
   @Prop() index: number;
-  @Prop() items: any = [];
+  @Prop() items: any[] = [];
   @Prop() key: string = '';
+  @Prop() columns: any[] = [];
 
   @Part() $cells: HTMLDivElement;
 
@@ -34,7 +35,12 @@ export default class PgTableRow extends HTMLElement {
           ? item.type
           : types.get(typeof item.value);
       },
-      create: ($item, item) => {
+      create: ($item: any, item) => {
+        console.log(this.columns.find(i => i.key === item.key));
+        const { editable } = this.columns.find(i => i.key === item.key) ?? {};
+        if (editable) {
+          $item.editable = editable;
+        }
         $item.addEventListener('action', (e: any) => {
           e.stopPropagation();
           this.dispatchEvent(new CustomEvent('action', {
