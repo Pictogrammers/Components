@@ -2,16 +2,19 @@ import { Component, Prop, Part } from '@pictogrammers/element';
 
 import PgJsonArray from '../jsonArray/jsonArray';
 import PgJsonObject from '../jsonObject/jsonObject';
+import PgJsonString from '../jsonString/jsonString';
 
 import template from './json.html';
 import style from './json.css';
 
 function unwrapObject(obj: any) {
   return {
+    type: PgJsonObject,
     items: Object.keys(obj).map((key) => {
       return {
         key,
         value: obj[key],
+        type: PgJsonString,
       }
     })
   };
@@ -19,6 +22,7 @@ function unwrapObject(obj: any) {
 
 function unwrapArray(items: any) {
   return {
+    type: PgJsonArray,
     items: items.map((item) => {
       if (Array.isArray(item)) {
         return unwrapArray(item);
