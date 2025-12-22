@@ -1,9 +1,12 @@
-import { Component, Prop, Part } from '@pictogrammers/element';
+import { Component, Prop, Part, forEach } from '@pictogrammers/element';
 
-import template from './json.html';
-import style from './json.css';
+import PgJsonArray from '../jsonArray/jsonArray';
+import PgJsonString from '../jsonString/jsonString';
+import PgJsonBoolean from '../jsonBoolean/jsonBoolean';
+import PgJsonNumber from '../jsonNumber/jsonNumber';
 
-const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
+import template from './jsonObject.html';
+import style from './jsonObject.css';
 
 @Component({
   selector: 'pg-json-object',
@@ -11,11 +14,33 @@ const noIcon = 'M0 0h24v24H0V0zm2 2v20h20V2H2z';
   template,
 })
 export default class PgJsonObject extends HTMLElement {
-  @Prop() items: any[] = [];
+  @Prop() key: string = '';
+  @Prop() value: any[] = [];
+  @Prop() expanded: boolean = false;
 
   @Part() $items: HTMLElement;
 
-  render(changes) {
-
+  connectedCallback() {
+    forEach({
+      container: this.$items,
+      items: this.value,
+      type: (item) => {
+        if (Array.isArray(item.value)) {
+          return PgJsonArray;
+        }
+        if (typeof item.value === 'object') {
+          return PgJsonObject;
+        }
+        if (typeof item.value === 'string') {
+          return PgJsonString;
+        }
+        if (typeof item.value === 'boolean') {
+          return PgJsonBoolean;
+        }
+        if (typeof item.value === 'number') {
+          return PgJsonNumber;
+        }
+      },
+    });
   }
 }

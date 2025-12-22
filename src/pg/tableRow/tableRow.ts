@@ -36,7 +36,6 @@ export default class PgTableRow extends HTMLElement {
           : types.get(typeof item.value);
       },
       create: ($item: any, item) => {
-        console.log(this.columns.find(i => i.key === item.key));
         const { editable } = this.columns.find(i => i.key === item.key) ?? {};
         if (editable) {
           $item.editable = editable;

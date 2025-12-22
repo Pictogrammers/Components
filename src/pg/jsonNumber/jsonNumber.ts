@@ -1,16 +1,16 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import template from './jsonString.html';
-import style from './jsonString.css';
+import template from './jsonNumber.html';
+import style from './jsonNumber.css';
 
 @Component({
-  selector: 'pg-json-string',
+  selector: 'pg-json-number',
   style,
   template,
 })
-export default class PgJsonString extends HTMLElement {
+export default class PgJsonNumber extends HTMLElement {
   @Prop() key: string = '';
-  @Prop() value: string = '';
+  @Prop() value: number = 0;
 
   @Part() $key: HTMLDivElement;
   @Part() $value: HTMLDivElement;
@@ -20,7 +20,7 @@ export default class PgJsonString extends HTMLElement {
       this.$key.textContent = this.key;
     }
     if (changes.value) {
-      this.$value.textContent = this.value;
+      this.$value.textContent = `${this.value}`;
     }
   }
 }

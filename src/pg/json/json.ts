@@ -2,35 +2,50 @@ import { Component, Prop, Part } from '@pictogrammers/element';
 
 import PgJsonArray from '../jsonArray/jsonArray';
 import PgJsonObject from '../jsonObject/jsonObject';
-import PgJsonString from '../jsonString/jsonString';
 
 import template from './json.html';
 import style from './json.css';
 
 function unwrapObject(obj: any) {
-  return {
-    type: PgJsonObject,
-    items: Object.keys(obj).map((key) => {
+  return Object.keys(obj).map((key) => {
+    if (Array.isArray(obj[key])) {
       return {
         key,
-        value: obj[key],
-        type: PgJsonString,
-      }
-    })
-  };
+        value: unwrapArray(obj[key]),
+      };
+    }
+    if (typeof obj[key] === 'object') {
+      return {
+        key,
+        value: unwrapObject(obj[key]),
+      };
+    }
+    return {
+      key,
+      value: obj[key],
+    };
+  });
 }
 
 function unwrapArray(items: any) {
-  return {
-    type: PgJsonArray,
-    items: items.map((item) => {
-      if (Array.isArray(item)) {
-        return unwrapArray(item);
-      } else {
-        return unwrapObject(item);
-      }
-    })
-  };
+  return items.map((item, i) => {
+    if (Array.isArray(item)) {
+      return {
+        key: i.toString(),
+        value: unwrapArray(item),
+      };
+    }
+    if (typeof item === 'object') {
+      return {
+        key: i.toString(),
+        value: unwrapObject(item),
+      };
+    }
+    return {
+      key: i.toString(),
+      value: item,
+    }
+  });
 }
 
 @Component({
@@ -49,11 +64,11 @@ export default class PgJson extends HTMLElement {
     if (changes.value && this.value !== null) {
       if (typeof this.value === 'object') {
         const $object = document.createElement('pg-json-object') as PgJsonObject;
-        $object.items = unwrapObject(this.value).items;
+        $object.value = unwrapObject(this.value);
         this.$container.appendChild($object);
       } else if (Array.isArray(this.value)) {
         const $array = document.createElement('pg-json-array') as PgJsonArray;
-        $array.items = unwrapArray(this.value).items;
+        $array.value = unwrapArray(this.value);
         this.$container.appendChild($array);
       }
     }
