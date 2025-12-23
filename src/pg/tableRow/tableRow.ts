@@ -36,9 +36,12 @@ export default class PgTableRow extends HTMLElement {
           : types.get(typeof item.value);
       },
       create: ($item: any, item) => {
-        const { editable } = this.columns.find(i => i.key === item.key) ?? {};
+        const { editable, maxWidth } = this.columns.find(i => i.key === item.key) ?? {};
         if (editable) {
           $item.editable = editable;
+        }
+        if (maxWidth) {
+          $item.maxWidth = maxWidth;
         }
         $item.addEventListener('action', (e: any) => {
           e.stopPropagation();

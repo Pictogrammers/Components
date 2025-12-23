@@ -14,6 +14,7 @@ export default class PgTableCellText extends HTMLElement {
   @Prop() value: string = '';
   @Prop() key: string = '';
   @Prop() editable: boolean = false;
+  @Prop() maxWidth: number | string | null = null;
 
   @Part() $input: PgInputText;
 
@@ -46,6 +47,16 @@ export default class PgTableCellText extends HTMLElement {
     }
     if (changes.editable) {
       this.$input.readOnly = !this.editable;
+    }
+    if (changes.maxWidth) {
+      if (this.maxWidth === null) {
+        this.$input.style.removeProperty('--pg-input-text-max-width');
+      } else {
+        this.$input.style.setProperty(
+          '--pg-input-text-max-width',
+          `${typeof this.maxWidth === 'string' ? this.maxWidth : this.maxWidth + 'px'}`
+        );
+      }
     }
   }
 }
