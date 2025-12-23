@@ -4,4 +4,7 @@
 
 [part=value] {
   user-select: text;
+  --pg-input-text-padding: 0 0.25rem;
+  display: inline-flex;
+  vertical-align: middle;
 }

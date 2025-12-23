@@ -1,14 +1,14 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import template from './inputText.html';
-import style from './inputText.css';
+import template from './inputNumber.html';
+import style from './inputNumber.css';
 
 @Component({
-  selector: 'pg-input-text',
+  selector: 'pg-input-number',
   style,
-  template
+  template,
 })
-export default class PgInputText extends HTMLElement {
+export default class PgInputNumber extends HTMLElement {
   @Prop() name: string = '';
   @Prop() value: string = '';
   @Prop() placeholder: string = '';
