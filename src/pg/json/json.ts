@@ -2,9 +2,24 @@ import { Component, Prop, Part } from '@pictogrammers/element';
 
 import PgJsonArray from '../jsonArray/jsonArray';
 import PgJsonObject from '../jsonObject/jsonObject';
+import PgJsonString from '../jsonString/jsonString';
+import PgJsonBoolean from '../jsonBoolean/jsonBoolean';
+import PgJsonNumber from '../jsonNumber/jsonNumber';
 
 import template from './json.html';
 import style from './json.css';
+
+function getType(value) {
+  if (typeof value === 'string') {
+    return PgJsonString;
+  }
+  if (typeof value === 'boolean') {
+    return PgJsonBoolean;
+  }
+  if (typeof value === 'number') {
+    return PgJsonNumber;
+  }
+}
 
 function unwrapObject(obj: any) {
   return Object.keys(obj).map((key) => {
@@ -12,17 +27,20 @@ function unwrapObject(obj: any) {
       return {
         key,
         value: unwrapArray(obj[key]),
+        type: PgJsonArray,
       };
     }
     if (typeof obj[key] === 'object') {
       return {
         key,
         value: unwrapObject(obj[key]),
+        type: PgJsonObject,
       };
     }
     return {
       key,
       value: obj[key],
+      type: getType(obj[key]),
     };
   });
 }
@@ -33,17 +51,20 @@ function unwrapArray(items: any) {
       return {
         key: i.toString(),
         value: unwrapArray(item),
+        type: PgJsonArray,
       };
     }
     if (typeof item === 'object') {
       return {
         key: i.toString(),
         value: unwrapObject(item),
+        type: PgJsonObject,
       };
     }
     return {
       key: i.toString(),
       value: item,
+      type: getType(item),
     }
   });
 }

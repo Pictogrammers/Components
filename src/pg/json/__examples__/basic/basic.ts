@@ -16,6 +16,7 @@ export default class XPgJsonBasic extends HTMLElement {
       users: [{
         name: 'Dipper Pines',
         age: 12,
+        selected: false,
       }]
     }; // Array or Object
     this.$json.addEventListener('change', (e: any) => {

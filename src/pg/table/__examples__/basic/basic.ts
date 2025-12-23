@@ -30,7 +30,9 @@ export default class XPgTableBasic extends HTMLElement {
       editable: true,
     }, {
       label: 'Name',
-      key: 'name'
+      key: 'name',
+      editable: true,
+      maxWidth: 100,
     }, {
       label: 'Age',
       key: 'age'
@@ -64,6 +66,9 @@ export default class XPgTableBasic extends HTMLElement {
     this.$table.addEventListener('action', (e: any) => {
       const { getColumn, key } = e.detail;
       switch(key) {
+        case 'name':
+          getColumn(key).value = e.detail.value;
+          break;
         case 'favorite':
           getColumn(key).value = !getColumn(key).value;
           if (getColumn(key).value) {

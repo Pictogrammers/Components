@@ -1,3 +1,11 @@
 :host {
-  display: inline-flex;
+  display: contents;
+}
+
+.hide {
+  display: none;
+}
+
+[part=items] {
+  padding-left: 1rem;
 }

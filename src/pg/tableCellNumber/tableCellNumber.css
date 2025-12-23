@@ -2,11 +2,10 @@
   display: contents;
 }
 
-[part=label] {
+[part=cell] {
   display: table-cell;
-  padding: 0.125rem 0.5rem;
   background-color: var(--pg-table-row-background-color);
-  border-top: 0;
-  border-radius: 0.125rem;
+  --pg-input-text-padding: 0.125rem 0.25rem;
+  --pg-input-text-border-color: rgb(69, 60, 79, 0.5);
   vertical-align: middle;
 }

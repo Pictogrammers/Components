@@ -12,6 +12,7 @@ export default class PgInputText extends HTMLElement {
   @Prop() name: string = '';
   @Prop() value: string = '';
   @Prop() placeholder: string = '';
+  @Prop() readOnly: boolean = false;
 
   @Part() $input: HTMLInputElement;
 
@@ -28,6 +29,9 @@ export default class PgInputText extends HTMLElement {
     }
     if (changes.placeholder) {
       this.$input.placeholder = this.placeholder;
+    }
+    if (changes.readOnly) {
+      this.$input.readOnly = this.readOnly;
     }
     this.skipValue = false;
   }

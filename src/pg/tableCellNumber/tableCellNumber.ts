@@ -1,5 +1,7 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
+import PgInputText from '../inputText/inputText';
+
 import template from './tableCellNumber.html';
 import style from './tableCellNumber.css';
 
@@ -11,12 +13,28 @@ import style from './tableCellNumber.css';
 export default class PgTableCellNumber extends HTMLElement {
   @Prop() value: number = 0;
   @Prop() key: string = '';
+  @Prop() editable: boolean = false;
 
-  @Part() $label: HTMLDivElement;
+  @Part() $input: PgInputText;
+
+  connectedCallback() {
+    this.$input.addEventListener('change', (e: any) => {
+      this.dispatchEvent(
+        new CustomEvent('action', {
+          detail: {
+            value: e.detail.value,
+          }
+        })
+      );
+    });
+  }
 
   render(changes) {
     if (changes.value) {
-      this.$label.textContent = `${this.value}`;
+      this.$input.value = `${this.value}`;
+    }
+    if (changes.editable) {
+      this.$input.readOnly = !this.editable;
     }
   }
 }

@@ -1,3 +1,7 @@
 :host {
-  display: inline-flex;
+  display: flex;
+}
+
+[part=value] {
+  user-select: text;
 }

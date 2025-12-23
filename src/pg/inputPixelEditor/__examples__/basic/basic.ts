@@ -169,15 +169,19 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$colors.columns = [{
       label: 'Red',
       key: 'r',
+      editable: true,
     }, {
       label: 'Green',
       key: 'g',
+      editable: true,
     }, {
       label: 'Blue',
       key: 'b',
+      editable: true,
     }, {
       label: 'Alpha',
       key: 'a',
+      editable: true,
     }, {
       label: 'Delete',
       key: 'delete',

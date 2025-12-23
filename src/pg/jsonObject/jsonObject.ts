@@ -18,29 +18,23 @@ export default class PgJsonObject extends HTMLElement {
   @Prop() value: any[] = [];
   @Prop() expanded: boolean = false;
 
-  @Part() $items: HTMLElement;
+  @Part() $key: HTMLDivElement;
+  @Part() $seperator: HTMLDivElement;
+  @Part() $items: HTMLDivElement;
 
   connectedCallback() {
     forEach({
       container: this.$items,
       items: this.value,
-      type: (item) => {
-        if (Array.isArray(item.value)) {
-          return PgJsonArray;
-        }
-        if (typeof item.value === 'object') {
-          return PgJsonObject;
-        }
-        if (typeof item.value === 'string') {
-          return PgJsonString;
-        }
-        if (typeof item.value === 'boolean') {
-          return PgJsonBoolean;
-        }
-        if (typeof item.value === 'number') {
-          return PgJsonNumber;
-        }
-      },
+      type: (item) => item.type,
     });
+  }
+
+  render(changes) {
+    if (changes.key) {
+      this.$key.classList.toggle('hide', this.key === '' || !isNaN(this.key as any));
+      this.$seperator.classList.toggle('hide', this.key === '' || !isNaN(this.key as any));
+      this.$key.textContent = this.key;
+    }
   }
 }

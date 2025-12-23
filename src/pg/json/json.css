@@ -1,4 +1,8 @@
 :host {
-  display: inline-flex;
-  color: var(--pg-icon-color, #222);
+  display: contents;
+}
+
+[part=container] {
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  user-select: none;
 }
