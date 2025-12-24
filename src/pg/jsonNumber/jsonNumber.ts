@@ -17,6 +17,19 @@ export default class PgJsonNumber extends HTMLElement {
   @Part() $key: HTMLDivElement;
   @Part() $value: PgInputNumber;
 
+  connectedCallback() {
+    this.$value.addEventListener('input', (e: any) => {
+      this.dispatchEvent(
+        new CustomEvent('update', {
+          detail: {
+            path: [this.key],
+            value: e.detail.value,
+          }
+        })
+      );
+    });
+  }
+
   render(changes) {
     if (changes.key) {
       this.$key.textContent = this.key;

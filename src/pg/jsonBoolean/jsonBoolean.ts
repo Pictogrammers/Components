@@ -15,15 +15,23 @@ export default class PgJsonBoolean extends HTMLElement {
   @Prop() value: boolean = false;
 
   @Part() $key: HTMLDivElement;
-  @Part() $input: PgInputSelect;
+  @Part() $value: PgInputSelect;
 
   connectedCallback() {
-    this.$input.options.push(
+    this.$value.options.push(
       { label: 'true', value: 'true' },
       { label: 'false', value: 'false' },
     );
-    this.$input.addEventListener('change', (e: any) => {
-      this.$input.value = e.detail.value;
+    this.$value.addEventListener('input', (e: any) => {
+      this.$value.value = e.detail.value;
+      this.dispatchEvent(
+        new CustomEvent('update', {
+          detail: {
+            path: [this.key],
+            value: e.detail.value,
+          }
+        })
+      );
     });
   }
 
@@ -32,7 +40,7 @@ export default class PgJsonBoolean extends HTMLElement {
       this.$key.textContent = this.key;
     }
     if (changes.value) {
-      this.$input.value = this.value ? 'true' : 'false';
+      this.$value.value = this.value ? 'true' : 'false';
     }
   }
 }

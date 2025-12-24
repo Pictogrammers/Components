@@ -27,6 +27,15 @@ export default class PgJsonObject extends HTMLElement {
       container: this.$items,
       items: this.value,
       type: (item) => item.type,
+      create($item, item) {
+        $item.addEventListener('update', (e: any) => {
+          this.dispatchEvent(
+            new CustomEvent('update', {
+
+            })
+          );
+        });
+      }
     });
   }
 
