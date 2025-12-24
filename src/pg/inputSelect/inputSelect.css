@@ -8,7 +8,7 @@
   text-align: left;
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: 100% 0;
+  grid-template-columns: 100% 1.25rem;
   border: 1px solid var(--pg-input-select-border-color, #453C4F);
   border-radius: 0.25rem;
   padding: 0;
@@ -24,7 +24,7 @@
 [part=label] {
   grid-row: 1;
   grid-column: 1;
-  padding: 0.5rem 0.75rem;
+  padding: var(--pg-input-select-padding, 0.5rem 0.75rem);
   font-size: var(--pg-input-select-font-size, 1rem);
 }
 
@@ -35,5 +35,5 @@
   width: 1.5rem;
   height: 1.5rem;
   align-self: center;
-  transform: translate(-2rem, 0);
+  transform: translate(-1.5rem, 0);
 }

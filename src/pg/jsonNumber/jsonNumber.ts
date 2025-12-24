@@ -1,5 +1,7 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
+import PgInputNumber from '../inputNumber/inputNumber';
+
 import template from './jsonNumber.html';
 import style from './jsonNumber.css';
 
@@ -13,14 +15,14 @@ export default class PgJsonNumber extends HTMLElement {
   @Prop() value: number = 0;
 
   @Part() $key: HTMLDivElement;
-  @Part() $value: HTMLDivElement;
+  @Part() $value: PgInputNumber;
 
   render(changes) {
     if (changes.key) {
       this.$key.textContent = this.key;
     }
     if (changes.value) {
-      this.$value.textContent = `${this.value}`;
+      this.$value.value = `${this.value}`;
     }
   }
 }

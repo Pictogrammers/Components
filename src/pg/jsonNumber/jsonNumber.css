@@ -1,3 +1,20 @@
 :host {
   display: flex;
 }
+
+[part=key],
+[part=seperator]  {
+  display: inline-flex;
+  align-items: center;
+}
+
+[part=value] {
+  user-select: text;
+  --pg-input-text-padding: 0 0.25rem;
+  --pg-input-text-border-color: transparent;
+  display: inline-flex;
+  vertical-align: middle;
+  margin: 0 -0.25rem;
+  z-index: 1;
+  position: relative;
+}
