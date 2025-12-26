@@ -1,6 +1,6 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import PgInputSelect from '../inputSelect/inputSelect';
+import PgOverlaySelectMenu from '../overlaySelectMenu/overlaySelectMenu';
 
 import template from './jsonBoolean.html';
 import style from './jsonBoolean.css';
@@ -15,24 +15,19 @@ export default class PgJsonBoolean extends HTMLElement {
   @Prop() value: boolean = false;
 
   @Part() $key: HTMLDivElement;
-  @Part() $value: PgInputSelect;
+  @Part() $value: HTMLButtonElement;
 
   connectedCallback() {
-    this.$value.options.push(
-      { label: 'true', value: 'true' },
-      { label: 'false', value: 'false' },
-    );
-    this.$value.addEventListener('input', (e: any) => {
-      this.$value.value = e.detail.value;
-      this.dispatchEvent(
-        new CustomEvent('update', {
-          detail: {
-            path: [this.key],
-            value: e.detail.value,
-          }
-        })
-      );
-    });
+    this.$value.addEventListener('click', this.#handleClick.bind(this));
+    // this.$value.value = e.detail.value;
+    // this.dispatchEvent(
+    //   new CustomEvent('update', {
+    //     detail: {
+    //       path: [this.key],
+    //       value: e.detail.value,
+    //     }
+    //   })
+    // );
   }
 
   render(changes) {
@@ -40,7 +35,33 @@ export default class PgJsonBoolean extends HTMLElement {
       this.$key.textContent = this.key;
     }
     if (changes.value) {
-      this.$value.value = this.value ? 'true' : 'false';
+      this.$value.textContent = this.value ? 'true' : 'false';
     }
+  }
+
+  options = [
+    { label: 'true', value: 'true' },
+    { label: 'false', value: 'false' },
+  ];
+
+  #menuOpen = false;
+  async #handleClick() {
+    if (this.#menuOpen) { return; }
+    this.#menuOpen = true;
+    const result = await PgOverlaySelectMenu.open({
+      source: this.$value,
+      value: this.options.find(x => x.value === `${this.value}`) ?? 'false',
+      items: this.options,
+    });
+    if (result !== undefined) {
+      this.dispatchEvent(new CustomEvent('change', {
+        detail: {
+          value: result.value
+        }
+      }));
+      this.$value.textContent = result.label;
+      this.value = result.value === 'true';
+    }
+    this.#menuOpen = false;
   }
 }
