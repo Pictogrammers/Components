@@ -58,7 +58,7 @@ export default class PgJsonBoolean extends HTMLElement {
         detail: {
           path: [this.key],
           key: this.key,
-          value: result.value
+          value: result.value === 'true'
         }
       }));
       this.$value.textContent = result.label;

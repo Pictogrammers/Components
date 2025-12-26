@@ -30,7 +30,7 @@ export default class PgJsonArray extends HTMLElement {
       create: ($item, item) => {
         $item.addEventListener('update', (e: any) => {
           const { path, key, value } = e.detail;
-          path.push(this.key);
+          this.key && path.push(this.key);
           this.dispatchEvent(
             new CustomEvent('update', {
               detail: {

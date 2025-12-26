@@ -99,7 +99,7 @@ export default class PgJson extends HTMLElement {
 
   getParent(path: string[], parent) {
     const key = path.pop();
-    if (key) {
+    if (key && (typeof parent[key] === 'object' || parent[key] instanceof Array)) {
       return this.getParent(path, parent[key]);
     }
     return parent;
