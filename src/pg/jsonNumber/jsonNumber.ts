@@ -24,7 +24,7 @@ export default class PgJsonNumber extends HTMLElement {
           detail: {
             path: [this.key],
             key: this.key,
-            value: e.detail.value,
+            value: Number.parseInt(e.detail.value, 10),
           }
         })
       );

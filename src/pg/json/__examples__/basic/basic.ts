@@ -10,6 +10,7 @@ import template from './basic.html';
 })
 export default class XPgJsonBasic extends HTMLElement {
   @Part() $json: PgJson;
+  @Part() $output: HTMLPreElement;
 
   connectedCallback() {
     this.$json.value = {
@@ -24,7 +25,7 @@ export default class XPgJsonBasic extends HTMLElement {
       if (value !== parent[key]) {
         parent[key] = value;
       }
-      console.log(this.$json.value);
+      this.$output.textContent = JSON.stringify(this.$json.value);
     });
   }
 }
