@@ -3,6 +3,7 @@
 }
 
 [part=container] {
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  --pg-json-font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-family: var(--pg-json-font-family);
   user-select: none;
 }

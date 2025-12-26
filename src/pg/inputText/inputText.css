@@ -7,7 +7,7 @@
   border: 1px solid var(--pg-input-text-border-color, #453C4F);
   border-radius: 0.125rem;
   padding: var(--pg-input-text-padding, calc(0.5rem - 1px) 0.75rem);
-  font-family: var(--pg-font-family);
+  font-family: var(--pg-input-text-font-family, var(--pg-font-family));
   font-size: 1rem;
   outline: none;
   field-sizing: content;
