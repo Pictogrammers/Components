@@ -23,6 +23,7 @@ export default class PgJsonString extends HTMLElement {
         new CustomEvent('update', {
           detail: {
             path: [this.key],
+            key: this.key,
             value: e.detail.value,
           }
         })

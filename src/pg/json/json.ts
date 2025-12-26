@@ -86,12 +86,36 @@ export default class PgJson extends HTMLElement {
       if (typeof this.value === 'object') {
         const $object = document.createElement('pg-json-object') as PgJsonObject;
         $object.value = unwrapObject(this.value);
+        $object.addEventListener('update', this.handleUpdate.bind(this));
         this.$container.appendChild($object);
       } else if (Array.isArray(this.value)) {
         const $array = document.createElement('pg-json-array') as PgJsonArray;
         $array.value = unwrapArray(this.value);
+        $array.addEventListener('update', this.handleUpdate.bind(this));
         this.$container.appendChild($array);
       }
     }
+  }
+
+  getParent(path: string[], parent) {
+    const key = path.pop();
+    if (key) {
+      return this.getParent(path, parent[key]);
+    }
+    return parent;
+  }
+
+  handleUpdate(e: any) {
+    const { path, key, value } = e.detail;
+    const parent = this.getParent(path, this.value);
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          parent,
+          key,
+          value,
+        }
+      })
+    )
   }
 }

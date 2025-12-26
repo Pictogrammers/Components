@@ -54,8 +54,10 @@ export default class PgJsonBoolean extends HTMLElement {
       items: this.options,
     });
     if (result !== undefined) {
-      this.dispatchEvent(new CustomEvent('change', {
+      this.dispatchEvent(new CustomEvent('update', {
         detail: {
+          path: [this.key],
+          key: this.key,
           value: result.value
         }
       }));

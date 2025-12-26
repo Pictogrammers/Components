@@ -20,10 +20,11 @@ export default class XPgJsonBasic extends HTMLElement {
       }]
     }; // Array or Object
     this.$json.addEventListener('change', (e: any) => {
-      const { parent, key, path, value } = e.detail;
+      const { parent, key, value } = e.detail;
       if (value !== parent[key]) {
         parent[key] = value;
       }
+      console.log(this.$json.value);
     });
   }
 }
