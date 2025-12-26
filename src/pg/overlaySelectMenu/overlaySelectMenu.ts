@@ -33,6 +33,7 @@ export default class PgOverlaySelectMenu extends PgOverlay {
     // Pass throughs are binded once, do not do this in render
     this.$menu.items = this.items;
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
+    this.$menu.addEventListener('close', this.#handleClose.bind(this));
     this.$overlay.popover = 'auto';
     if (this.source !== null) {
       // @ts-ignore
@@ -91,6 +92,11 @@ export default class PgOverlaySelectMenu extends PgOverlay {
   #handleSelect(e: any) {
     e.detail.item.index = e.detail.index;
     this.close(e.detail.item);
+    this.source?.focus();
+  }
+
+  #handleClose() {
+    this.close({ value: null });
     this.source?.focus();
   }
 }

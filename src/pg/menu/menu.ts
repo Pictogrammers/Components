@@ -26,7 +26,7 @@ export default class PgMenu extends HTMLElement {
       },
       create: ($item: any, item) => {
         $item.addEventListener('close', (e: any) => {
-          const { depth } = e.detail;
+          const depth = e.detail ? e.detail.depth : 1;
           this.dispatchEvent(new CustomEvent('close', {
             detail: {
               depth
