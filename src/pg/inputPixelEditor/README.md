@@ -40,13 +40,14 @@ See usage for each method below.
 | `hasUndo()` | -     | Has undo |
 | `hasRedo()` | -     | Has redo |
 | `redo()` | -           | Redo. |
-| `selectLayer()` | -    | Select layer. |
+| `selectLayer(index)` | -    | Select layer. |
 | `getLayers()` | -    | Get layer array. |
 | `addLayer(option)` | -        | Add layer. |
 | `removeLayer(index)` | -      | Remove layer. |
 | `flattenLayers(layerIndexes)` | -      | Flatten layers. |
 | `moveLayer(startIndex, endIndex)` | -    | Move layer. |
 | `getColors()` | -    | Get colors. |
+| `setColor(index, r, g, b, a)` | -  | Set Color. |
 | `addColor(r, g, b, a)` | -    | Add color. |
 | `removeColor(index)` | -    | Remove color. |
 | `moveColor(startIndex, endIndex)` | -    | Move index. |

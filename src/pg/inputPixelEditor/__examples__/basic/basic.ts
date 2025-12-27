@@ -161,9 +161,14 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       hideLabel: true,
     }];
     this.$addLayer.addEventListener('click', () => {
-      // number[][][]
-      // this.$input.addLayer();
-
+      this.$layers.data.push(
+        createTableItem({
+          name: 'Layer 1',
+          type: 'pixel',
+          selected: true,
+        })
+      );
+      this.$input.addLayer();
     });
     // Colors
     this.$colors.columns = [{

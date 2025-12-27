@@ -995,4 +995,43 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#init();
   }
 
+  addColor(r, g, b, a) {
+    this.#colors.push([r, g, b, a]);
+  }
+
+  removeColor(index) {
+    this.#colors.splice(index, 1);
+  }
+
+  setColor(index, r, g, b, a) {
+    this.#colors[index] = [r, g, b, a];
+  }
+
+  moveColor(startIndex, endIndex) {
+
+  }
+
+  getLayers() {
+    return this.#data.map((data, index) => index);
+  }
+
+  selectLayer(index) {
+    this.#layer = index;
+  }
+
+  addLayer() {
+    this.#data.push(fillGrid(this.width, this.height));
+  }
+
+  removeLayer(index) {
+    this.#data.splice(index, 1);
+  }
+
+  /**
+   * Flatten layers, first index determines the color
+   */
+  flattenLayers(layerIndexes: number[]) {
+
+  }
+
 }

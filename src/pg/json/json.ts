@@ -83,6 +83,9 @@ export default class PgJson extends HTMLElement {
 
   render(changes) {
     if (changes.value && this.value !== null) {
+      if (this.$container.children.length === 1) {
+        this.$container.children[0].remove();
+      }
       if (typeof this.value === 'object') {
         const $object = document.createElement('pg-json-object') as PgJsonObject;
         $object.value = unwrapObject(this.value);
