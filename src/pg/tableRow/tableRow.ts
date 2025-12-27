@@ -20,6 +20,7 @@ const types = new Map<string, any>([
 })
 export default class PgTableRow extends HTMLElement {
   @Prop() index: number;
+  @Prop() rows: any[] = [];
   @Prop() items: any[] = [];
   @Prop() key: string = '';
   @Prop() columns: any[] = [];
@@ -50,12 +51,21 @@ export default class PgTableRow extends HTMLElement {
               ...e.detail,
               index: this.index,
               key: item.key,
+              getRows: () => {
+                return this.rows.map((row) => {
+                  return {
+                    getColumn: (key: string) => {
+                      return row.items.find(x => x.key === key);
+                    },
+                  };
+                });
+              },
               getRow() {
                 return this.items;
               },
               getColumn: (key: string) => {
                 return this.items.find(x => x.key === key);
-              }
+              },
             },
           }));
         });

@@ -1023,6 +1023,10 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#data.push(fillGrid(this.width, this.height));
   }
 
+  /**
+   * Remove layer.
+   * @param index Layer index to remove
+   */
   removeLayer(index) {
     this.#data.splice(index, 1);
   }
@@ -1030,7 +1034,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   /**
    * Flatten layers, first index determines the color
    */
-  flattenLayers(layerIndexes: number[]) {
+  flattenLayers(indexes: number[]) {
 
   }
 

@@ -60,6 +60,7 @@ export default class PgTable extends HTMLElement {
         if (this.columns.length === 0) {
           throw 'columns must be set before data';
         }
+        $item.rows = this.data;
         $item.columns = this.columns;
         $item.addEventListener('action', (e: any) => {
           e.stopPropagation();

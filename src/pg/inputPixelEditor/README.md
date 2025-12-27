@@ -135,7 +135,7 @@ A complete JSON storage for a 10x10 image.
 
 ## Layer Type
 
-There are currently 5 differnet layer types.
+There are currently 6 differnet layer types.
 
 - `pixel` - Raster artboard of pixels.
   - `path` - pixels
@@ -158,3 +158,6 @@ There are currently 5 differnet layer types.
   - `transform: [1, 0, 0, 0.5, 0, 0]` to create ellipses
   - `stops: [[stop, colorIndex], [stop, colorIndex]]`
   - `dither: 'bayer4' | 'bayer8' | 'bayer16'`
+- `text` - Text, maybe???
+  - `id` - file uuid
+  - `value` - string

@@ -12,7 +12,7 @@ import style from './tableCellButtonIcon.css';
   template
 })
 export default class PgTableCellButtonIcon extends HTMLElement {
-  @Prop() value: boolean = false;
+  @Prop() value: any = null;
   @Prop() icon: string = '';
 
   @Part() $button: PgButton;
