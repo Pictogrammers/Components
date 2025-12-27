@@ -112,6 +112,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   #isShift: boolean = false;
   #isAlt: boolean = false;
   #data: number[][][] = [];
+  #export: number[][] = [];
   #undoHistory: History[] = [];
   #redoHistory: History[] = [];
   #context: CanvasRenderingContext2D;
@@ -205,6 +206,7 @@ export default class PgInputPixelEditor extends HTMLElement {
         opacity: 1
       }];
       this.#data = [fillGrid(this.width, this.height)];
+      this.#export = fillGrid(this.width, this.height);
       this.#reset = false;
       this.#undoHistory = [];
       this.#redoHistory = [];
@@ -241,14 +243,11 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   #handleChange() {
-    const paths = this.#data.map(layer => bitmaskToPath(layer, { scale: 1 }));
-    console.log('change:', paths);
+    // Due to perf, don't compute anything here
+    // use this.$input.get... methods
     this.dispatchEvent(new CustomEvent('change', {
-      detail: { value: paths }
+      detail: { export: this.#export }
     }));
-    /*this.dispatchEvent(new CustomEvent('change', {
-      detail: data
-    }));*/
   };
 
   #delayTimerId: number = 0;
@@ -302,6 +301,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     );
     // Verify this is the only place setting pixel data!
     this.#data[this.#layer][y][x] = color;
+    this.#updateExport(x, y);
     this.#delayedChange();
   }
 
@@ -311,6 +311,28 @@ export default class PgInputPixelEditor extends HTMLElement {
         this.#setPixel(x, y, this.#data[this.#layer][y][x]);
       }
     }
+  }
+
+  /**
+   * Update cached export grid for performance.
+   * @param x X
+   * @param y Y
+   */
+  #updateExport(x: number, y: number) {
+    let color = 0;
+    let layers = this.#layers.reduce((acc: any, layer: any, index: number) => {
+      if (layer.export) {
+        acc.push(index);
+      }
+    }, []);
+    for (let i = 0; i < layers.length; i++) {
+      const layer = layers[i];
+      if (this.#data[layer][y][x] !== 0) {
+        color = this.#data[layer][y][x];
+        break;
+      }
+    }
+    this.#export[y][x] = color;
   }
 
   #setPreview(pixels: Pixel[], previousX: number, previousY: number) {
@@ -762,6 +784,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       }
     });
     this.#data = [fillGrid(this.width, this.height)];
+    this.#export = fillGrid(this.width, this.height);
     this.#updateGrid();
   }
 
@@ -1021,6 +1044,13 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   addLayer() {
     this.#data.push(fillGrid(this.width, this.height));
+    this.#layers.push({
+      name: 'Layer 1',
+      export: true,
+      locked: false,
+      visible: true,
+      opacity: 1
+    });
   }
 
   /**
@@ -1036,6 +1066,14 @@ export default class PgInputPixelEditor extends HTMLElement {
    */
   flattenLayers(indexes: number[]) {
 
+  }
+
+  getLayerPaths() {
+    return this.#data.map(layer => bitmaskToPath(layer, { scale: 1 }));
+  }
+
+  getExportPath() {
+    return bitmaskToPath(this.#export, { scale: 1 });
   }
 
 }

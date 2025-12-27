@@ -271,8 +271,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   }
 
   handleChange(e: CustomEvent) {
-    const { value } = e.detail;
-    this.$value1.textContent = value.join('--');
+    this.$value1.textContent = this.$input.getLayerPaths().join('--');
   }
 
   handleInput(e: CustomEvent) {
