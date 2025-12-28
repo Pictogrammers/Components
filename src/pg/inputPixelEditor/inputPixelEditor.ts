@@ -228,12 +228,14 @@ export default class PgInputPixelEditor extends HTMLElement {
       if (y >= data[0].length) {
         for (let l = 0; l < layerCount; l++) {
           data[l].push(new Array(this.width).fill(0));
+          this.#export.push(new Array(this.width).fill(0));
         }
       }
       for (let x = 0; x < this.width; x++) {
         if (x >= data[0][y].length) {
           for (let l = 0; l < layerCount; l++) {
             data[l][y].push(0);
+            this.#export[y].push(0);
           }
         }
         for (let l = 0; l < layerCount; l++) {
@@ -305,6 +307,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     );
     // Verify this is the only place setting pixel data!
     this.#data[this.#layer][y][x] = color;
+    console.log(this.#data);
     this.#updateExport(x, y);
     this.#delayedChange();
   }
@@ -1086,7 +1089,7 @@ export default class PgInputPixelEditor extends HTMLElement {
    * Outline.
    */
   outline() {
-    const pixels = getOutline(this.#data[this.#layer]);
+    const pixels = getOutline(this.#data[this.#layer], true);
     pixels.forEach(([x, y]) => {
       this.#setPixel(x, y, this.#color);
     });
