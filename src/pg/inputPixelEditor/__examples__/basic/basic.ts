@@ -124,7 +124,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
           suggestedName: 'Canvas',
           types: [{
             description: 'SVG Document',
-            accept: {'image/svg+xml': ['.svg']},
+            accept: { 'image/svg+xml': ['.svg'] },
           }],
         });
         const writable = await handle.createWritable();
@@ -143,7 +143,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
           suggestedName: 'CanvasName',
           types: [{
             description: 'SVG Document',
-            accept: {'image/svg+xml': ['.svg']},
+            accept: { 'image/svg+xml': ['.svg'] },
           }],
         });
         const writable = await handle.createWritable();
@@ -184,7 +184,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     ];
     this.$layers.addEventListener('action', (e: any) => {
       const { getColumn, getRows, key } = e.detail;
-      switch(key) {
+      switch (key) {
         case 'select':
           getRows().forEach(({ getColumn }) => {
             getColumn('selected').value = false;
@@ -259,14 +259,27 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       });
     }));
     this.$colors.addEventListener('action', (e: any) => {
-      const { getColumn, getRows, key } = e.detail;
-      switch(key) {
+      const { getColumn, getRows, key, value, index } = e.detail;
+      const [r, g, b, a] = this.$input.getColor(index);
+      switch (key) {
         case 'select':
           getRows().forEach(({ getColumn }) => {
             getColumn('selected').value = false;
           });
           getColumn('selected').value = true;
           this.$input.selectColor(getColumn('select').value);
+          break;
+        case 'r':
+          this.$input.setColor(index, value, g, b, a);
+          break;
+        case 'g':
+          this.$input.setColor(index, r, value, b, a);
+          break;
+        case 'b':
+          this.$input.setColor(index, r, g, value, a);
+          break;
+        case 'a':
+          this.$input.setColor(index, r, g, b, value);
           break;
       }
     });
@@ -295,7 +308,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     if (files.length !== 1) {
       throw new Error('select only 1 file');
     }
-    switch(files[0].type) {
+    switch (files[0].type) {
       case 'image/svg+xml':
         // Read the file
         const reader = new FileReader();

@@ -17,6 +17,7 @@ import createLayer from './utils/createLayer';
 import diffGrid from './utils/diffGrid';
 import { getGuides } from './utils/getGuides';
 import { getOutline } from './utils/getOutline';
+import { getGridColorIndexes } from './utils/getGridColorIndexes';
 
 type Color = [number, number, number, number];
 
@@ -1042,6 +1043,10 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#colors.splice(index, 1);
   }
 
+  getColor(index) {
+    return this.#colors[index];
+  }
+
   setColor(index, r, g, b, a) {
     this.#colors[index] = [r, g, b, a];
   }
@@ -1092,6 +1097,10 @@ export default class PgInputPixelEditor extends HTMLElement {
    */
   flattenLayers(indexes: number[]) {
 
+  }
+
+  getLayerColorIndexes() {
+    return getGridColorIndexes(this.#data[this.#layer]);
   }
 
   getLayerPaths() {
