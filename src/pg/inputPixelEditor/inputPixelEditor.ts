@@ -1096,6 +1096,16 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   /**
+   * Glow.
+   */
+  glow() {
+    const pixels = getOutline(this.#data[this.#layer], false);
+    pixels.forEach(([x, y]) => {
+      this.#setPixel(x, y, this.#color);
+    });
+  }
+
+  /**
    * Flatten layers, first index determines the color
    */
   flattenLayers(indexes: number[]) {
