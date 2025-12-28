@@ -86,7 +86,7 @@ export function getOutline(grid) {
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
-      if (grid[y][x] !== 1) continue;
+      if (grid[y][x] === 0) continue;
 
       const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
       for (const [dx, dy] of dirs) {
@@ -95,7 +95,7 @@ export function getOutline(grid) {
         if (
           nx < 0 || nx >= cols ||
           ny < 0 || ny >= rows ||
-          (grid[ny][nx] === 0 && outside[ny][nx])
+          (grid[ny][nx] !== 1 && outside[ny][nx])
         ) {
           boundary.add(key(x, y));
           break;
