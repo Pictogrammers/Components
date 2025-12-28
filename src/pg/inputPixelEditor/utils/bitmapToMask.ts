@@ -6,28 +6,38 @@ interface Edge {
 }
 
 interface Options {
+  x?: number;
+  y?: number;
   width?: number;
   height?: number;
   scale?: number;
   offsetX?: number;
   offsetY?: number;
+  include?: number[];
 }
 
 export function toIndex(x: number, y: number, width: number) {
   return y * width + x;
 }
 
+/**
+ * Convert a 2d array to a SVG path.
+ * @param data
+ * @param options
+ * @returns path string
+ */
 export default function bitmaskToPath(data: number[] | number[][], options: Options = {}) {
 
-  let bitmask: number[] | number[][],
+  let bitmask: number[],
     width: number,
     height: number,
     scale = 1,
     offsetX = 0,
-    offsetY = 0;
+    offsetY = 0,
+    include = [1];
 
   if (options.width) {
-    bitmask = data;
+    bitmask = data as number[]; // already flat
     width = options.width;
     height = bitmask.length / width;
     if (height % 1 !== 0) {
@@ -53,6 +63,10 @@ export default function bitmaskToPath(data: number[] | number[][], options: Opti
     offsetY = options.offsetY;
   }
 
+  if (options.include) {
+    include = options.include;
+  }
+
   // Naively copy into a new bitmask with a border of 1 to make sampling easier (no out of bounds checks)
   const newWidth = width + 2;
   const newHeight = height + 2;
@@ -65,7 +79,7 @@ export default function bitmaskToPath(data: number[] | number[][], options: Opti
 
   for (let y = 0; y < height; ++y) {
     for (let x = 0; x < width; ++x) {
-      bm[BMXYToIndex(x, y)] = bitmask[toIndex(x, y, width)];
+      bm[BMXYToIndex(x, y)] = include.includes(bitmask[toIndex(x, y, width)]) ? 1 : 0;
     }
   }
 
@@ -101,7 +115,7 @@ export default function bitmaskToPath(data: number[] | number[][], options: Opti
 
   for (let y = 0; y < height; ++y) {
     for (let x = 0; x < width; ++x) {
-      if (bm[BMXYToIndex(x, y)] == 1) {
+      if (bm[BMXYToIndex(x, y)] === 1) {
         const left = bm[BMXYToIndex(x - 1, y)];
         if (left == 0) {
           const edge = edges[EdgeYIndex(x, y)];
@@ -116,7 +130,7 @@ export default function bitmaskToPath(data: number[] | number[][], options: Opti
           UnionGroup(edge);
         }
         const right = bm[BMXYToIndex(x + 1, y)];
-        if (right == 0) {
+        if (right === 0) {
           const edge = edges[EdgeYIndex(x + 1, y)];
           SetEdge(edge, x + 1, y);
           if (bm[BMXYToIndex(x + 1, y + 1)]) {
@@ -129,7 +143,7 @@ export default function bitmaskToPath(data: number[] | number[][], options: Opti
           UnionGroup(edge);
         }
         const top = bm[BMXYToIndex(x, y - 1)];
-        if (top == 0) {
+        if (top === 0) {
           const edge: Edge = edges[EdgeXIndex(x, y)];
           SetEdge(edge, x, y);
           if (bm[BMXYToIndex(x + 1, y - 1)]) {
@@ -142,7 +156,7 @@ export default function bitmaskToPath(data: number[] | number[][], options: Opti
           UnionGroup(edge);
         }
         const bottom = bm[BMXYToIndex(x, y + 1)];
-        if (bottom == 0) {
+        if (bottom === 0) {
           const edge = edges[EdgeXIndex(x, y + 1)];
           SetEdge(edge, x + 1, y + 1);
           if (bm[BMXYToIndex(x - 1, y + 1)]) {
