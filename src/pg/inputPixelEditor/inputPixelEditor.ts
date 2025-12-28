@@ -313,6 +313,15 @@ export default class PgInputPixelEditor extends HTMLElement {
     }
   }
 
+  getExportLayerIndexes() {
+    return this.#layers.reduce((arr: any, layer: any, index: number) => {
+      if (layer.export) {
+        arr.push(index);
+      }
+      return arr;
+    }, []);
+  }
+
   /**
    * Update cached export grid for performance.
    * @param x X
@@ -320,11 +329,7 @@ export default class PgInputPixelEditor extends HTMLElement {
    */
   #updateExport(x: number, y: number) {
     let color = 0;
-    let layers = this.#layers.reduce((acc: any, layer: any, index: number) => {
-      if (layer.export) {
-        acc.push(index);
-      }
-    }, []);
+    let layers = this.getExportLayerIndexes();
     for (let i = 0; i < layers.length; i++) {
       const layer = layers[i];
       if (this.#data[layer][y][x] !== 0) {

@@ -104,7 +104,8 @@ A complete JSON storage for a 10x10 image.
   "transparent": true,
   "colors": [
     [0, 0, 0, 0],
-    [0, 0, 0, 1]
+    [0, 0, 0, 1],
+    [255, 255, 255, 1]
   ],
   "layers": [
     {
