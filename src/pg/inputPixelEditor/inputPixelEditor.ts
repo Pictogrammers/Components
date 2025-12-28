@@ -116,9 +116,11 @@ export default class PgInputPixelEditor extends HTMLElement {
   #undoHistory: History[] = [];
   #redoHistory: History[] = [];
   #context: CanvasRenderingContext2D;
+  #color: number = 1;
   #colors: Color[] = [
     [0, 0, 0, 0],
-    [0, 0, 0, 1]
+    [0, 0, 0, 1],
+    [255, 0, 255, 1]
   ];
   #baseLayer: HTMLCanvasElement;
   #baseLayerContext: CanvasRenderingContext2D;
@@ -535,7 +537,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#startY = newY;
     this.#x = newX;
     this.#y = newY;
-    const color = event.buttons === 32 ? 0 : 1;
+    const color = event.buttons === 32 ? 0 : this.#color;
     switch (this.#inputMode) {
       case InputMode.Pixel:
         this.#setPixel(newX, newY, color);
@@ -660,7 +662,7 @@ export default class PgInputPixelEditor extends HTMLElement {
         points.push([newX, newY]);
       }
       // Is Eraser
-      const color = event.buttons === 32 ? 0 : 1;
+      const color = event.buttons === 32 ? 0 : this.#color;
       // Shape tools only care about the last point
       if (points.length === 0) { return; }
       const [lastX, lastY] = points.at(-1) as [number, number];
@@ -1021,6 +1023,14 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#redoHistory = json.redo;
     }
     this.#init();
+  }
+
+  selectColor(index) {
+    this.#color = index;
+  }
+
+  getColors() {
+    return this.#colors;
   }
 
   addColor(r, g, b, a) {
