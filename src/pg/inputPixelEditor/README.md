@@ -46,7 +46,9 @@ See usage for each method below.
 | `removeLayer(index)` | -      | Remove layer. |
 | `flattenLayers(layerIndexes)` | -      | Flatten layers. |
 | `moveLayer(startIndex, endIndex)` | -    | Move layer. |
+| `getColor()` | -     | Get selected color |
 | `getColors()` | -    | Get colors. |
+| `selectColor(index)` | -    | Select color. |
 | `setColor(index, r, g, b, a)` | -  | Set Color. |
 | `addColor(r, g, b, a)` | -    | Add color. |
 | `removeColor(index)` | -    | Remove color. |
@@ -57,6 +59,7 @@ See usage for each method below.
 | `flipHorizontal()` | -  | Flip horizontal. |
 | `flipVertical()` | -  | Flip vertical. |
 | `invert()` | -  | Invert layer. |
+| `outline()` | - | Outline layer with selected color. |
 
 ### `save(options)` Method
 
@@ -101,7 +104,7 @@ A complete JSON storage for a 10x10 image.
 {
   "width": 10,
   "height": 10,
-  "transparent": true,
+  "transparent": [0],
   "colors": [
     [0, 0, 0, 0],
     [0, 0, 0, 1],

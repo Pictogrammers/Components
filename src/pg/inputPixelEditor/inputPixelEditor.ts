@@ -16,6 +16,7 @@ import bitmaskToPath from './utils/bitmapToMask';
 import createLayer from './utils/createLayer';
 import diffGrid from './utils/diffGrid';
 import { getGuides } from './utils/getGuides';
+import { getOutline } from './utils/getOutline';
 
 type Color = [number, number, number, number];
 
@@ -1074,6 +1075,16 @@ export default class PgInputPixelEditor extends HTMLElement {
    */
   removeLayer(index) {
     this.#data.splice(index, 1);
+  }
+
+  /**
+   * Outline.
+   */
+  outline() {
+    const pixels = getOutline(this.#data[this.#layer]);
+    pixels.forEach(([x, y]) => {
+      this.#setPixel(x, y, this.#color);
+    });
   }
 
   /**
