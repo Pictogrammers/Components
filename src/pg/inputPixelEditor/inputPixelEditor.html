@@ -1,3 +1,24 @@
 <div part="wrapper" tabindex="0">
   <canvas part="canvas" draggable="false"></canvas>
+  <svg part="selection" viewBox="0 0 10 10">
+    <defs>
+    <filter id="whiteOutline" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Thicken the source graphic (the original stroke path) -->
+      <feMorphology in="SourceGraphic" operator="dilate" radius="1" result="dilated" />
+
+      <!-- Flood the dilated shape with white color -->
+      <feFlood flood-color="white" result="flood" />
+
+      <!-- Composite the white color with the dilated shape to create the white outline shape -->
+      <feComposite in="flood" in2="dilated" operator="in" result="whiteOutlineShape" />
+
+      <!-- Merge the white outline shape with the original source graphic -->
+      <feMerge>
+        <feMergeNode in="whiteOutlineShape" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+    <path part="selectionPath" d="M9,7H1V1H9Z" filter="url(#whiteOutline)" />
+  </svg>
 </div>

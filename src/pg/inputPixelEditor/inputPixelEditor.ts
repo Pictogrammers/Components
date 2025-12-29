@@ -98,6 +98,8 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   @Part() $wrapper: HTMLDivElement;
   @Part() $canvas: HTMLCanvasElement;
+  @Part() $selection: SVGSVGElement;
+  @Part() $selectionPath: SVGPathElement;
 
   // Internal State
   #inputStamp: number[][] = [];
@@ -111,6 +113,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   #y: number = -1;
   #layer: number = 0;
   #layers: Layer[] = [];
+  #selection = new Set<string>(); // 'x,y'
   #isCtrl: boolean = false;
   #isShift: boolean = false;
   #isAlt: boolean = false;
@@ -255,6 +258,9 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.dispatchEvent(new CustomEvent('change', {
       detail: { export: this.#export }
     }));
+    // temporary test
+    this.$selection.setAttribute('viewBox', `0 0 ${this.width * this.size} ${this.height * this.size}`)
+    this.$selectionPath.setAttribute('d', bitmaskToPath(this.#data[0], { scale: this.size }));
   };
 
   #delayTimerId: number = 0;
@@ -944,6 +950,18 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#inputMode = InputMode.Stamp;
     // Clear previous pixel
     this.#clearStampPreview();
+  }
+
+  inputModeSelectRectangle() {
+    this.#inputMode = InputMode.SelectRectangle;
+  }
+
+  inputModeSelectEllipse() {
+    this.#inputMode = InputMode.SelectEllipse;
+  }
+
+  inputModeSelectLasso() {
+    this.#inputMode = InputMode.SelectLasso;
   }
 
   inputModePixel() {
