@@ -96,6 +96,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   @Prop(normalizeBoolean) transparent: boolean = false;
   @Prop() placeholder: string = '';
 
+  @Part() $wrapper: HTMLDivElement;
   @Part() $canvas: HTMLCanvasElement;
 
   // Internal State
@@ -159,11 +160,11 @@ export default class PgInputPixelEditor extends HTMLElement {
       'pointerleave',
       this.handlePointerLeave.bind(this)
     );
-    this.$canvas.addEventListener(
+    this.$wrapper.addEventListener(
       'keydown',
       this.handleKeyDown.bind(this)
     );
-    this.$canvas.addEventListener(
+    this.$wrapper.addEventListener(
       'keyup',
       this.handleKeyUp.bind(this)
     );
@@ -307,7 +308,6 @@ export default class PgInputPixelEditor extends HTMLElement {
     );
     // Verify this is the only place setting pixel data!
     this.#data[this.#layer][y][x] = color;
-    console.log(this.#data);
     this.#updateExport(x, y);
     this.#delayedChange();
   }
