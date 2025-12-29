@@ -1088,8 +1088,8 @@ export default class PgInputPixelEditor extends HTMLElement {
   /**
    * Outline.
    */
-  outline() {
-    const pixels = getOutline(this.#data[this.#layer], true);
+  outline(include: number[] = []) {
+    const pixels = getOutline(this.#data[this.#layer], true, include);
     pixels.forEach(([x, y]) => {
       this.#setPixel(x, y, this.#color);
     });
@@ -1098,8 +1098,8 @@ export default class PgInputPixelEditor extends HTMLElement {
   /**
    * Glow.
    */
-  glow() {
-    const pixels = getOutline(this.#data[this.#layer], false);
+  glow(include: number[] = []) {
+    const pixels = getOutline(this.#data[this.#layer], false, include);
     pixels.forEach(([x, y]) => {
       this.#setPixel(x, y, this.#color);
     });

@@ -1,4 +1,4 @@
-export function getOutline(pixels: number[][], ignoreInside: boolean = false) {
+export function getOutline(pixels: number[][], ignoreInside: boolean = false, include: number[] = []) {
   const moatPixels: number[][] = [];
   const height = pixels.length;
   if (height === 0) return moatPixels;
@@ -59,9 +59,14 @@ export function getOutline(pixels: number[][], ignoreInside: boolean = false) {
   // ---------------------------------------------------------
   const moatSet = new Set<string>();
 
+  let condition = (pixel) => pixel === 0;
+  if (include.length !== 0) {
+    condition = (pixel) => !include.includes(pixel);
+  }
+
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      if (pixels[y][x] !== 1) continue;
+      if (condition(pixels[y][x])) continue;
 
       for (const [dx, dy] of directions) {
         const nx = x + dx;
