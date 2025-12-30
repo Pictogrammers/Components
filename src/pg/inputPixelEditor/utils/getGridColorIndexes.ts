@@ -1,5 +1,5 @@
 export function getGridColorIndexes(arr: number[][]) {
-  const seen = new Set();
+  const seen = new Set([0]);
   const result: number[] = [];
   for (const innerArray of arr) {
     for (const value of innerArray) {

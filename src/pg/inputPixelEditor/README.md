@@ -48,6 +48,7 @@ See usage for each method below.
 | `moveLayer(startIndex, endIndex)` | -    | Move layer. |
 | `getColor()` | -     | Get selected color |
 | `getColors()` | -    | Get colors. |
+| `getLayerColorIndexes()` | -  | Get selected layer colors. |
 | `selectColor(index)` | -    | Select color. |
 | `setColor(index, r, g, b, a)` | -  | Set Color. |
 | `addColor(r, g, b, a)` | -    | Add color. |
@@ -56,10 +57,13 @@ See usage for each method below.
 | `rotateClockwise()` | -    | Rotate. |
 | `rotateCounterclockwise()` | -    | Rotate. |
 | `move(x, y[, layer])` | -  | Move. |
-| `flipHorizontal()` | -  | Flip horizontal. |
-| `flipVertical()` | -  | Flip vertical. |
+| `getSelection()` | -  | Get selection pixels. |
+| `clearSelection()` | -  | Clear selection. |
+| `flipHorizontal()` | -  | Flip horizontal selection. |
+| `flipVertical()` | -  | Flip vertical selection. |
 | `invert()` | -  | Invert layer. |
-| `outline()` | - | Outline layer with selected color. |
+| `outline()` | -  | Outline layer with selected color. |
+| `glow()` | -  | Glow layer with selected color. |
 
 ### `save(options)` Method
 

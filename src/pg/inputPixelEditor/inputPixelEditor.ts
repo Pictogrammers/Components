@@ -1130,12 +1130,24 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   }
 
-  getLayerColorIndexes() {
-    return getGridColorIndexes(this.#data[this.#layer]);
+  getLayerColorIndexes(layerIndex = this.#layer) {
+    return getGridColorIndexes(this.#data[layerIndex]).sort();
+  }
+
+  /**
+   * Every unique color gets a path
+   */
+  #getLayerPaths() {
+    return this.#data.map((layer, layerIndex) => {
+      const colors = this.getLayerColorIndexes(layerIndex);
+      return colors.map((color) => {
+        return [color, bitmaskToPath(layer, { scale: 1, include: [color] })];
+      });
+    });
   }
 
   getLayerPaths() {
-    return this.#data.map(layer => bitmaskToPath(layer, { scale: 1 }));
+    return this.#getLayerPaths() as any;
   }
 
   getExportPath() {
