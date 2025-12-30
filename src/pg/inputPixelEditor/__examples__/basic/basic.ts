@@ -43,6 +43,10 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $modeRectangleOutline: HTMLButtonElement;
   @Part() $modeEllipse: HTMLButtonElement;
   @Part() $modeEllipseOutline: HTMLButtonElement;
+  @Part() $selectRectangle: HTMLButtonElement;
+  @Part() $selectCircle: HTMLButtonElement;
+  @Part() $selectLasso: HTMLButtonElement;
+  @Part() $selectMagic: HTMLButtonElement;
 
   @Part() $save: HTMLButtonElement;
   @Part() $open: HTMLButtonElement;
@@ -97,6 +101,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$modeEllipseOutline.addEventListener('click', () => {
       this.$input.inputModeEllipseOutline();
     });
+    this.$selectRectangle.addEventListener('click', () => {
+      this.$input.inputModeSelectRectangle();
+    });
     this.$reset.addEventListener('click', () => {
       this.$input.reset();
     });
@@ -113,12 +120,12 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       this.$input.glow();
     });
     this.$save.addEventListener('click', async () => {
-      const json = await this.$input.save();
+      const json = await this.$input.getJson();
       this.$output.textContent = JSON.stringify(json, null, 4);
     });
     this.$open.addEventListener('click', () => {
       const json = JSON.parse(this.$output.textContent || '');
-      this.$input.open(json as any);
+      this.$input.setJson(json as any);
     });
     this.$file.addEventListener('change', this.handleFile.bind(this));
     this.$saveSvg.addEventListener('click', async () => {
@@ -340,7 +347,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   handleChange(e: CustomEvent) {
     this.$value1.textContent = this.$input.getLayerPaths().map((layer) => {
       return layer.map(x => x.join('=')).join(';');
-    }).join('<->');
+    }).join('\n');
   }
 
   handleInput(e: CustomEvent) {

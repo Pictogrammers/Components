@@ -964,6 +964,10 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#inputMode = InputMode.SelectLasso;
   }
 
+  inputModeSelectMagicWand() {
+    this.#inputMode = InputMode.SelectMagicWand;
+  }
+
   inputModePixel() {
     this.#inputMode = InputMode.Pixel;
   }
@@ -988,7 +992,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#inputMode = InputMode.EllipseOutline;
   }
 
-  async save(options: FileOptions = {}): Promise<File> {
+  async getJson(options: FileOptions = {}): Promise<File> {
     const file: File = {
       width: this.width,
       height: this.height,
@@ -1019,7 +1023,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     return file;
   }
 
-  async open(json: File) {
+  async setJson(json: File) {
     if (typeof json !== 'object') {
       return ['json must be type object'];
     }

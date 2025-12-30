@@ -34,12 +34,23 @@ See usage for each method below.
 
 | Method     | Tested   | Description |
 | ---------- | -------- | ----------- |
-| `save(options)` | -        | Save file. |
-| `open(json)` | -        | Open file. |
+| `getJson(options)` | -        | Get JSON file. |
+| `setJson(json)` | -        | Set JSON file. |
 | `undo()` | -           | Undo. |
 | `hasUndo()` | -     | Has undo |
 | `hasRedo()` | -     | Has redo |
 | `redo()` | -           | Redo. |
+| `inputModeSelectRectangle()` | -  | Input Mode Select Rectangle |
+| `inputModeSelectEllipse()` | -  | Input Mode Select Ellipse |
+| `inputModeSelectLasso()` | -  | Input Mode Lasso |
+| `inputModeSelectMagicWand()` | -  | Input Mode Magic Wand |
+| `inputModePixel()` | -  | Input Mode Pixel |
+| `inputModeStamp(stamp)` | -  | Input Mode Stamp |
+| `inputModeLine()` | -  | Input Mode Line |
+| `inputModeRectangle()` | -  | Input Mode Rectangle |
+| `inputModeRectangleOutline()` | -  | Input Mode Rectangle Outline |
+| `inputModeEllipse()` | -  | Input Mode Ellipse |
+| `inputModeEllipseOutline()` | -  | Input Mode Ellipse Outline |
 | `selectLayer(index)` | -    | Select layer. |
 | `getLayers()` | -    | Get layer array. |
 | `addLayer(option)` | -        | Add layer. |

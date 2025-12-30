@@ -36,6 +36,10 @@ svg {
   grid-row: 1;
 }
 
+svg.hide {
+  display: none;
+}
+
 path {
   fill: none;
   stroke: #000;
