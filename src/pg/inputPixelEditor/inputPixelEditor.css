@@ -47,6 +47,10 @@ path {
   stroke-dashoffset: 10px;
 }
 
+path.preview {
+  stroke: rgb(0 96 255);
+}
+
 path.hide {
   display: none;
 }

@@ -286,12 +286,12 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#previousPreview = pixels;
       this.#selectionPreview[y][x] = 1;
     });
-    this.$selectionPathPreview.setAttribute('visibility', 'visible');
+    this.$selectionPathPreview.classList.toggle('hide', false);
     this.$selectionPathPreview.setAttribute('d', bitmaskToPath(this.#selectionPreview, { scale: this.size }));
   }
 
   #clearSelectionPreview() {
-    this.$selectionPathPreview.setAttribute('visibility', 'hidden');
+    this.$selectionPathPreview.classList.toggle('hide', true);
     this.#previousPreview.forEach(({x, y}) => {
       this.#selectionPreview[y][x] = 0;
     });
@@ -592,7 +592,6 @@ export default class PgInputPixelEditor extends HTMLElement {
         });
         break;
     }
-    console.log(this.#inputMode, newX, newY);
     // track movement
     this.#handlePointerMoveCache = this.handlePointerMove.bind(this);
     document.addEventListener('pointermove', this.#handlePointerMoveCache);
@@ -638,8 +637,9 @@ export default class PgInputPixelEditor extends HTMLElement {
           getRectanglePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
             this.#setSelectionPixel(x, y);
           });
-          this.$selectionPathPreview.setAttribute('visibility', 'hidden');
-          this.$selectionPath.setAttribute('visibility', 'visible');
+          this.$selectionPathPreview.classList.toggle('hide', true);
+          this.$selectionPath.classList.toggle('hide', false);
+          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
           break;
         case InputMode.Line:
           getLinePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
