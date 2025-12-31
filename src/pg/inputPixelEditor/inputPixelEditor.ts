@@ -118,6 +118,8 @@ export default class PgInputPixelEditor extends HTMLElement {
   #isShift: boolean = false;
   #isAlt: boolean = false;
   #data: number[][][] = [];
+  #selectionPreview: number[][] = [];
+  #selectionPixels = new Map<string, number[]>(); // 'x,y', [x, y]
   #selection: number[][] = [];
   #export: number[][] = [];
   #undoHistory: History[] = [];
@@ -205,6 +207,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     } else {
       this.#baseLayerContext.clearRect(0, 0, actualWidth, actualHeight);
     }
+    this.$selection.setAttribute('viewBox', `0 0 ${this.width * this.size} ${this.height * this.size}`);
     if (this.#reset) {
       this.#layer = 0;
       this.#layers = [{
@@ -216,6 +219,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       }];
       this.#data = [fillGrid(this.width, this.height)];
       this.#export = fillGrid(this.width, this.height);
+      this.#selectionPreview = fillGrid(this.width, this.height);
       this.#selection = fillGrid(this.width, this.height);
       this.#reset = false;
       this.#undoHistory = [];
@@ -235,6 +239,8 @@ export default class PgInputPixelEditor extends HTMLElement {
         for (let l = 0; l < layerCount; l++) {
           data[l].push(new Array(this.width).fill(0));
           this.#export.push(new Array(this.width).fill(0));
+          this.#selection.push(new Array(this.width).fill(0));
+          this.#selectionPreview.push(new Array(this.width).fill(0));
         }
       }
       for (let x = 0; x < this.width; x++) {
@@ -242,6 +248,8 @@ export default class PgInputPixelEditor extends HTMLElement {
           for (let l = 0; l < layerCount; l++) {
             data[l][y].push(0);
             this.#export[y].push(0);
+            this.#selection[y].push(0);
+            this.#selectionPreview[y].push(0);
           }
         }
         for (let l = 0; l < layerCount; l++) {
@@ -260,9 +268,6 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.dispatchEvent(new CustomEvent('change', {
       detail: { export: this.#export }
     }));
-    // temporary test
-    this.$selection.setAttribute('viewBox', `0 0 ${this.width * this.size} ${this.height * this.size}`)
-    this.$selectionPath.setAttribute('d', bitmaskToPath(this.#data[0], { scale: this.size }));
   };
 
   #delayTimerId: number = 0;
@@ -271,21 +276,29 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#delayTimerId = window.setTimeout(this.#handleChange.bind(this), 1000);
   };
 
+  #previousPreview: Pixel[] = [];
   #setSelectionPreview(pixels: Pixel[]) {
+    // Undo previous selection
+    this.#previousPreview.forEach(({x, y}) => {
+      this.#selectionPreview[y][x] = 0;
+    });
     pixels.forEach(({ x, y }) => {
-      this.#selection[y][x] = 1;
+      this.#previousPreview = pixels;
+      this.#selectionPreview[y][x] = 1;
     });
     this.$selectionPathPreview.setAttribute('visibility', 'visible');
-    this.$selectionPathPreview.setAttribute('d', bitmaskToPath(this.#selection, { scale: 1 }));
-    console.log(bitmaskToPath(this.#selection, { scale: 1 }));
+    this.$selectionPathPreview.setAttribute('d', bitmaskToPath(this.#selectionPreview, { scale: this.size }));
   }
 
   #clearSelectionPreview() {
     this.$selectionPathPreview.setAttribute('visibility', 'hidden');
-    this.#selection = fillGrid(this.width, this.height);
+    this.#previousPreview.forEach(({x, y}) => {
+      this.#selectionPreview[y][x] = 0;
+    });
   }
 
   #setSelectionPixel(x: number, y: number) {
+    this.#selectionPixels.set(`${x},${y}`, [x, y]);
     this.#selection[y][x] = 1;
   }
 
@@ -834,6 +847,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
     this.#data = [fillGrid(this.width, this.height)];
     this.#export = fillGrid(this.width, this.height);
+    this.#selectionPreview = fillGrid(this.width, this.height);
     this.#selection = fillGrid(this.width, this.height);
     this.#updateGrid();
   }
