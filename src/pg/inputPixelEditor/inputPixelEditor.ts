@@ -18,6 +18,7 @@ import diffGrid from './utils/diffGrid';
 import { getGuides } from './utils/getGuides';
 import { getOutline } from './utils/getOutline';
 import { getGridColorIndexes } from './utils/getGridColorIndexes';
+import { getFloodFill } from './utils/getFloodFill';
 
 type Color = [number, number, number, number];
 
@@ -297,6 +298,14 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
   }
 
+  clearSelection() {
+    this.#selectionPixels.forEach(([x, y]) => {
+      this.#selection[y][x] = 0;
+    });
+    this.#selectionPixels.clear();
+    this.$selectionPath.classList.toggle('hide', true);
+  }
+
   #setSelectionPixel(x: number, y: number) {
     this.#selectionPixels.set(`${x},${y}`, [x, y]);
     this.#selection[y][x] = 1;
@@ -531,19 +540,20 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   handleKeyDown(event: KeyboardEvent) {
     console.log(event.shiftKey, event.ctrlKey, event.altKey, event.key);
+    this.#isShift = true;
     switch (event.key) {
       case ' ':
         console.log('space');
         break;
       case 'Escape':
         console.log('escape');
-        // Cancel editing
+        this.clearSelection();
         break;
     }
   }
 
   handleKeyUp(event: KeyboardEvent) {
-
+    this.#isShift = false;
   }
 
   handleContextMenu(event: MouseEvent) {
@@ -618,28 +628,64 @@ export default class PgInputPixelEditor extends HTMLElement {
     //  return;
     //}
     // Single Tap
-    if (newX === this.#startX && newY === this.#startY && this.#startColor === 1) {
+    if (newX === this.#startX && newY === this.#startY) {
       switch (this.#inputMode) {
+        case InputMode.SelectMagicWand:
+          if (!event.shiftKey) {
+            this.clearSelection();
+          }
+          const color = this.#data[this.#layer][newY][newX];
+          console.log(color);
+          const pixels = getFloodFill(this.#data[this.#layer], newX, newY, [color]);
+          pixels.forEach(([x, y]) => {
+            this.#setSelectionPixel(x, y);
+          });
+          this.$selectionPathPreview.classList.toggle('hide', true);
+          this.$selectionPath.classList.toggle('hide', false);
+          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
+          break;
         case InputMode.Pixel:
-          this.#setPixel(newX, newY, 0);
-          this.#data[this.#layer][newY][newX] = 0;
+          if (this.#startColor === 1) {
+            this.#setPixel(newX, newY, 0);
+            this.#data[this.#layer][newY][newX] = 0;
+          }
           break;
         case InputMode.Stamp:
-          this.#inputStamp.forEach((point) => {
-            this.#setPixel(newX + point[0], newY + point[1], 0);
-          });
+          if (this.#startColor === 1) {
+            this.#inputStamp.forEach((point) => {
+              this.#setPixel(newX + point[0], newY + point[1], 0);
+            });
+          }
           break;
       }
     } else {
       switch (this.#inputMode) {
         case InputMode.SelectRectangle:
           this.#clearSelectionPreview();
+          if (!event.shiftKey) {
+            this.clearSelection();
+          }
           getRectanglePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
             this.#setSelectionPixel(x, y);
           });
           this.$selectionPathPreview.classList.toggle('hide', true);
           this.$selectionPath.classList.toggle('hide', false);
           this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
+          break;
+        case InputMode.SelectEllipse:
+          this.#clearSelectionPreview();
+          if (!event.shiftKey) {
+            this.clearSelection();
+          }
+          getEllipsePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
+            this.#setSelectionPixel(x, y);
+          });
+          this.$selectionPathPreview.classList.toggle('hide', true);
+          this.$selectionPath.classList.toggle('hide', false);
+          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
+          break;
+        case InputMode.SelectLasso:
+
           break;
         case InputMode.Line:
           getLinePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
@@ -860,6 +906,10 @@ export default class PgInputPixelEditor extends HTMLElement {
   clearHistory() {
     this.#undoHistory = [];
     this.#redoHistory = [];
+  }
+
+  getHistory() {
+    return this.#undoHistory;
   }
 
   applyTemplate(template: number[][]) {

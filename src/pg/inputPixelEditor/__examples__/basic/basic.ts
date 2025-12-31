@@ -44,7 +44,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $modeEllipse: HTMLButtonElement;
   @Part() $modeEllipseOutline: HTMLButtonElement;
   @Part() $selectRectangle: HTMLButtonElement;
-  @Part() $selectCircle: HTMLButtonElement;
+  @Part() $selectEllipse: HTMLButtonElement;
   @Part() $selectLasso: HTMLButtonElement;
   @Part() $selectMagic: HTMLButtonElement;
 
@@ -103,6 +103,15 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     });
     this.$selectRectangle.addEventListener('click', () => {
       this.$input.inputModeSelectRectangle();
+    });
+    this.$selectEllipse.addEventListener('click', () => {
+      this.$input.inputModeSelectEllipse();
+    });
+    this.$selectLasso.addEventListener('click', () => {
+      this.$input.inputModeSelectLasso();
+    });
+    this.$selectMagic.addEventListener('click', () => {
+      this.$input.inputModeSelectMagicWand();
     });
     this.$reset.addEventListener('click', () => {
       this.$input.reset();
