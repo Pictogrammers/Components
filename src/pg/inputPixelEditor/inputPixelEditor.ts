@@ -100,6 +100,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   @Part() $canvas: HTMLCanvasElement;
   @Part() $selection: SVGSVGElement;
   @Part() $selectionPath: SVGPathElement;
+  @Part() $selectionPathPreview: SVGPathElement;
 
   // Internal State
   #inputStamp: number[][] = [];
@@ -113,11 +114,11 @@ export default class PgInputPixelEditor extends HTMLElement {
   #y: number = -1;
   #layer: number = 0;
   #layers: Layer[] = [];
-  #selection = new Set<string>(); // 'x,y'
   #isCtrl: boolean = false;
   #isShift: boolean = false;
   #isAlt: boolean = false;
   #data: number[][][] = [];
+  #selection: number[][] = [];
   #export: number[][] = [];
   #undoHistory: History[] = [];
   #redoHistory: History[] = [];
@@ -215,6 +216,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       }];
       this.#data = [fillGrid(this.width, this.height)];
       this.#export = fillGrid(this.width, this.height);
+      this.#selection = fillGrid(this.width, this.height);
       this.#reset = false;
       this.#undoHistory = [];
       this.#redoHistory = [];
@@ -268,6 +270,24 @@ export default class PgInputPixelEditor extends HTMLElement {
     clearInterval(this.#delayTimerId);
     this.#delayTimerId = window.setTimeout(this.#handleChange.bind(this), 1000);
   };
+
+  #setSelectionPreview(pixels: Pixel[]) {
+    pixels.forEach(({ x, y }) => {
+      this.#selection[y][x] = 1;
+    });
+    this.$selectionPathPreview.setAttribute('visibility', 'visible');
+    this.$selectionPathPreview.setAttribute('d', bitmaskToPath(this.#selection, { scale: 1 }));
+    console.log(bitmaskToPath(this.#selection, { scale: 1 }));
+  }
+
+  #clearSelectionPreview() {
+    this.$selectionPathPreview.setAttribute('visibility', 'hidden');
+    this.#selection = fillGrid(this.width, this.height);
+  }
+
+  #setSelectionPixel(x: number, y: number) {
+    this.#selection[y][x] = 1;
+  }
 
   #setPixel(x: number, y: number, color: number) {
     if (x >= this.width || x < 0) {
@@ -600,6 +620,14 @@ export default class PgInputPixelEditor extends HTMLElement {
       }
     } else {
       switch (this.#inputMode) {
+        case InputMode.SelectRectangle:
+          this.#clearSelectionPreview();
+          getRectanglePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
+            this.#setSelectionPixel(x, y);
+          });
+          this.$selectionPathPreview.setAttribute('visibility', 'hidden');
+          this.$selectionPath.setAttribute('visibility', 'visible');
+          break;
         case InputMode.Line:
           getLinePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
             this.#setPixel(x, y, 1);
@@ -683,6 +711,9 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#x = lastX;
       this.#y = lastY;
       switch (this.#inputMode) {
+        case InputMode.SelectRectangle:
+          this.#setSelectionPreview(getRectanglePixels(startX, startY, lastX, lastY));
+          break;
         case InputMode.Pixel:
           for (var point of points) {
             this.#setPixel(point[0], point[1], color);
@@ -803,6 +834,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
     this.#data = [fillGrid(this.width, this.height)];
     this.#export = fillGrid(this.width, this.height);
+    this.#selection = fillGrid(this.width, this.height);
     this.#updateGrid();
   }
 

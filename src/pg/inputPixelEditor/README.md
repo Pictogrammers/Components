@@ -23,10 +23,18 @@ import { PgInputPixelEditor } from '@pictogrammers/components/pgInputPixelEditor
 
 ## Events
 
-| Events     | Tested   | Description |
-| ---------- | -------- | ----------- |
-| `change`   |          | `{ detail: { value }` |
-| `input`    |          | `{ detail: { value }` |
+| Events      | Tested   | Description |
+| ----------- | -------- | ----------- |
+| `change`    |          | `{ detail: { value }` |
+| `reference` |          | `{ detail: { id, callback } }` |
+
+```typescript
+this.$input.addEventListener('reference', (e: any) => {
+  const { id, callback } = e.detail;
+  // async request
+  // callback(file: File)
+});
+```
 
 ## Methods
 
@@ -76,9 +84,9 @@ See usage for each method below.
 | `outline()` | -  | Outline layer with selected color. |
 | `glow()` | -  | Glow layer with selected color. |
 
-### `save(options)` Method
+### `getJson(options)` Method
 
-The save method allows getting the JSON representation of the current editor.
+The `getJson` method allows getting the JSON representation of the current editor. Optionally this can snapshot the entire undo history.
 
 ```typescript
 @Part() $editor: PgInputPixelEditor;
@@ -92,7 +100,7 @@ handleSave() {
 }
 ```
 
-### `open(json)` Method
+### `setJson(json)` Method
 
 The open method allows loading json for previously created images.
 
@@ -111,7 +119,7 @@ handleOpen() {
 
 - `width` - Image width.
 - `height` - Image width.
-- `transparent` - Render transparent background.
+- `transparent` - Override the transparent color. This has no impact on the exported background.
 
 A complete JSON storage for a 10x10 image.
 
@@ -119,7 +127,7 @@ A complete JSON storage for a 10x10 image.
 {
   "width": 10,
   "height": 10,
-  "transparent": [0],
+  "transparent": null,
   "colors": [
     [0, 0, 0, 0],
     [0, 0, 0, 1],
@@ -137,16 +145,8 @@ A complete JSON storage for a 10x10 image.
   ],
   "data": [
     [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      [1, "M...Z"],
+      [2, "M...Z"]
     ]
   ]
 }

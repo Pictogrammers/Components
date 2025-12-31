@@ -1,6 +1,6 @@
 <div part="wrapper" tabindex="0">
   <canvas part="canvas" draggable="false"></canvas>
-  <svg part="selection" viewBox="0 0 10 10" class="hide">
+  <svg part="selection" viewBox="0 0 10 10">
     <defs>
     <filter id="whiteOutline" x="-50%" y="-50%" width="200%" height="200%">
       <!-- Thicken the source graphic (the original stroke path) -->
@@ -19,6 +19,7 @@
       </feMerge>
     </filter>
   </defs>
-    <path part="selectionPath" d="M9,7H1V1H9Z" filter="url(#whiteOutline)" />
+    <path part="selectionPath" visibility="hidden" d="M9,7H1V1H9Z" filter="url(#whiteOutline)" />
+    <path part="selectionPathPreview" visibility="hidden" d="M9,7H1V1H9Z" filter="url(#whiteOutline)" />
   </svg>
 </div>

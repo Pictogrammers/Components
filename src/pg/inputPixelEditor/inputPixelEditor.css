@@ -36,10 +36,6 @@ svg {
   grid-row: 1;
 }
 
-svg.hide {
-  display: none;
-}
-
 path {
   fill: none;
   stroke: #000;
@@ -49,6 +45,10 @@ path {
   animation: stroke 0.4s linear infinite;
   shape-rendering: geometricPrecision;
   stroke-dashoffset: 10px;
+}
+
+path.hide {
+  display: none;
 }
 
 @keyframes stroke {
