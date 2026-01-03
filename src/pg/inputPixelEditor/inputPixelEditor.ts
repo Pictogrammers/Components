@@ -19,6 +19,8 @@ import { getGuides } from './utils/getGuides';
 import { getOutline } from './utils/getOutline';
 import { getGridColorIndexes } from './utils/getGridColorIndexes';
 import { getFloodFill } from './utils/getFloodFill';
+import { readMetadata, textEncode, writeMetadata } from './utils/pngMetadata';
+import { canvasToPngBuffer } from './utils/canvasToPngBuffer';
 
 type Color = [number, number, number, number];
 
@@ -78,6 +80,14 @@ interface File {
   data: number[][][]
   undo?: History[]
   redo?: History[]
+}
+
+interface Export {
+  scale?: number;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
 }
 
 function toColor([r, g, b, a]: Color) {
@@ -175,6 +185,23 @@ export default class PgInputPixelEditor extends HTMLElement {
       'keyup',
       this.handleKeyUp.bind(this)
     );
+    this.$wrapper.addEventListener('paste', async (e: any) => {
+      e.preventDefault();
+      const clipboardContents = await navigator.clipboard.read();
+      for (const item of clipboardContents) {
+        if (item.types.includes("image/png")) {
+          const pngBlob = await item.getType('image/png');
+          console.log('read', pngBlob.size);
+          const arrayBuffer = await pngBlob.arrayBuffer();
+          console.log(readMetadata(new Uint8Array(arrayBuffer)));
+        }
+        if (item.types.includes('web application/easel+text')) {
+          const textBlob = await item.getType('web application/easel+text');
+          const text = await textBlob.text();
+          console.log('Text content:', text);
+        }
+      }
+    });
   }
 
   render(changes) {
@@ -304,6 +331,17 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
     this.#selectionPixels.clear();
     this.$selectionPath.classList.toggle('hide', true);
+  }
+
+  hasSelection() {
+    return this.#selectionPixels.size !== 0;
+  }
+
+  /**
+   * Get a JSON contents of the selected region
+   */
+  getSelection() {
+
   }
 
   #setSelectionPixel(x: number, y: number) {
@@ -538,6 +576,33 @@ export default class PgInputPixelEditor extends HTMLElement {
     }));
   }
 
+  async copyPngToClipboard(blob) {
+    try {
+      // Ensure the blob is of type image/png if necessary
+      // In many cases, the fetched blob's type is already correct
+      if (blob.type !== "image/png") {
+          console.error("Fetched resource is not a PNG image.");
+          // Optional: convert to PNG using a canvas if needed
+          // For conversion logic, see Stack Overflow links
+          return;
+      }
+
+      // 3. Create a new ClipboardItem with the Blob
+      const clipboardItem = new ClipboardItem({
+        [blob.type]: blob,
+        'web application/easel+text': new Blob(['testing'], { type: 'web application/easel+text' }),
+      });
+
+      // 4. Write the ClipboardItem to the clipboard
+      await navigator.clipboard.write([clipboardItem]);
+      console.log('Image copied to clipboard successfully!');
+
+    } catch (err) {
+      console.error('Failed to copy image: ', err.name, err.message);
+      // Handle potential errors (e.g., user denied permission, network issues)
+    }
+  }
+
   handleKeyDown(event: KeyboardEvent) {
     console.log(event.shiftKey, event.ctrlKey, event.altKey, event.key);
     this.#isShift = true;
@@ -549,6 +614,25 @@ export default class PgInputPixelEditor extends HTMLElement {
         console.log('escape');
         this.clearSelection();
         break;
+    }
+    if (event.ctrlKey) {
+      switch (event.key) {
+        case 'c':
+          const canvas = this.getExportCanvas();
+          canvasToPngBuffer(canvas).then((data) => {
+            const file = new Uint8Array(data);
+            const meta = readMetadata(file);
+            meta.tEXt = meta.tEXt ?? {};
+            meta.tEXt['easel'] = 'testing';
+            const file2 = writeMetadata(file, meta);
+            const meta2 = readMetadata(new Uint8Array(file2));
+            console.log(meta2);
+            const blob2 = new Blob([new Uint8Array(file2)], { type: 'image/png' });
+            console.log('write', blob2.size);
+            this.copyPngToClipboard(blob2);
+          });
+          break;
+      }
     }
   }
 
@@ -1252,6 +1336,51 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   getExportPath() {
     return bitmaskToPath(this.#export, { scale: 1 });
+  }
+
+  /**
+   * Include metadata.
+   */
+  getExportCanvas(options: Export = {}) {
+    const canvas = document.createElement('canvas') as HTMLCanvasElement;
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const scale = (options.scale ?? 1);
+    canvas.width = (options.width ?? this.width) * scale;
+    canvas.height = (options.height ?? this.height) * scale;
+    this.#export.forEach((row, y) => {
+      row.forEach((column, x) => {
+        const [ r, g, b, a ] = this.#colors[column];
+        context.fillStyle = `rgba(${r},${g},${b},${a})`;
+        context.fillRect(x * scale, y * scale, scale, scale);
+      });
+    });
+    return canvas;
+  }
+
+  async getExportPng() {
+    return new Promise<Blob>((resolve, reject) => {
+      this.getExportCanvas().toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject();
+        }
+      }, 'image/png');
+    });
+  }
+
+  async getExportPngWithMeta(extra: object = {}) {
+    const blob = await this.getExportPng();
+    const arrayBuffer = await blob.arrayBuffer();
+    const file = new Uint8Array(arrayBuffer);
+    const meta = {
+      tEXt: {
+        ...extra,
+        easel: 'testing'
+      }
+    };
+    const fileWithMeta = writeMetadata(file, meta);
+    return fileWithMeta;
   }
 
 }

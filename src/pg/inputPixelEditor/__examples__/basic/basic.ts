@@ -48,6 +48,8 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $selectLasso: HTMLButtonElement;
   @Part() $selectMagic: HTMLButtonElement;
 
+  @Part() $undo: HTMLButtonElement;
+  @Part() $redo: HTMLButtonElement;
   @Part() $save: HTMLButtonElement;
   @Part() $open: HTMLButtonElement;
   @Part() $output: HTMLPreElement;
@@ -162,13 +164,13 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
         const handle = await window.showSaveFilePicker({
           suggestedName: 'CanvasName',
           types: [{
-            description: 'SVG Document',
-            accept: { 'image/svg+xml': ['.svg'] },
+            description: 'PNG Image',
+            accept: { 'image/png': ['.png'] },
           }],
         });
         const writable = await handle.createWritable();
-        await writable.write('something');
-        await writable.write
+        const image = await this.$input.getExportPngWithMeta();
+        await writable.write(image);
         await writable.close();
       } catch (e: any) {
         // no save

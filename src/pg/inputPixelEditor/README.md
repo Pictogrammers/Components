@@ -44,6 +44,8 @@ See usage for each method below.
 | ---------- | -------- | ----------- |
 | `getJson(options)` | -        | Get JSON file. |
 | `setJson(json)` | -        | Set JSON file. |
+| `getExportCanvas()` | -  | Get new canvas of export. |
+| `await getExportPng()` | -  | Promise. |
 | `undo()` | -           | Undo. |
 | `hasUndo()` | -     | Has undo |
 | `hasRedo()` | -     | Has redo |
@@ -127,6 +129,7 @@ A complete JSON storage for a 10x10 image.
 {
   "width": 10,
   "height": 10,
+  "gridSize": 10,
   "transparent": null,
   "colors": [
     [0, 0, 0, 0],
