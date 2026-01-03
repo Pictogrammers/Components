@@ -208,11 +208,14 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       const { getColumn, getRows, key } = e.detail;
       switch (key) {
         case 'select':
-          getRows().forEach(({ getColumn }) => {
-            getColumn('selected').value = false;
+          getColumn('selected').value = !getColumn('selected').value;
+          const selectedLayers: number[] = [];
+          getRows().forEach(({ getColumn, index }) => {
+            if (getColumn('selected').value) {
+              selectedLayers.push(index);
+            }
           });
-          getColumn('selected').value = true;
-          this.$input.selectLayer(getColumn('select').value);
+          this.$input.selectLayers(selectedLayers);
           break;
       }
     });

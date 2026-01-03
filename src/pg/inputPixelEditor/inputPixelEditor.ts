@@ -1280,7 +1280,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     return this.#data.map((data, index) => index);
   }
 
-  selectLayer(indexes) {
+  selectLayers(indexes: number[]) {
     this.#layer = indexes;
   }
 
