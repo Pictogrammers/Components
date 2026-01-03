@@ -10,7 +10,7 @@
   outline: 0;
 }
 
-[part="wrapper"]:focus-visible::before {
+[part="wrapper"]:not(.ignore):focus-visible::before {
   pointer-events: none;
   content: '';
   position: absolute;

@@ -178,6 +178,10 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.handlePointerLeave.bind(this)
     );
     this.$wrapper.addEventListener(
+      'keypress',
+      this.handleKeyPress.bind(this)
+    );
+    this.$wrapper.addEventListener(
       'keydown',
       this.handleKeyDown.bind(this)
     );
@@ -195,8 +199,8 @@ export default class PgInputPixelEditor extends HTMLElement {
           const arrayBuffer = await pngBlob.arrayBuffer();
           console.log(readMetadata(new Uint8Array(arrayBuffer)));
         }
-        if (item.types.includes('web application/easel+text')) {
-          const textBlob = await item.getType('web application/easel+text');
+        if (item.types.includes('web application/easel+json')) {
+          const textBlob = await item.getType('web application/easel+json');
           const text = await textBlob.text();
           console.log('Text content:', text);
         }
@@ -576,7 +580,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     }));
   }
 
-  async copyPngToClipboard(blob) {
+  async copyPngToClipboard(blob, data) {
     try {
       // Ensure the blob is of type image/png if necessary
       // In many cases, the fetched blob's type is already correct
@@ -590,16 +594,20 @@ export default class PgInputPixelEditor extends HTMLElement {
       // 3. Create a new ClipboardItem with the Blob
       const clipboardItem = new ClipboardItem({
         [blob.type]: blob,
-        'web application/easel+text': new Blob(['testing'], { type: 'web application/easel+text' }),
+        'web application/easel+json': new Blob([JSON.stringify(data)], { type: 'web application/easel+json' }),
       });
 
       // 4. Write the ClipboardItem to the clipboard
       await navigator.clipboard.write([clipboardItem]);
-      console.log('Image copied to clipboard successfully!');
 
     } catch (err) {
       console.error('Failed to copy image: ', err.name, err.message);
-      // Handle potential errors (e.g., user denied permission, network issues)
+    }
+  }
+
+  handleKeyPress(event: KeyboardEvent) {
+    if (event.key === 'Delete') {
+      event.preventDefault();
     }
   }
 
@@ -614,23 +622,24 @@ export default class PgInputPixelEditor extends HTMLElement {
         console.log('escape');
         this.clearSelection();
         break;
+      case 'Delete':
+        this.#selectionPixels.forEach(([x, y]) => {
+          this.#setPixel(x, y, 0);
+        });
+        this.clearSelection();
+        this.$wrapper.classList.toggle('ignore', true);
+        break;
     }
     if (event.ctrlKey) {
       switch (event.key) {
         case 'c':
-          const canvas = this.getExportCanvas();
-          canvasToPngBuffer(canvas).then((data) => {
-            const file = new Uint8Array(data);
-            const meta = readMetadata(file);
-            meta.tEXt = meta.tEXt ?? {};
-            meta.tEXt['easel'] = 'testing';
-            const file2 = writeMetadata(file, meta);
-            const meta2 = readMetadata(new Uint8Array(file2));
-            console.log(meta2);
-            const blob2 = new Blob([new Uint8Array(file2)], { type: 'image/png' });
-            console.log('write', blob2.size);
-            this.copyPngToClipboard(blob2);
-          });
+          if (this.hasSelection()) {
+            const image = this.getSelectionPng();
+            this.copyPngToClipboard(image, {});
+          } else {
+            const image = this.getExportPng();
+            this.copyPngToClipboard(image, {});
+          }
           break;
       }
     }
@@ -1379,6 +1388,20 @@ export default class PgInputPixelEditor extends HTMLElement {
     } else {
       return blob;
     }
+  }
+
+  getSelectionPng() {
+    const xList: number[] = [];
+    const yList: number[] = [];
+    this.#selectionPixels.forEach(([x, y]) => {
+      xList.push(x);
+      yList.push(y);
+    });
+    let minX = Math.min(...xList),
+      minY = Math.min(...yList),
+      maxX = Math.max(...xList),
+      maxY = Math.max(...yList);
+    console.log(minX, minY, maxX, maxY);
   }
 
 }
