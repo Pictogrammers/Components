@@ -66,7 +66,6 @@ See usage for each method below.
 | `addLayer(option)` | -        | Add layer. |
 | `removeLayer(index)` | -      | Remove layer. |
 | `flattenLayers(layerIndexes)` | -      | Flatten layers. |
-| `moveLayer(startIndex, endIndex)` | -    | Move layer. |
 | `getColor()` | -     | Get selected color |
 | `getColors()` | -    | Get colors. |
 | `getLayerColorIndexes()` | -  | Get selected layer colors. |
@@ -80,6 +79,7 @@ See usage for each method below.
 | `move(x, y[, layer])` | -  | Move. |
 | `getSelection()` | -  | Get selection pixels. |
 | `clearSelection()` | -  | Clear selection. |
+| `moveSelection(x, y)` | -    | Move selection. |
 | `flipHorizontal()` | -  | Flip horizontal selection. |
 | `flipVertical()` | -  | Flip vertical selection. |
 | `invert()` | -  | Invert layer. |
