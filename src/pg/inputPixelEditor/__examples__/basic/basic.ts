@@ -169,7 +169,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
           }],
         });
         const writable = await handle.createWritable();
-        const image = await this.$input.getExportPngWithMeta();
+        const image = await this.$input.getExportPng();
         await writable.write(image);
         await writable.close();
       } catch (e: any) {

@@ -45,7 +45,7 @@ See usage for each method below.
 | `getJson(options)` | -        | Get JSON file. |
 | `setJson(json)` | -        | Set JSON file. |
 | `getExportCanvas()` | -  | Get new canvas of export. |
-| `await getExportPng()` | -  | Promise. |
+| `await getExportPng(options, meta)` | -  | Get image. |
 | `undo()` | -           | Undo. |
 | `hasUndo()` | -     | Has undo |
 | `hasRedo()` | -     | Has redo |
