@@ -124,7 +124,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   #startY: number = -1;
   #x: number = -1;
   #y: number = -1;
-  #layer: number = 0;
+  #layer: number[] = [0];
   #layers: Layer[] = [];
   #isCtrl: boolean = false;
   #isShift: boolean = false;
@@ -242,7 +242,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     }
     this.$selection.setAttribute('viewBox', `0 0 ${this.width * this.size} ${this.height * this.size}`);
     if (this.#reset) {
-      this.#layer = 0;
+      this.#layer = [0];
       this.#layers = [{
         name: 'Layer 1',
         export: true,
@@ -398,7 +398,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       x * totalSize, y * totalSize, this.size + 2, this.size + 2
     );
     // Verify this is the only place setting pixel data!
-    this.#data[this.#layer][y][x] = color;
+    this.#data[this.#layer[0]][y][x] = color;
     this.#updateExport(x, y);
     this.#delayedChange();
   }
@@ -406,7 +406,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   #setPixelAll() {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        this.#setPixel(x, y, this.#data[this.#layer][y][x]);
+        this.#setPixel(x, y, this.#data[this.#layer[0]][y][x]);
       }
     }
   }
@@ -630,13 +630,19 @@ export default class PgInputPixelEditor extends HTMLElement {
         this.clearSelection();
         this.$wrapper.classList.toggle('ignore', true);
         break;
+      case 'ArrowRight':
+        if (this.hasSelection()) {
+          this.moveSelection(1, 0);
+        }
+        this.$wrapper.classList.toggle('ignore', true);
+        break;
     }
     if (event.ctrlKey) {
       switch (event.key) {
         case 'c':
           if (this.hasSelection()) {
             const image = await this.getSelectionPng();
-            this.copyPngToClipboard(image, {});
+            this.copyPngToClipboard(image, { x: 2, y: 2 });
           } else {
             const image = await this.getExportPng();
             this.copyPngToClipboard(image, {});
@@ -680,7 +686,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (newX >= this.width) { newX = this.width - 1; }
     if (newY >= this.height) { newY = this.height - 1; }
     this.#isPressed = true;
-    this.#startColor = this.#data[this.#layer][newY][newX];
+    this.#startColor = this.#data[this.#layer[0]][newY][newX];
     this.#startX = newX;
     this.#startY = newY;
     this.#x = newX;
@@ -728,9 +734,9 @@ export default class PgInputPixelEditor extends HTMLElement {
           if (!event.shiftKey) {
             this.clearSelection();
           }
-          const color = this.#data[this.#layer][newY][newX];
+          const color = this.#data[this.#layer[0]][newY][newX];
           console.log(color);
-          const pixels = getFloodFill(this.#data[this.#layer], newX, newY, [color]);
+          const pixels = getFloodFill(this.#data[this.#layer[0]], newX, newY, [color]);
           pixels.forEach(([x, y]) => {
             this.#setSelectionPixel(x, y);
           });
@@ -741,7 +747,7 @@ export default class PgInputPixelEditor extends HTMLElement {
         case InputMode.Pixel:
           if (this.#startColor === 1) {
             this.#setPixel(newX, newY, 0);
-            this.#data[this.#layer][newY][newX] = 0;
+            this.#data[this.#layer[0]][newY][newX] = 0;
           }
           break;
         case InputMode.Stamp:
@@ -971,7 +977,7 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   clear() {
     const gridEmpty = fillGrid(this.width, this.height);
-    const diff = diffGrid(this.#data[this.#layer], gridEmpty);
+    const diff = diffGrid(this.#data[this.#layer[0]], gridEmpty);
     this.#undoHistory.push({
       type: HistoryType.Group,
       data: {
@@ -982,7 +988,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       type: HistoryType.Pixel,
       data: {
         pixels: [],
-        layer: this.#layer
+        layer: this.#layer[0]
       }
     });
     this.#data = [fillGrid(this.width, this.height)];
@@ -1012,21 +1018,21 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   flipHorizontal() {
-    const cloned = cloneGrid(this.#data[this.#layer]);
+    const cloned = cloneGrid(this.#data[this.#layer[0]]);
     const w = cloned[0].length - 1;
-    iterateGrid(this.#data[this.#layer], (x, y) => {
-      cloned[y][x] = this.#data[this.#layer][y][w - x];
+    iterateGrid(this.#data[this.#layer[0]], (x, y) => {
+      cloned[y][x] = this.#data[this.#layer[0]][y][w - x];
     });
-    this.#data[this.#layer] = cloned;
+    this.#data[this.#layer[0]] = cloned;
   }
 
   flipVertical() {
-    const cloned = cloneGrid(this.#data[this.#layer]);
+    const cloned = cloneGrid(this.#data[this.#layer[0]]);
     const h = cloned.length - 1;
-    iterateGrid(this.#data[this.#layer], (x, y) => {
-      cloned[this.#layer][y][x] = this.#data[h - y][x];
+    iterateGrid(this.#data[this.#layer[0]], (x, y) => {
+      cloned[this.#layer[0]][y][x] = this.#data[h - y][x];
     });
-    this.#data[this.#layer] = cloned;
+    this.#data[this.#layer[0]] = cloned;
   }
 
   move(translateX: number, translateY: number) {
@@ -1034,16 +1040,16 @@ export default class PgInputPixelEditor extends HTMLElement {
     for (let iy = 0; iy < this.height; iy++) {
       cloned[iy].fill(0);
     }
-    iterateGrid(this.#data[this.#layer], (x, y) => {
+    iterateGrid(this.#data[this.#layer[0]], (x, y) => {
       if (y - translateY < 0
         || x - translateX < 0
         || y - translateY >= this.height
         || x - translateX >= this.width) {
         return;
       }
-      cloned[y][x] = this.#data[this.#layer][y - translateY][x - translateX];
+      cloned[y][x] = this.#data[this.#layer[0]][y - translateY][x - translateX];
     });
-    this.#data[this.#layer] = cloned;
+    this.#data[this.#layer[0]] = cloned;
   }
 
   invert() {
@@ -1051,8 +1057,8 @@ export default class PgInputPixelEditor extends HTMLElement {
     if (this.#colors.length > 2) {
       return;
     }
-    iterateGrid(this.#data[this.#layer], (x, y) => {
-      this.#data[this.#layer][y][x] = this.#data[this.#layer][y][x] === 0 ? 1 : 0;
+    iterateGrid(this.#data[this.#layer[0]], (x, y) => {
+      this.#data[this.#layer[0]][y][x] = this.#data[this.#layer[0]][y][x] === 0 ? 1 : 0;
     });
     this.#setPixelAll();
   }
@@ -1075,7 +1081,7 @@ export default class PgInputPixelEditor extends HTMLElement {
         this.#redoHistory.push(revert);
         (revert.data as HistoryPixelType).pixels.forEach((item) => {
           const [x, y] = item;
-          this.#data[this.#layer][y][x] = item[2];
+          this.#data[this.#layer[0]][y][x] = item[2];
           // redraw canvas
         });
         break;
@@ -1103,23 +1109,23 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   #rotate(counterClockwise: boolean = false) {
-    const cloned = cloneGrid(this.#data[this.#layer]);
+    const cloned = cloneGrid(this.#data[this.#layer[0]]);
     if (counterClockwise) {
       const newData = this.#data[0].map((val, index) => this.#data.map(row => row[row.length - 1 - index]));
       for (let iy = 0; iy < this.height; iy++) {
         for (let ix = 0; ix < this.width; ix++) {
-          cloned[iy][ix] = newData[this.#layer][iy][ix];
+          cloned[iy][ix] = newData[this.#layer[0]][iy][ix];
         }
       }
     } else {
       const newData = this.#data[0].map((val, index) => this.#data.map(row => row[index]).reverse());
       for (let iy = 0; iy < this.height; iy++) {
         for (let ix = 0; ix < this.width; ix++) {
-          cloned[iy][ix] = newData[this.#layer][iy][ix];
+          cloned[iy][ix] = newData[this.#layer[0]][iy][ix];
         }
       }
     }
-    this.#data[this.#layer] = cloned;
+    this.#data[this.#layer[0]] = cloned;
   }
 
   hasUndo() {
@@ -1274,8 +1280,8 @@ export default class PgInputPixelEditor extends HTMLElement {
     return this.#data.map((data, index) => index);
   }
 
-  selectLayer(index) {
-    this.#layer = index;
+  selectLayer(indexes) {
+    this.#layer = indexes;
   }
 
   addLayer() {
@@ -1301,7 +1307,7 @@ export default class PgInputPixelEditor extends HTMLElement {
    * Outline.
    */
   outline(include: number[] = []) {
-    const pixels = getOutline(this.#data[this.#layer], true, include);
+    const pixels = getOutline(this.#data[this.#layer[0]], true, include);
     pixels.forEach(([x, y]) => {
       this.#setPixel(x, y, this.#color);
     });
@@ -1311,7 +1317,7 @@ export default class PgInputPixelEditor extends HTMLElement {
    * Glow.
    */
   glow(include: number[] = []) {
-    const pixels = getOutline(this.#data[this.#layer], false, include);
+    const pixels = getOutline(this.#data[this.#layer[0]], false, include);
     pixels.forEach(([x, y]) => {
       this.#setPixel(x, y, this.#color);
     });
@@ -1324,7 +1330,7 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   }
 
-  getLayerColorIndexes(layerIndex = this.#layer) {
+  getLayerColorIndexes(layerIndex = this.#layer[0]) {
     return getGridColorIndexes(this.#data[layerIndex]).sort();
   }
 
@@ -1419,4 +1425,12 @@ export default class PgInputPixelEditor extends HTMLElement {
     }, meta);
   }
 
+  /**
+   * Move selection.
+   * @param x X
+   * @param y Y
+   */
+  moveSelection(x: number, y: number) {
+
+  }
 }
