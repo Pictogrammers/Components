@@ -1357,9 +1357,9 @@ export default class PgInputPixelEditor extends HTMLElement {
     return canvas;
   }
 
-  async getExportPng() {
+  async getExportPng(option: Export = {}) {
     return new Promise<Blob>((resolve, reject) => {
-      this.getExportCanvas().toBlob((blob) => {
+      this.getExportCanvas(option).toBlob((blob) => {
         if (blob) {
           resolve(blob);
         } else {
@@ -1369,8 +1369,8 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
   }
 
-  async getExportPngWithMeta(extra: object = {}) {
-    const blob = await this.getExportPng();
+  async getExportPngWithMeta(option: Export = {}, extra: object = {}) {
+    const blob = await this.getExportPng(option);
     const arrayBuffer = await blob.arrayBuffer();
     const file = new Uint8Array(arrayBuffer);
     const meta = {
