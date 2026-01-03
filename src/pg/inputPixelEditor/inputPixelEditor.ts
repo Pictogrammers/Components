@@ -21,6 +21,7 @@ import { getGridColorIndexes } from './utils/getGridColorIndexes';
 import { getFloodFill } from './utils/getFloodFill';
 import { readMetadata, textEncode, writeMetadata } from './utils/pngMetadata';
 import { canvasToPngBuffer } from './utils/canvasToPngBuffer';
+import { blobToImage } from './utils/blobToImage';
 
 type Color = [number, number, number, number];
 
@@ -611,7 +612,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     }
   }
 
-  handleKeyDown(event: KeyboardEvent) {
+  async handleKeyDown(event: KeyboardEvent) {
     console.log(event.shiftKey, event.ctrlKey, event.altKey, event.key);
     this.#isShift = true;
     switch (event.key) {
@@ -634,10 +635,10 @@ export default class PgInputPixelEditor extends HTMLElement {
       switch (event.key) {
         case 'c':
           if (this.hasSelection()) {
-            const image = this.getSelectionPng();
+            const image = await this.getSelectionPng();
             this.copyPngToClipboard(image, {});
           } else {
-            const image = this.getExportPng();
+            const image = await this.getExportPng();
             this.copyPngToClipboard(image, {});
           }
           break;
@@ -1353,22 +1354,29 @@ export default class PgInputPixelEditor extends HTMLElement {
   getExportCanvas(options: Export = {}) {
     const canvas = document.createElement('canvas') as HTMLCanvasElement;
     const context = canvas.getContext('2d') as CanvasRenderingContext2D;
-    const scale = (options.scale ?? 1);
+    const scale = options.scale ?? 1;
+    const offsetX = options.x ?? 0;
+    const offsetY = options.y ?? 0;
     canvas.width = (options.width ?? this.width) * scale;
     canvas.height = (options.height ?? this.height) * scale;
-    this.#export.forEach((row, y) => {
-      row.forEach((column, x) => {
-        const [ r, g, b, a ] = this.#colors[column];
+    const rows = options.height ?? this.#export.length;
+    const columns = options.width ?? this.#export[0].length;
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < columns; x++) {
+        const relativeX = x + offsetX;
+        const relativeY = y + offsetY;
+        const color = this.#export[relativeY][relativeX];
+        const [ r, g, b, a ] = this.#colors[color];
         context.fillStyle = `rgba(${r},${g},${b},${a})`;
         context.fillRect(x * scale, y * scale, scale, scale);
-      });
-    });
+      }
+    }
     return canvas;
   }
 
-  async #getExportPng(option: Export = {}) {
+  async #getExportPng(options: Export = {}) {
     return new Promise<Blob>((resolve, reject) => {
-      this.getExportCanvas(option).toBlob((blob) => {
+      this.getExportCanvas(options).toBlob((blob) => {
         if (blob) {
           resolve(blob);
         } else {
@@ -1378,19 +1386,20 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
   }
 
-  async getExportPng(option: Export = {}, meta: any = {}) {
-    const blob = await this.#getExportPng(option);
+  async getExportPng(options: Export = {}, meta: any = null) {
+    const blob = await this.#getExportPng(options);
     if (meta) {
       const arrayBuffer = await blob.arrayBuffer();
       const file = new Uint8Array(arrayBuffer);
       const data = { tEXt: meta };
-      return writeMetadata(file, data);
+      const blobWithMeta = writeMetadata(file, data);
+      return blobWithMeta.buffer;
     } else {
       return blob;
     }
   }
 
-  getSelectionPng() {
+  async getSelectionPng(options: Export = {}, meta: any = null) {
     const xList: number[] = [];
     const yList: number[] = [];
     this.#selectionPixels.forEach(([x, y]) => {
@@ -1401,7 +1410,13 @@ export default class PgInputPixelEditor extends HTMLElement {
       minY = Math.min(...yList),
       maxX = Math.max(...xList),
       maxY = Math.max(...yList);
-    console.log(minX, minY, maxX, maxY);
+    return await this.getExportPng({
+      ...options,
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    }, meta);
   }
 
 }
