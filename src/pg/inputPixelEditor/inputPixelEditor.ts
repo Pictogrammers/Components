@@ -22,6 +22,7 @@ import { getFloodFill } from './utils/getFloodFill';
 import { readMetadata, textEncode, writeMetadata } from './utils/pngMetadata';
 import { canvasToPngBuffer } from './utils/canvasToPngBuffer';
 import { blobToImage } from './utils/blobToImage';
+import { diffLeftMapPixels } from './utils/diffMap';
 
 type Color = [number, number, number, number];
 
@@ -1473,12 +1474,34 @@ export default class PgInputPixelEditor extends HTMLElement {
    * @param y Y
    */
   moveSelection(x: number, y: number) {
-    const newSelection: number[][] = [];
+    const changes = new Map<string, number[]>();
+    const newSelection = new Map<string, number[]>();
     this.#selectionPixels.forEach(([currentX, currentY]) => {
-      newSelection.push([currentX, currentY]);
+      const newX = currentX + x;
+      const newY = currentY + y;
+      this.#layer.forEach((layer) => {
+        const color = this.#data[layer][currentY][currentX];
+        const newColor = this.#data[layer][newY][newX];
+        if (color !== newColor) {
+          changes.set(`${layer},${currentX},${currentY}`, [layer, currentX, currentY, color]);
+        }
+      });
+      newSelection.set(`${newX},${newY}`, [newX, newY]);
     });
-    debugger;
-    newSelection.forEach(([currentX, currentY]) => {
+    const clearSelection = diffLeftMapPixels(this.#selectionPixels, newSelection);
+    // Add pixels no longer in the selection as these are all now 0
+    clearSelection.forEach(([clearX, clearY]) => {
+      const newX = clearX + x;
+      const newY = clearY + y;
+      this.#layer.forEach((layer) => {
+        const color = this.#data[layer][clearY][clearX];
+        if (color !== 0) { // already empty ignore
+          changes.set(`${layer},${clearX},${clearY}`, [layer, clearX, clearY, 0]);
+        }
+      });
+    });
+    console.log(changes);
+    changes.forEach(([currentX, currentY]) => {
       this.#selectionPixels.delete(`${currentX},${currentY}`);
       this.#selection[currentY][currentX] = 0;
       const newX = currentX + x;
