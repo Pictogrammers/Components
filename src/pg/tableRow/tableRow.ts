@@ -53,11 +53,12 @@ export default class PgTableRow extends HTMLElement {
               getRows: () => {
                 if (!this.parentNode) { return; }
                 const items = Array.from(this.parentNode.children) as PgTableRow[];
-                return items.map((row) => {
+                return items.map((row, index) => {
                   return {
                     getColumn: (key: string) => {
                       return row.items.find(x => x.key === key);
                     },
+                    index,
                   };
                 });
               },

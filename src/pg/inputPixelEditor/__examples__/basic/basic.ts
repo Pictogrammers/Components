@@ -200,7 +200,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
         select: {
           type: PgTableCellButtonIcon,
           icon: IconLayerEdit,
-          value: 0,
+          value: this.$layers.data.length,
         }
       })
     ];
@@ -209,24 +209,23 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       switch (key) {
         case 'select':
           const selectedLayers: number[] = [];
-          getRows().forEach(({ getColumn }) => {
+          getRows().forEach(({ getColumn, index: index2 }) => {
             if (getColumn('selected').value) {
-              selectedLayers.push(getColumn('select').value);
+              selectedLayers.push(index2);
             }
           });
           if (
             selectedLayers.length === 1
-            && selectedLayers[0] === getColumn('select').value
+            && selectedLayers[0] === index
           ) {
             // ignore
           } else {
-            const index = getColumn('select').value;
             const currentValue = getColumn('selected').value;
             getColumn('selected').value = !currentValue;
             if (currentValue) {
-              selectedLayers.splice(selectedLayers.findIndex(x => x ))
+              selectedLayers.splice(selectedLayers.findIndex(x => x === index), 1);
             } else {
-              selectedLayers.push(getColumn('select').value);
+              selectedLayers.push(index);
             }
           }
           console.log('selected', selectedLayers);
