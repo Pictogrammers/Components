@@ -44,6 +44,7 @@ See usage for each method below.
 | ---------- | -------- | ----------- |
 | `getJson(options)` | -        | Get JSON file. |
 | `setJson(json)` | -        | Set JSON file. |
+| `reset()` | -  | Reset canvas and data. |
 | `getExportCanvas()` | -  | Get new canvas of export. |
 | `await getExportPng(options, meta)` | -  | Get image. |
 | `undo()` | -           | Undo. |
@@ -90,6 +91,7 @@ See usage for each method below.
 | `drawRectangle(x, y, width, height, isOutline)` | -  | Draw rectangle |
 | `drawEllipse(x, y, width, height, isOutline)` | -  | Draw ellipse. |
 | `drawLine()` | -  | Draw line. |
+| `flush()` | -  | Flush changes to history. |
 
 ### `getJson(options)` Method
 
@@ -193,12 +195,21 @@ There are currently 6 differnet layer types.
 
 The history list contains every change made to the canvas. All feature insert an entry into history. Pens and pattern tools will group as to cut down history entries.
 
+Note: Calling the `draw*()` commands programatically will group into a single history item. To create multiple entries call `flush()`.
+
 - Undo a change
 - Redo an undo
 - Timeline - Commonly used to generate progression clips. `getHistoryGif({ delay: 0.05 })` for instance generates a gif with 0.05 second delay between each change.
 
 ### History Format
 
-For plugins or tools generating custom output the `getHistory()` returns an array with all entries.
+For plugins or tools generating timelines the `getHistory()` returns an array with all entries. Note the `getHistoryPng(index)` is very CPU intensive and will recreate every change up to the index.
 
--
+```json
+[       // history
+  [     // history item
+    {}, // group
+    {}
+  ]
+]
+```
