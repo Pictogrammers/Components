@@ -50,6 +50,7 @@ See usage for each method below.
 | `hasUndo()` | -     | Has undo |
 | `hasRedo()` | -     | Has redo |
 | `redo()` | -           | Redo. |
+| `getHistory()` | -  | History list. |
 | `inputModeSelectRectangle()` | -  | Input Mode Select Rectangle |
 | `inputModeSelectEllipse()` | -  | Input Mode Select Ellipse |
 | `inputModeSelectLasso()` | -  | Input Mode Lasso |
@@ -85,6 +86,10 @@ See usage for each method below.
 | `invert()` | -  | Invert layer. |
 | `outline()` | -  | Outline layer with selected color. |
 | `glow()` | -  | Glow layer with selected color. |
+| `drawPixels([[x, y, color], ...])` | -  | Draw pixels. Color optional. |
+| `drawRectangle(x, y, width, height, isOutline)` | -  | Draw rectangle |
+| `drawEllipse(x, y, width, height, isOutline)` | -  | Draw ellipse. |
+| `drawLine()` | -  | Draw line. |
 
 ### `getJson(options)` Method
 
@@ -183,3 +188,17 @@ There are currently 6 differnet layer types.
 - `text` - Text, maybe???
   - `id` - file uuid
   - `value` - string
+
+## History
+
+The history list contains every change made to the canvas. All feature insert an entry into history. Pens and pattern tools will group as to cut down history entries.
+
+- Undo a change
+- Redo an undo
+- Timeline - Commonly used to generate progression clips. `getHistoryGif({ delay: 0.05 })` for instance generates a gif with 0.05 second delay between each change.
+
+### History Format
+
+For plugins or tools generating custom output the `getHistory()` returns an array with all entries.
+
+-

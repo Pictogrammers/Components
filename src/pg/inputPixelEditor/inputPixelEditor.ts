@@ -179,6 +179,14 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.handlePointerLeave.bind(this)
     );
     this.$wrapper.addEventListener(
+      'focus',
+      this.handleFocus.bind(this)
+    );
+    this.$wrapper.addEventListener(
+      'blur',
+      this.handleBlur.bind(this)
+    );
+    this.$wrapper.addEventListener(
       'keypress',
       this.handleKeyPress.bind(this)
     );
@@ -606,6 +614,16 @@ export default class PgInputPixelEditor extends HTMLElement {
     }
   }
 
+  handleFocus() {
+    if(!this.$wrapper.matches(':focus-visible')) {
+      this.$wrapper.classList.toggle('ignore', true);
+    }
+  }
+
+  handleBlur() {
+    this.$wrapper.classList.toggle('ignore', false);
+  }
+
   handleKeyPress(event: KeyboardEvent) {
     if (event.key === 'Delete') {
       event.preventDefault();
@@ -617,7 +635,8 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#isShift = true;
     switch (event.key) {
       case ' ':
-        console.log('space');
+        // stop page scroll
+        event.preventDefault();
         break;
       case 'Escape':
         console.log('escape');
@@ -628,13 +647,11 @@ export default class PgInputPixelEditor extends HTMLElement {
           this.#setPixel(x, y, 0);
         });
         this.clearSelection();
-        this.$wrapper.classList.toggle('ignore', true);
         break;
       case 'ArrowRight':
         if (this.hasSelection()) {
           this.moveSelection(1, 0);
         }
-        this.$wrapper.classList.toggle('ignore', true);
         break;
     }
     if (event.ctrlKey) {

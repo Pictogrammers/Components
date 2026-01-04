@@ -205,16 +205,31 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       })
     ];
     this.$layers.addEventListener('action', (e: any) => {
-      const { getColumn, getRows, key } = e.detail;
+      const { getColumn, getRows, key, index } = e.detail;
       switch (key) {
         case 'select':
-          getColumn('selected').value = !getColumn('selected').value;
           const selectedLayers: number[] = [];
-          getRows().forEach(({ getColumn, index }) => {
+          getRows().forEach(({ getColumn }) => {
             if (getColumn('selected').value) {
-              selectedLayers.push(index);
+              selectedLayers.push(getColumn('select').value);
             }
           });
+          if (
+            selectedLayers.length === 1
+            && selectedLayers[0] === getColumn('select').value
+          ) {
+            // ignore
+          } else {
+            const index = getColumn('select').value;
+            const currentValue = getColumn('selected').value;
+            getColumn('selected').value = !currentValue;
+            if (currentValue) {
+              selectedLayers.splice(selectedLayers.findIndex(x => x ))
+            } else {
+              selectedLayers.push(getColumn('select').value);
+            }
+          }
+          console.log('selected', selectedLayers);
           this.$input.selectLayers(selectedLayers);
           break;
       }
