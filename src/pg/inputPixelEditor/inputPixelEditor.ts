@@ -55,10 +55,12 @@ type HistoryColorUpdateType = {
   index: number
 }
 
-type History = {
+type HistoryItem = {
   type: HistoryType,
   data: HistoryGroupType | HistoryPixelType | HistoryColorUpdateType
 }
+
+type History = HistoryItem[];
 
 type Layer = {
   name: string,
@@ -665,6 +667,18 @@ export default class PgInputPixelEditor extends HTMLElement {
             this.copyPngToClipboard(image, {});
           }
           break;
+        case 'z':
+          if (event.shiftKey) {
+            // modern redo keybinding
+            this.redo();
+          } else {
+            this.undo();
+          }
+          break;
+        case 'y':
+          // legacy redo keybinding
+          this.redo();
+          break;
       }
     }
   }
@@ -992,22 +1006,12 @@ export default class PgInputPixelEditor extends HTMLElement {
     // ToDo: Code this
   }
 
+  /**
+   * ToDo: Delete this method
+   */
   clear() {
     const gridEmpty = fillGrid(this.width, this.height);
     const diff = diffGrid(this.#data[this.#layer[0]], gridEmpty);
-    this.#undoHistory.push({
-      type: HistoryType.Group,
-      data: {
-        name: 'Clear'
-      }
-    });
-    this.#undoHistory.push({
-      type: HistoryType.Pixel,
-      data: {
-        pixels: [],
-        layer: this.#layer[0]
-      }
-    });
     this.#data = [fillGrid(this.width, this.height)];
     this.#export = fillGrid(this.width, this.height);
     this.#selectionPreview = fillGrid(this.width, this.height);
@@ -1091,18 +1095,20 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   undo() {
     // ToDo: Rewrite to use new history api
-    const revert = this.#undoHistory.pop();
-    if (!revert) { return; }
-    switch (revert.type) {
-      case HistoryType.Pixel:
-        this.#redoHistory.push(revert);
-        (revert.data as HistoryPixelType).pixels.forEach((item) => {
-          const [x, y] = item;
-          this.#data[this.#layer[0]][y][x] = item[2];
-          // redraw canvas
-        });
-        break;
-    }
+    const historyItems = this.#undoHistory.pop();
+    if (!historyItems) { return; }
+    this.#redoHistory.push(historyItems);
+    historyItems.forEach((historyItem) => {
+      switch (historyItem.type) {
+        case HistoryType.Pixel:
+          (historyItem.data as HistoryPixelType).pixels.forEach((item) => {
+            const [x, y] = item;
+            this.#data[this.#layer[0]][y][x] = item[2];
+            // redraw canvas
+          });
+          break;
+      }
+    });
   }
 
   redo() {
