@@ -650,9 +650,28 @@ export default class PgInputPixelEditor extends HTMLElement {
         });
         this.clearSelection();
         break;
+      case 'ArrowLeft':
+        if (this.hasSelection()) {
+          this.moveSelection(event.shiftKey ? -10 : -1, 0);
+          event.preventDefault();
+        }
+        break;
       case 'ArrowRight':
         if (this.hasSelection()) {
-          this.moveSelection(1, 0);
+          this.moveSelection(event.shiftKey ? 10 : 1, 0);
+          event.preventDefault();
+        }
+        break;
+      case 'ArrowUp':
+        if (this.hasSelection()) {
+          this.moveSelection(0, event.shiftKey ? -10 : -1);
+          event.preventDefault();
+        }
+        break;
+      case 'ArrowDown':
+        if (this.hasSelection()) {
+          this.moveSelection(0, event.shiftKey ? 10 : 1);
+          event.preventDefault();
         }
         break;
     }
@@ -1449,11 +1468,25 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   /**
-   * Move selection.
+   * Move selection. This optimizes, by only updating pixels that changed.
    * @param x X
    * @param y Y
    */
   moveSelection(x: number, y: number) {
-
+    const newSelection: number[][] = [];
+    this.#selectionPixels.forEach(([currentX, currentY]) => {
+      newSelection.push([currentX, currentY]);
+    });
+    debugger;
+    newSelection.forEach(([currentX, currentY]) => {
+      this.#selectionPixels.delete(`${currentX},${currentY}`);
+      this.#selection[currentY][currentX] = 0;
+      const newX = currentX + x;
+      const newY = currentY + y;
+      this.#selectionPixels.set(`${newX},${newY}`, [newX, newY]);
+      this.#selection[newY][newX] = 1;
+    });
+    // Update render
+    this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
   }
 }
