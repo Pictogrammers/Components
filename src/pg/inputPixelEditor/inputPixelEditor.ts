@@ -1485,7 +1485,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#layer.forEach((layer) => {
         const color = this.#data[layer][currentY][currentX];
         const newColor = this.#data[layer][newY][newX];
-        if (color !== 0 && color !== newColor) {
+        if (color !== newColor) {
           changes.set(`${layer},${newX},${newY}`, [layer, newX, newY, color]);
         }
       });
