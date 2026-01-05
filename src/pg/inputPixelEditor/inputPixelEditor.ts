@@ -365,7 +365,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#selection[y][x] = 1;
   }
 
-  #setPixel(x: number, y: number, color: number) {
+  #setPixel(x: number, y: number, color: number, layers = this.#layer) {
     if (x >= this.width || x < 0) {
       return;
       // throw new Error(`Invalid x; ${x} > ${this.width} or ${x} < 0`);
@@ -409,7 +409,9 @@ export default class PgInputPixelEditor extends HTMLElement {
       x * totalSize, y * totalSize, this.size + 2, this.size + 2
     );
     // Verify this is the only place setting pixel data!
-    this.#data[this.#layer[0]][y][x] = color;
+    layers.forEach((layer) => {
+      this.#data[layer][y][x] = color;
+    });
     this.#updateExport(x, y);
     this.#delayedChange();
   }
@@ -642,8 +644,9 @@ export default class PgInputPixelEditor extends HTMLElement {
         event.preventDefault();
         break;
       case 'Escape':
-        console.log('escape');
-        this.clearSelection();
+        if (this.hasSelection()) {
+          this.clearSelection();
+        }
         break;
       case 'Delete':
         this.#selectionPixels.forEach(([x, y]) => {
@@ -1469,7 +1472,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   /**
-   * Move selection. This optimizes, by only updating pixels that changed.
+   * Move selection. Only move changed pixels.
    * @param x X
    * @param y Y
    */
@@ -1483,32 +1486,37 @@ export default class PgInputPixelEditor extends HTMLElement {
         const color = this.#data[layer][currentY][currentX];
         const newColor = this.#data[layer][newY][newX];
         if (color !== newColor) {
-          changes.set(`${layer},${currentX},${currentY}`, [layer, currentX, currentY, color]);
+          changes.set(`${layer},${newX},${newY}`, [layer, newX, newY, color]);
         }
       });
       newSelection.set(`${newX},${newY}`, [newX, newY]);
     });
     const clearSelection = diffLeftMapPixels(this.#selectionPixels, newSelection);
-    // Add pixels no longer in the selection as these are all now 0
-    clearSelection.forEach(([clearX, clearY]) => {
-      const newX = clearX + x;
-      const newY = clearY + y;
-      this.#layer.forEach((layer) => {
-        const color = this.#data[layer][clearY][clearX];
-        if (color !== 0) { // already empty ignore
-          changes.set(`${layer},${clearX},${clearY}`, [layer, clearX, clearY, 0]);
-        }
-      });
-    });
+    // Move pixels
     console.log(changes);
-    changes.forEach(([currentX, currentY]) => {
-      this.#selectionPixels.delete(`${currentX},${currentY}`);
-      this.#selection[currentY][currentX] = 0;
-      const newX = currentX + x;
-      const newY = currentY + y;
+    changes.forEach(([layer, newX, newY, color]) => {
+      this.#data[layer][newY][newX] = color;
+      this.#setPixel(newX, newY, color, [layer]);
       this.#selectionPixels.set(`${newX},${newY}`, [newX, newY]);
       this.#selection[newY][newX] = 1;
     });
+    // Select new selection
+    newSelection.forEach(([newX, newY]) => {
+      this.#selectionPixels.set(`${newX},${newY}`, [newX, newY]);
+      this.#selection[newY][newX] = 1;
+    });
+    // Add pixels no longer in the selection as these are all now 0
+    clearSelection.forEach(([clearX, clearY]) => {
+      this.#layer.forEach((layer) => {
+        const color = this.#data[layer][clearY][clearX];
+        if (color !== 0) { // already empty ignore
+          this.#setPixel(clearX, clearY, 0);
+        }
+      });
+      this.#selectionPixels.delete(`${clearX},${clearY}`);
+      this.#selection[clearY][clearX] = 0;
+    });
+
     // Update render
     this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
   }
