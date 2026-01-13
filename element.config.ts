@@ -6,9 +6,11 @@ export default {
   }, {
     label: 'Overlays',
     extends: ['PgOverlay'],
+    include: ['PgOverlay'],
   }, {
     label: 'Modals',
     extends: ['PgModal'],
+    include: ['PgModal', 'PgModalAlert'],
   }],
   themes: [{
     label: 'UI3',
