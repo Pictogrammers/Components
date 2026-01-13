@@ -1,0 +1,59 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--pg-font-family, system-ui);
+}
+
+[part="user"] {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 4rem 2rem 1.5rem 1fr auto;
+  padding: 0.5rem;
+}
+
+[part="avatar"] {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+[part="name"] {
+  grid-column: 2 / span 3;
+  grid-row: 1;
+  white-space: nowrap;
+}
+
+[part="iconCount"] {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) inset;
+  border-radius: 0.25rem;
+  background: rgba(0, 0, 0, 0.05);
+  grid-column: 5;
+  grid-row: 1 / span 2;
+  padding: 0 0.5rem;
+  align-items: stretch;
+  justify-content: center;
+  color: #444;
+  margin-left: 0.5rem;
+}
+
+[part="iconCountValue"] {
+  font-weight: bold;
+}
+
+[part="github"] svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+[part="github"] {
+  grid-row: 2;
+  grid-column: 2;
+  color: #333;
+}
+
+[part="github"]:hover {
+  color: #4f8ff9;
+}

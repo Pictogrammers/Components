@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  font-family: var(--pg-font-family, system-ui);
+}
+
+[part=input] {
+  border: 1px solid var(--pg-input-text-border-color, #453C4F);
+  border-radius: 0.125rem;
+  padding: var(--pg-input-text-padding, calc(0.5rem - 1px) 0.75rem);
+  font-family: var(--pg-input-text-font-family, var(--pg-font-family));
+  font-size: 1rem;
+  outline: none;
+  field-sizing: content;
+  min-width: calc(100% - 0.5rem - 2px);
+  max-width: calc(var(--pg-input-text-max-width, 100%) - 0.5rem - 2px);
+  background-color: transparent;
+}
+
+[part=input]:read-only {
+  border-color: transparent;
+}
+
+[part=input]:active {
+  box-shadow: 0 0 0 3px var(--pg-input-text-active-glow, rgb(79, 143, 249, 0.6));
+}
+[part=input]:focus {
+  box-shadow: 0 0 0 3px var(--pg-input-text-focus-glow, rgb(79, 143, 249, 0.5));
+}
