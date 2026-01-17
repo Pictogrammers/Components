@@ -17,4 +17,5 @@ export default {
     file: 'src/theme-ui3.css',
   }],
   repo: 'https://github.com/Pictogrammers/Components',
+  repoComponent: '$repo/tree/master/src/components/$namespace/$component'
 }
