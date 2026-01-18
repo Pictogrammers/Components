@@ -5,7 +5,7 @@
 > - [React](https://github.com/Templarian/MaterialDesign-React/)
 > - [Web Component](https://github.com/Templarian/MaterialDesign-WebComponent/)
 
-Components here are in various stages of development, view the `src/pg` folder to see the source.
+Components here are in various stages of development, view the `src/components/pg` folder to see the source.
 
 - [View the Components](https://pictogrammers.github.io/@pictogrammers/components/)
 
@@ -42,7 +42,7 @@ Web Components with a [very basic wrapper](https://github.com/Pictogrammers/Elem
 - `@Prop() foo = 'Hello World`;
   - Calls `this.render()` on change.
 - `@Part() $foo: HTMLDivElement;` = `<div part="foo"></div>`
-  - `this.$part.innerText = 'Hello World!';`
+  - `this.$part.textContent = 'Hello World!';`
 - `@Local('store') foo = Map([['key', true]]);` Shorthand for localStorage.
 
 Learn More: https://github.com/Pictogrammers/Element
