@@ -1370,10 +1370,14 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   /**
-   * Flatten layers, first index determines the color
+   * Flatten layers, always merges to lowest layer
+   * Note 0 is the lowest layer.
    */
   flattenLayers(indexes: number[]) {
-
+    // ${x},${y} = [x, y, color]
+    const changedPixels = new Map<string, number[]>();
+    //this.#data[index]
+    // Update preview
   }
 
   getLayerColorIndexes(layerIndex = this.#layer[0]) {

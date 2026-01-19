@@ -167,18 +167,20 @@ A complete JSON storage for a 10x10 image.
 There are currently 6 differnet layer types.
 
 - `pixel` - Raster artboard of pixels.
-  - `path` - pixels
-  - `color` - colorIndex
+  - `color: 0` - colorIndex
+  - `path: ''` - pixels
 - `reference`
-  - `id` - uuid of frame
+  - `id: 'uuid'` - uuid of frame
   - `position: [x, y]`
 - `pattern` - Repeat an existing frame
-  - `path` - pixels
-  - `id` - uuid of frame
-  - `offset [x, y]` - offset pattern
+  - `id: 'uuid'` - uuid of frame
+  - `position: [x, y]` - required
+  - `size: [x, y]` - optional, size to clip at
+  - `offset [x, y]` - optional, offset pattern
 - `linear` - Linear gradient.
   - `start: [x, y]`
   - `end: [x, y]`
+  - `path: ''` - optional, mask
   - `stops: [[stop, colorIndex], [stop, colorIndex]]`
   - `dither: 'bayer4' | 'bayer8', 'bayer16'`
 - `radial` - Radial gradients.
@@ -188,8 +190,85 @@ There are currently 6 differnet layer types.
   - `stops: [[stop, colorIndex], [stop, colorIndex]]`
   - `dither: 'bayer4' | 'bayer8' | 'bayer16'`
 - `text` - Text, maybe???
-  - `id` - file uuid
-  - `value` - string
+  - `id: 'uuid'` - file uuid
+  - `value: ''` - string
+
+### Layer `pixel` Type
+
+The most common layer type.
+
+```json
+{
+  "data": [
+    [
+      [{ "color": 1, "path": "M...Z" }],
+      [{ "color": 2, "path": "M...Z" }]
+    ]
+  ]
+}
+```
+
+### Layer `reference` Type
+
+Using an existing canvas in a design can be done with a reference layer.
+
+```json
+{
+  "data": [
+    [{ "id": "uuid", "position": [0, 0] }]
+  ]
+}
+```
+
+### Layer `pattern` Type
+
+Using an existing canvas, but in a repeating pattern.
+
+```json
+{
+  "data": [
+    [{ "id": "uuid", "position": [0, 0], "size": [100, 100] }],
+    [{ "id": "uuid", "position": [0, 0], "offset": [0, -2] }]
+  ]
+}
+```
+
+### Layer `linear` / `radial` Type
+
+Linear and radial gradient between 2 points. Both allow a mask to be applied.
+
+```json
+{
+  "data": [
+    [{ "id": "uuid", "start": [0, 0], "end": [100, 100] }],
+    [{ "id": "uuid", "start": [0, 0], "end": [100, 0], "stops": [] }]
+  ]
+}
+```
+
+### Layer `text` Type
+
+Pull down a known font and use it as a reference.
+
+```json
+{
+  "data": [
+    [{ "id": "uuid", "value": "Hello World!", "position": [0, 0] }],
+    [{ "id": "uuid", "value": "Hello World!", "position": [0, 0], "wrap": 100 }]
+  ]
+}
+```
+
+If a `id` is not found in the current file it will call the `reference` event. This event will need to return the found file to the `callback`. This could slow down initial project load.
+
+```typescript
+this.$input.addEventListener('reference', (e: any) => {
+  const { id, callback } = e.detail;
+  if (id === 'uuid') {
+    callback(file);
+  }
+});
+```
 
 ## History
 
