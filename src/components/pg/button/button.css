@@ -16,6 +16,7 @@
   border-radius: var(--pg-button-border-radius, 0.25rem);
   outline: none;
   --pg-icon-color: var(--pg-button-color, #453C4F);
+  cursor: var(--pg-button-cursor, var(--pg-cursor-default, default));
 }
 
 [part="button"]:hover {

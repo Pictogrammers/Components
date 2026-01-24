@@ -747,6 +747,11 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#y = newY;
     const color = event.buttons === 32 ? 0 : this.#color;
     switch (this.#inputMode) {
+      case InputMode.Cursor:
+        const currentColor = this.getColorAt(newX, newY);
+        const atLayerIndex = this.getLayerAt(newX, newY);
+        console.log('currentColor', currentColor, atLayerIndex);
+        break;
       case InputMode.Pixel:
         this.#setPixel(newX, newY, color);
         break;
@@ -1320,6 +1325,25 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   moveColor(startIndex, endIndex) {
 
+  }
+
+  getColorAt(x: number, y: number) {
+    return this.#export[y][x];
+  }
+
+  /**
+   * Get layer index with first valid color.
+   * @param x x
+   * @param y y
+   */
+  getLayerAt(x: number, y: number) {
+    for (let i = 0, c = this.#data.length; i < c; i++) {
+      const layer = this.#data[i];
+      if (layer[y][x] !== 0) {
+        return i;
+      }
+    }
+    return null;
   }
 
   getLayers() {

@@ -1,4 +1,5 @@
 export const enum InputMode {
+  Cursor,
   SelectRectangle,
   SelectEllipse,
   SelectLasso,
