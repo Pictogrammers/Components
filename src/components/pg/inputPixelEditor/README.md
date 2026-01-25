@@ -124,6 +124,21 @@ handleOpen() {
 }
 ```
 
+## Events
+
+### `change`
+
+### `selectLayer`
+
+Using `InputMode.Cursor` individual pixels can be clicked on to select the layer. Note, selecting a layer does not automatically select it. The event must be handled.
+
+```typescript
+this.$input.addEventListener('selectlayer', (e: any) => {
+  const { color, index } = e.detail;
+  this.selectLayers([index]);
+})
+```
+
 ## JSON Format
 
 - `width` - Image width.
@@ -158,7 +173,8 @@ A complete JSON storage for a 10x10 image.
       [1, "M...Z"],
       [2, "M...Z"]
     ]
-  ]
+  ],
+  "history": []
 }
 ```
 
