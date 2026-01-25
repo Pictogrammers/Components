@@ -4,7 +4,10 @@ The `pg-input-pixel-editor` component is used to edit images. Tailored for pen o
 
 ```typescript
 import '@pictogrammers/components/pgInputPixelEditor';
-import { PgInputPixelEditor } from '@pictogrammers/components/pgInputPixelEditor';
+import PgInputPixelEditor, {
+  InputMode,
+  LayerType,
+} from '@pictogrammers/components/pgInputPixelEditor';
 ```
 
 ```html

@@ -26,7 +26,7 @@ import { diffLeftMapPixels } from './utils/diffMap';
 
 type Color = [number, number, number, number];
 
-enum HistoryType {
+export enum HistoryType {
   Group,
   Pixel,
   ColorUpdate,
@@ -1562,3 +1562,6 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
   }
 }
+
+export { InputMode } from './utils/inputMode';
+export { LayerType } from './utils/constants';

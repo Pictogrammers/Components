@@ -11,4 +11,4 @@ export const enum InputMode {
   RectangleOutline,
   Ellipse,
   EllipseOutline
-}
+};

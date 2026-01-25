@@ -3,7 +3,7 @@ import PgInputPixelEditor from '../../inputPixelEditor';
 import PgTable, { createTableItem } from '../../../table/table';
 import PgTableCellButtonIcon from '../../../tableCellButtonIcon/tableCellButtonIcon';
 import { maskToBitmap } from '../../utils/maskToBitmap';
-import { patterns } from './constants';
+import { fileOk, patterns } from './constants';
 
 import template from './basic.html';
 import style from './basic.css';
@@ -59,6 +59,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $savePng: HTMLInputElement;
 
   @Part() $addLayer: HTMLButtonElement;
+  @Part() $addLayerReference: HTMLButtonElement;
   @Part() $addColor: HTMLButtonElement;
 
   @Part() $colors: PgTable;
@@ -76,6 +77,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$input.addEventListener('input', this.handleInput.bind(this));
     this.$input.addEventListener('debug', this.handleDebug.bind(this));
     this.$input.addEventListener('selectlayer', this.handleSelectLayer.bind(this));
+    this.$input.addEventListener('reference', this.handleReference.bind(this));
     [
       this.$modeStamp1,
       this.$modeStamp2,
@@ -253,6 +255,21 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       );
       this.$input.addLayer();
     });
+    this.$addLayerReference.addEventListener('click', () => {
+      this.$layers.data.push(
+        createTableItem({
+          name: 'Layer 2',
+          type: 'reference',
+          selected: false,
+          select: {
+            type: PgTableCellButtonIcon,
+            icon: IconLayerEdit,
+            value: 1,
+          }
+        })
+      );
+      this.$input.addLayer();
+    });
     // Colors
     this.$colors.columns = [{
       label: 'Red',
@@ -410,6 +427,17 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       // Update input
       this.$input.selectLayers([index]);
     }
+  }
+
+  handleReference(e: any) {
+    const { id, callback } = e.detail;
+    // Test Data
+    const mock = new Map();
+    mock.set('9ee82807-ffa9-411c-abaf-7b8d46d74af4', fileOk);
+    if (mock.has(id)) {
+      callback(mock.get(id));
+    }
+    console.error('Unable to load', id);
   }
 
   handleWidthChange(e) {
