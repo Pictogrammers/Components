@@ -43,6 +43,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
   @Part() $modeRectangleOutline: HTMLButtonElement;
   @Part() $modeEllipse: HTMLButtonElement;
   @Part() $modeEllipseOutline: HTMLButtonElement;
+  @Part() $cursor: HTMLButtonElement;
   @Part() $selectRectangle: HTMLButtonElement;
   @Part() $selectEllipse: HTMLButtonElement;
   @Part() $selectLasso: HTMLButtonElement;
@@ -74,6 +75,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$transparent.addEventListener('input', this.handleTransparentChange.bind(this));
     this.$input.addEventListener('input', this.handleInput.bind(this));
     this.$input.addEventListener('debug', this.handleDebug.bind(this));
+    this.$input.addEventListener('selectlayer', this.handleSelectLayer.bind(this));
     [
       this.$modeStamp1,
       this.$modeStamp2,
@@ -103,6 +105,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     this.$modeEllipseOutline.addEventListener('click', () => {
       this.$input.inputModeEllipseOutline();
     });
+    this.$cursor.addEventListener('click', () => {
+      this.$input.inputModeCursor();
+    })
     this.$selectRectangle.addEventListener('click', () => {
       this.$input.inputModeSelectRectangle();
     });
@@ -392,6 +397,19 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     //context.strokeStyle = 'rgba(255, 0, 0, 0.3)';
     //context.lineWidth = 1;
     //context.strokeRect(x, y, width, height);
+  }
+
+  handleSelectLayer(e: CustomEvent) {
+    const { color, index } = e.detail;
+    if (index !== null) {
+      // Update Table
+      this.$layers.data.forEach((layer) => {
+        layer.items.find(column => column.key === 'selected').value = false;
+      });
+      this.$layers.data[index].items.find(column => column.key === 'selected').value = true;
+      // Update input
+      this.$input.selectLayers([index]);
+    }
   }
 
   handleWidthChange(e) {

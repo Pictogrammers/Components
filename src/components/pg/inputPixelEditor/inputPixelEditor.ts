@@ -441,7 +441,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   #updateExport(x: number, y: number) {
     let color = 0;
     let layers = this.getExportLayerIndexes();
-    for (let i = 0; i < layers.length; i++) {
+    for (let i = layers.length - 1; i >= 0; i--) {
       const layer = layers[i];
       if (this.#data[layer][y][x] !== 0) {
         color = this.#data[layer][y][x];
@@ -749,8 +749,13 @@ export default class PgInputPixelEditor extends HTMLElement {
     switch (this.#inputMode) {
       case InputMode.Cursor:
         const currentColor = this.getColorAt(newX, newY);
-        const atLayerIndex = this.getLayerAt(newX, newY);
-        console.log('currentColor', currentColor, atLayerIndex);
+        const index = this.getLayerAt(newX, newY);
+        this.dispatchEvent(new CustomEvent('selectlayer', {
+          detail: {
+            color: currentColor,
+            index
+          }
+        }));
         break;
       case InputMode.Pixel:
         this.#setPixel(newX, newY, color);
@@ -804,13 +809,15 @@ export default class PgInputPixelEditor extends HTMLElement {
           this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
           break;
         case InputMode.Pixel:
-          if (this.#startColor === 1) {
+          // Same as current color
+          if (this.#startColor === this.#color) {
             this.#setPixel(newX, newY, 0);
             this.#data[this.#layer[0]][newY][newX] = 0;
           }
           break;
         case InputMode.Stamp:
-          if (this.#startColor === 1) {
+          // Same as current color
+          if (this.#startColor === this.#color) {
             this.#inputStamp.forEach((point) => {
               this.#setPixel(newX + point[0], newY + point[1], 0);
             });
@@ -1199,6 +1206,10 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#clearStampPreview();
   }
 
+  inputModeCursor() {
+    this.#inputMode = InputMode.Cursor;
+  }
+
   inputModeSelectRectangle() {
     this.#inputMode = InputMode.SelectRectangle;
   }
@@ -1337,7 +1348,7 @@ export default class PgInputPixelEditor extends HTMLElement {
    * @param y y
    */
   getLayerAt(x: number, y: number) {
-    for (let i = 0, c = this.#data.length; i < c; i++) {
+    for (let i = this.#data.length - 1; i >= 0; i--) {
       const layer = this.#data[i];
       if (layer[y][x] !== 0) {
         return i;
