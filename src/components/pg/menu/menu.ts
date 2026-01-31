@@ -34,11 +34,12 @@ export default class PgMenu extends HTMLElement {
           }));
         });
         $item.addEventListener('select', (e: any) => {
-          const { index } = e.detail;
+          const { indexes, item } = e.detail;
+          const lastIndex = indexes[indexes.length - 1];
           this.dispatchEvent(new CustomEvent('select', {
             detail: {
-              indexes: [index],
-              item
+              indexes,
+              item: item ? item : this.items[lastIndex],
             }
           }));
         });

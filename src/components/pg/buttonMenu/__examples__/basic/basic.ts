@@ -37,7 +37,7 @@ export default class XPgButtonMenuBasic extends HTMLElement {
   }
 
   handleChange(e: any) {
-    const { active } = e.detail;
-    this.$value.textContent = `${active}`;
+    const { indexes, item } = e.detail;
+    this.$value.textContent = `indexes: ${indexes.join(',')}; item: ${JSON.stringify(item)}`;
   }
 }

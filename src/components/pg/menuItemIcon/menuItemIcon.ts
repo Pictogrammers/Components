@@ -63,9 +63,11 @@ export default class PgMenuItemIcon extends HTMLElement {
         if (result === null) {
           this.focus();
         } else if (result) {
+          const { indexes, item } = result;
           this.dispatchEvent(new CustomEvent('select', {
             detail: {
-              item: result
+              indexes: [...indexes, this.index],
+              item,
             }
           }));
         } else {
@@ -78,8 +80,8 @@ export default class PgMenuItemIcon extends HTMLElement {
       } else {
         this.dispatchEvent(new CustomEvent('select', {
           detail: {
-            indexex: [this.index],
-            item: this.items[this.index]
+            indexes: [this.index],
+            item: undefined, // determined by parent
           }
         }));
       }
@@ -118,9 +120,11 @@ export default class PgMenuItemIcon extends HTMLElement {
             if (result === null) {
               this.focus();
             } else if (result) {
+              const { indexes, item } = result;
               this.dispatchEvent(new CustomEvent('select', {
                 detail: {
-                  item: result
+                  indexes: [...indexes, this.index],
+                  item,
                 }
               }));
             } else {

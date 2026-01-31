@@ -52,9 +52,12 @@ export default class PgButtonMenu extends HTMLElement {
     });
     this.$icon.path = IconExpand;
     if (result !== undefined) {
+      const { indexes, item } = result;
       this.dispatchEvent(new CustomEvent('change', {
         detail: {
-          value: result.value
+          indexes,
+          item,
+          value: item.value
         }
       }));
     }

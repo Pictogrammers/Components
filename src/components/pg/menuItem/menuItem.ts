@@ -56,10 +56,11 @@ export default class PgMenuItem extends HTMLElement {
         if (result === null) {
           this.focus();
         } else if (result) {
+          const { indexes, item } = result;
           this.dispatchEvent(new CustomEvent('select', {
             detail: {
               item: result,
-              indexes: [this.index],
+              indexes: [...indexes, this.index],
             }
           }));
         } else {
@@ -73,7 +74,7 @@ export default class PgMenuItem extends HTMLElement {
         this.dispatchEvent(new CustomEvent('select', {
           detail: {
             indexes: [this.index],
-            item: this.items[this.index],
+            item: undefined, // determined by parent
           }
         }));
       }

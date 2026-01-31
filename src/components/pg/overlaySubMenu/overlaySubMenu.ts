@@ -96,8 +96,12 @@ export default class PgOverlaySubMenu extends PgOverlay {
   }
 
   #handleSelect(e: any) {
-    e.detail.item.index = e.detail.index;
-    this.close(e.detail.item);
+    const { item, indexes } = e.detail;
+    //e.detail.item.index = e.detail.indexes;
+    this.close({
+      indexes,
+      item,
+    });
     this.source?.focus();
   }
 }

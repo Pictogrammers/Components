@@ -60,8 +60,12 @@ export default class PgOverlayMenu extends PgOverlay {
   }
 
   #handleSelect(e: any) {
-    e.detail.item.index = e.detail.index;
-    this.close(e.detail.item);
+    // e.detail.item.index = e.detail.index;
+    const { indexes, item } = e.detail;
+    this.close({
+      indexes,
+      item
+    });
     this.source?.focus();
   }
 }
