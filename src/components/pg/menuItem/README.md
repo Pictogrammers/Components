@@ -13,7 +13,11 @@ import '@pictogrammers/components/pgMenuItem.js';
 ```typescript
 this.$items = [{
   type: PgMenuItem,
-  label: 'Item 1'
+  label: 'Item 1',
+  items: [{
+    type: PgMenuItem,
+    label: 'Sub Item 1',
+  }]
 }];
 ```
 
@@ -23,10 +27,17 @@ this.$items = [{
 | `checked`  |          | Item checked. |
 | `disabled` |          | Item disabled. |
 
+| CSS Variable        | Default   | Description |
+| ------------------- | --------- | ----------- |
+| `--pg-menu-item-border-radius`  | `0.25rem` | Radius       |
+
 ## Events
 
 ```typescript
 this.$item.addEventListener('select', (e: any) => {
-  const { index } = e.detail;
+  // user clicks 'Sub Item 1'
+  const { indexes, item } = e.detail;
+  // indexes = [0, 0]
+  console.log(item.label);
 });
 ```

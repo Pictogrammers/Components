@@ -13,10 +13,7 @@
   border-color: transparent;
   border-width: 0;
   border-style: solid;
-  border-top-left-radius: var(--pg-menu-item-border-radius-top, 0.25rem);
-  border-top-right-radius: var(--pg-menu-item-border-radius-top, 0.25rem);
-  border-bottom-left-radius: var(--pg-menu-item-border-radius-bottom, 0.25rem);
-  border-bottom-right-radius: var(--pg-menu-item-border-radius-bottom, 0.25rem);
+  border-radius: var(--pg-menu-item-border-radius, 0.25rem);
   color: var(--pg-menu-item-color, #453C4F);
 }
 
@@ -69,7 +66,7 @@
   right: -1px;
   bottom: -1px;
   left: -1px;
-  border-radius: 0.25rem;
+  border-radius: var(--pg-menu-item-border-radius, 0.25rem);;
   box-shadow: 0 0 0 3px var(--pg-focus-color, rgb(79, 143, 249, 0.5));
 }
 
@@ -82,7 +79,7 @@
 }
 
 [part=label].more {
-  background-image: var(--pg-menu-item-check, url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z' fill='rgb(69, 60, 79)' /></svg>"));
+  background-image: var(--pg-menu-item-more, url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z' fill='rgb(69, 60, 79)' /></svg>"));
   background-size: 1.5rem 1.5rem;
   background-position: 100% 50%;
   background-repeat: no-repeat;
@@ -90,9 +87,9 @@
 
 [part=label].more:active,
 [part=label].more:hover {
-  background-image: var(--pg-menu-item-hover-check, url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z' fill='white' /></svg>"));
+  background-image: var(--pg-menu-item-hover-more, url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z' fill='white' /></svg>"));
 }
 
 [part=label].more:disabled {
-  background-image: var(--pg-menu-item-disabled-check, url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z' fill='rgb(69, 60, 79, 0.5)' /></svg>"));
+  background-image: var(--pg-menu-item-disabled-more, url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z' fill='rgb(69, 60, 79, 0.5)' /></svg>"));
 }

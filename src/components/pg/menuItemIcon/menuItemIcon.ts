@@ -78,7 +78,7 @@ export default class PgMenuItemIcon extends HTMLElement {
       } else {
         this.dispatchEvent(new CustomEvent('select', {
           detail: {
-            index: this.index,
+            indexex: [this.index],
             item: this.items[this.index]
           }
         }));

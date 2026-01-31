@@ -58,19 +58,23 @@ export default class PgMenuItem extends HTMLElement {
         } else if (result) {
           this.dispatchEvent(new CustomEvent('select', {
             detail: {
-              item: result
+              item: result,
+              indexes: [this.index],
             }
           }));
         } else {
           this.dispatchEvent(new CustomEvent('close', {
             detail: {
-              depth: -1
+              depth: -1,
             }
           }));
         }
       } else {
         this.dispatchEvent(new CustomEvent('select', {
-          detail: { index: this.index }
+          detail: {
+            indexes: [this.index],
+            item: this.items[this.index],
+          }
         }));
       }
     });
