@@ -1,5 +1,5 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
-import PgInputCheck from 'components/pg/inputCheck/inputCheck';
+import PgInputCheck from '../../inputCheck';
 
 import template from './basic.html';
 

@@ -1,5 +1,5 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
-import PgIcon from 'components/pg/icon/icon';
+import PgIcon from '../../icon';
 
 import template from './basic.html';
 import { mdiAccount, mdiSquare } from './constants';

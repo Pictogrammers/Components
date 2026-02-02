@@ -59,7 +59,7 @@ export default class PgMenuItem extends HTMLElement {
           const { indexes, item } = result;
           this.dispatchEvent(new CustomEvent('select', {
             detail: {
-              item: result,
+              item,
               indexes: [...indexes, this.index],
             }
           }));

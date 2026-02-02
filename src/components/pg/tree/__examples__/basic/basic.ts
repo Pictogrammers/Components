@@ -3,7 +3,6 @@ import PgTree, { SelectedTreeItem } from '../../tree';
 
 import template from './basic.html';
 import PgTreeButtonIcon from '../../../treeButtonIcon/treeButtonIcon';
-import PgTreeItem from 'components/pg/treeItem/treeItem';
 
 const IconAccount = 'M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z';
 const IconFile = 'M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z';

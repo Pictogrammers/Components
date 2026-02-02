@@ -1,5 +1,5 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
-import PgScroll from 'components/pg/scroll/scroll';
+import PgScroll from '../../scroll';
 
 import template from './basic.html';
 import style from './basic.css';

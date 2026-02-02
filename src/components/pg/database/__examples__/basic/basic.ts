@@ -1,5 +1,4 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
-import PgDatabase from 'components/pg/database/database';
 import { Icon } from '../../../shared/models/icon';
 
 import template from './basic.html';

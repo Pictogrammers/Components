@@ -1,5 +1,5 @@
 :host {
-  display: contents;
+  display: inline-flex;
 }
 
 [part="button"] {

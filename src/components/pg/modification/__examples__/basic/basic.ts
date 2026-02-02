@@ -1,5 +1,5 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
-import { Modification } from 'components/pg/shared/models/modification';
+import { Modification } from '../../../shared/models/modification';
 import PgModification from '../../modification';
 
 import template from './basic.html';
