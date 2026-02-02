@@ -64,10 +64,11 @@ type HistoryItem = {
 type History = HistoryItem[];
 
 type Layer = {
-  name: string,
-  visible: boolean,
-  locked: boolean,
-  opacity: number,
+  name: string
+  type: 'pixel' | 'reference'
+  visible: boolean
+  locked: boolean
+  opacity: number
   export: boolean
 }
 
@@ -87,11 +88,11 @@ interface File {
 }
 
 interface Export {
-  scale?: number;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
+  scale?: number
+  x?: number
+  y?: number
+  width?: number
+  height?: number
 }
 
 function toColor([r, g, b, a]: Color) {
@@ -256,6 +257,7 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.#layer = [0];
       this.#layers = [{
         name: 'Layer 1',
+        type: 'pixel',
         export: true,
         locked: false,
         visible: true,
@@ -1369,6 +1371,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#data.push(fillGrid(this.width, this.height));
     this.#layers.push({
       name: 'Layer 1',
+      type: 'pixel',
       export: true,
       locked: false,
       visible: true,
@@ -1433,6 +1436,31 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   getLayerPaths() {
     return this.#getLayerPaths() as any;
+  }
+
+  /**
+   * Save schema for `data`.
+   */
+  getData() {
+    return this.#layers.map((layer, layerIndex) => {
+      switch (layer.type) {
+        case 'pixel':
+          const colors = this.getLayerColorIndexes(layerIndex);
+          return colors.map((color) => {
+            return {
+              color,
+              path: bitmaskToPath(this.#data[layerIndex], {
+                scale: 1,
+                include: [color]
+              }),
+            };
+          });
+        case 'reference':
+          return { "id": "uuid", "position": [0, 0] }
+        default:
+          throw new Error('Not implemented');
+      }
+    });
   }
 
   getExportPath() {

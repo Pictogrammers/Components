@@ -46,6 +46,7 @@ See usage for each method below.
 | Method     | Tested   | Description |
 | ---------- | -------- | ----------- |
 | `getJson(options)` | -        | Get JSON file. |
+| `getData()` | -           | Get layer data. |
 | `setJson(json)` | -        | Set JSON file. |
 | `reset()` | -  | Reset canvas and data. |
 | `getExportCanvas()` | -  | Get new canvas of export. |
@@ -98,7 +99,7 @@ See usage for each method below.
 
 ### `getJson(options)` Method
 
-The `getJson` method allows getting the JSON representation of the current editor. Optionally this can snapshot the entire undo history.
+The `getJson` method allows getting the JSON representation of the current editor. Optionally this can snapshot the entire undo history. To get only data by layer call `getData()`.
 
 ```typescript
 @Part() $editor: PgInputPixelEditor;
@@ -173,8 +174,8 @@ A complete JSON storage for a 10x10 image.
   ],
   "data": [
     [
-      [1, "M...Z"],
-      [2, "M...Z"]
+      [{ "color": 1, "path": "M...Z" }],
+      [{ "color": 2, "path": "M...Z" }]
     ]
   ],
   "history": []
@@ -220,8 +221,8 @@ The most common layer type.
 {
   "data": [
     [
-      [{ "color": 1, "path": "M...Z" }],
-      [{ "color": 2, "path": "M...Z" }]
+      { "color": 1, "path": "M...Z" },
+      { "color": 2, "path": "M...Z" }
     ]
   ]
 }
