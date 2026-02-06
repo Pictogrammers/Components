@@ -1,4 +1,4 @@
-export function maskToBitmap(pathData: string, width: number, height: number) {
+export function maskToBitmap(pathData: string, width: number, height: number, fill: number = 1) {
   const grid: number[][] = Array(height).fill(0).map(() => Array(width).fill(0));
 
   // Store only the vertical edges
@@ -57,7 +57,7 @@ export function maskToBitmap(pathData: string, width: number, height: number) {
         }
       }
       if (inside) {
-        grid[y][x] = 1;
+        grid[y][x] = fill;
       }
     }
   }

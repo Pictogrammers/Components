@@ -47,6 +47,7 @@ See usage for each method below.
 | ---------- | -------- | ----------- |
 | `getJson(options)` | -        | Get JSON file. |
 | `getData()` | -           | Get layer data. |
+| `setData()` | -           | Set layer data. |
 | `setJson(json)` | -        | Set JSON file. |
 | `reset()` | -  | Reset canvas and data. |
 | `getExportCanvas()` | -  | Get new canvas of export. |
@@ -69,7 +70,7 @@ See usage for each method below.
 | `inputModeEllipseOutline()` | -  | Input Mode Ellipse Outline |
 | `selectLayer(index)` | -    | Select layer. |
 | `getLayers()` | -    | Get layer array. |
-| `addLayer(option)` | -        | Add layer. |
+| `addLayer(option)` | -        | Add layer. `name`, `type` required. |
 | `removeLayer(index)` | -      | Remove layer. |
 | `flattenLayers(layerIndexes)` | -      | Flatten layers. |
 | `getColor()` | -     | Get selected color |

@@ -23,6 +23,7 @@ import { readMetadata, textEncode, writeMetadata } from './utils/pngMetadata';
 import { canvasToPngBuffer } from './utils/canvasToPngBuffer';
 import { blobToImage } from './utils/blobToImage';
 import { diffLeftMapPixels } from './utils/diffMap';
+import { maskToBitmap } from './utils/maskToBitmap';
 
 type Color = [number, number, number, number];
 
@@ -57,7 +58,7 @@ type HistoryColorUpdateType = {
 }
 
 type HistoryItem = {
-  type: HistoryType,
+  type: HistoryType
   data: HistoryGroupType | HistoryPixelType | HistoryColorUpdateType
 }
 
@@ -1367,16 +1368,20 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#layer = indexes;
   }
 
-  addLayer() {
+  addLayer({ name, type, ...optional }) {
     this.#data.push(fillGrid(this.width, this.height));
     this.#layers.push({
-      name: 'Layer 1',
-      type: 'pixel',
-      export: true,
-      locked: false,
-      visible: true,
-      opacity: 1
+      name,
+      type,
+      export: optional.exclude ?? true,
+      locked: optional.locked ?? false,
+      visible: optional.hidden ?? true,
+      opacity: optional.opacity ?? 1,
     });
+    // short hand for initial data
+    if (optional.data) {
+      this.setData(optional.data);
+    }
   }
 
   /**
@@ -1459,6 +1464,34 @@ export default class PgInputPixelEditor extends HTMLElement {
           return { "id": "uuid", "position": [0, 0] }
         default:
           throw new Error('Not implemented');
+      }
+    });
+  }
+
+  /**
+   * Set data
+   */
+  setData(data: any[]) {
+    data.forEach((layerData, layerIndex) => {
+      const { type } = this.#layers[layerIndex];
+      switch(type) {
+        case 'pixel':
+          const { color, path } = layerData;
+          const temp = maskToBitmap(path, this.width, this.height);
+          temp.forEach((tempY, y) => {
+            tempY.forEach((tempX, x) => {
+              if (tempX !== 0) {
+                //this.#data[layerIndex][y][x] = color;
+                this.#setPixel(x, y, color, [layerIndex]);
+              }
+            });
+          });
+          break;
+        case 'reference':
+          console.log('reference', layerData);
+          break;
+        default:
+          throw new Error(`unknown type ${type}`);
       }
     });
   }
