@@ -11,8 +11,8 @@
   font-size: 1rem;
   outline: none;
   field-sizing: content;
-  min-width: calc(100% - 0.5rem - 2px);
-  max-width: calc(var(--pg-input-text-max-width, 100%) - 0.5rem - 2px);
+  min-width: calc(100% - 1.5rem - 2px);
+  max-width: calc(var(--pg-input-text-max-width, 100%) - 1.5rem - 2px);
   background-color: transparent;
 }
 
