@@ -9,6 +9,10 @@ import template from './basic.html';
 })
 export class XMyModal extends PgModal {
 
+  @Prop() header: string = '';
+  @Prop() message: string = '';
+
+
   @Part() $close: HTMLButtonElement;
 
   connectedCallback() {
@@ -34,7 +38,7 @@ export default class XPgModalBasic extends HTMLElement {
   async handleClick() {
     const result = await XMyModal.open({
       header: 'Delete Item',
-      message: 'Are you sure you want to delete the item?'
+      message: 'Are you sure you want to delete the item?',
     });
     this.$result.textContent = `${result}`;
   }
