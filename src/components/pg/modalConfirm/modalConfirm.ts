@@ -57,5 +57,11 @@ export default class PgModalConfirm extends PgOverlay {
     if (changes.message) {
       this.$message.textContent = this.message;
     }
+    if (changes.okay) {
+      this.$okay.textContent = this.okay;
+    }
+    if (changes.cancel) {
+      this.$cancel.textContent = this.cancel;
+    }
   }
 }

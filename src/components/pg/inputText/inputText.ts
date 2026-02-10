@@ -21,6 +21,10 @@ export default class PgInputText extends HTMLElement {
     this.$input.addEventListener('change', this.handleChange.bind(this));
   }
 
+  focus() {
+    this.$input.focus();
+  }
+
   skipValue = false;
 
   render(changes) {

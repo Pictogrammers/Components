@@ -24,8 +24,8 @@
     "remarkable": "^2.0.1"
   },
   "devDependencies": {
-    "@pictogrammers/element": "0.0.71",
-    "@pictogrammers/element-esbuild": "^0.0.19",
+    "@pictogrammers/element": "0.0.74",
+    "@pictogrammers/element-esbuild": "^0.0.20",
     "@pictogrammers/element-jest": "^0.1.10",
     "cross-env": "^7.0.3",
     "npm-run-all": "^4.1.5",
