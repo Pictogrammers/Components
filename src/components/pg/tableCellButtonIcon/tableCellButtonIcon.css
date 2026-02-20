@@ -11,6 +11,9 @@
   vertical-align: middle;
   justify-items: center;
   --pg-button-background-color: transparent;
-  --pg-button-padding: 0;
+  --pg-button-inline-start: 0;
+  --pg-button-inline-end: 0;
+  --pg-button-block-start: 0;
+  --pg-button-block-end: 0;
   --pg-button-border-width: 0;
 }

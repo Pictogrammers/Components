@@ -96,6 +96,16 @@ interface Export {
   height?: number
 }
 
+interface GridItem {
+  value: number
+  color: number
+}
+
+interface Grid {
+  vertical: GridItem[]
+  horizontal: GridItem[]
+}
+
 function toColor([r, g, b, a]: Color) {
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
@@ -139,6 +149,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   #selectionPixels = new Map<string, number[]>(); // 'x,y', [x, y]
   #selection: number[][] = [];
   #export: number[][] = [];
+  #grid: Grid = { vertical: [], horizontal: [] };
   #undoHistory: History[] = [];
   #redoHistory: History[] = [];
   #context: CanvasRenderingContext2D;
@@ -1413,6 +1424,28 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   /**
+   * Draw pixel.
+   * @param grid 2d grid of colors
+   * @param layer Layer to apply the pixel.
+   */
+  drawGrid(grid: number[][], layer = this.#layer) {
+    grid.forEach((row, y) => {
+      row.forEach((color, x) => {
+        this.#setPixel(x, y, color, layer);
+      });
+    })
+  }
+
+  /**
+   * Draw a single pixel.
+   */
+  drawPixel(x: number, y: number, color: number, layer = this.#layer) {
+    this.#setPixel(x, y, color, layer);
+  }
+
+  // todo: add other draw commands
+
+  /**
    * Flatten layers, always merges to lowest layer
    * Note 0 is the lowest layer.
    */
@@ -1494,6 +1527,10 @@ export default class PgInputPixelEditor extends HTMLElement {
           throw new Error(`unknown type ${type}`);
       }
     });
+  }
+
+  getExport() {
+    return this.#export;
   }
 
   getExportPath() {

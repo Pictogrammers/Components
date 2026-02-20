@@ -1,5 +1,6 @@
 :host {
   display: inline-flex;
+  width: fit-content;
 }
 
 [part=button] {
@@ -12,7 +13,10 @@
   border: var(--pg-button-border-width, 1px) solid var(--pg-button-border-color, #453C4F);
   background-color: var(--pg-button-background-color, #FFFFFF);
   color: var(--pg-button-color, #453C4F);
-  padding: var(--pg-button-padding, 0.25rem 0.5rem);
+  padding-inline-start: var(--pg-button-padding-inline, var(--pg-button-padding-inline-start, 0.5rem));
+  padding-inline-end: var(--pg-button-padding-inline, var(--pg-button-padding-inline-end, 0.5rem));
+  padding-block-start: var(--pg-button-padding-block, var(--pg-button-padding-block-start, 0.25rem));
+  padding-block-end: var(--pg-button-padding-block, var(--pg-button-padding-block-start, 0.25rem));
   border-radius: var(--pg-button-border-radius, 0.25rem);
   outline: none;
   --pg-icon-color: var(--pg-button-color, #453C4F);

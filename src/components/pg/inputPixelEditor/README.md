@@ -3,11 +3,11 @@
 The `pg-input-pixel-editor` component is used to edit images. Tailored for pen or mouse input the editor can be used for various image editing tasks.
 
 ```typescript
-import '@pictogrammers/components/pgInputPixelEditor';
+import '@pictogrammers/components/pg/inputPixelEditor';
 import PgInputPixelEditor, {
   InputMode,
   LayerType,
-} from '@pictogrammers/components/pgInputPixelEditor';
+} from '@pictogrammers/components/pg/inputPixelEditor';
 ```
 
 ```html
@@ -50,8 +50,10 @@ See usage for each method below.
 | `setData()` | -           | Set layer data. |
 | `setJson(json)` | -        | Set JSON file. |
 | `reset()` | -  | Reset canvas and data. |
-| `getExportCanvas()` | -  | Get new canvas of export. |
-| `await getExportPng(options, meta)` | -  | Get image. |
+| `getExport()` | -  | 2d array of pixel color indexes. Already calculated. |
+| `getExport(id)` | -  | 2d array of pixel color indexes by export size. Minimal perf. |
+| `getExportCanvas()` | -  | Get new prepopulated HTML canvas, ideal for advanced export screens. |
+| `await getExportPng(options, meta)` | -  | Get png image with optional metadata. |
 | `undo()` | -           | Undo. |
 | `hasUndo()` | -     | Has undo |
 | `hasRedo()` | -     | Has redo |
@@ -179,6 +181,11 @@ A complete JSON storage for a 10x10 image.
       [{ "color": 2, "path": "M...Z" }]
     ]
   ],
+  "grid": {
+    "vertical": [],
+    "horizontal": []
+  },
+  "exports": [],
   "history": []
 }
 ```
@@ -289,6 +296,85 @@ this.$input.addEventListener('reference', (e: any) => {
     callback(file);
   }
 });
+```
+
+## Grid
+
+Grids seperate the frame into regions. The vertical and horizontal lines can be assigned a unique color often used in fonts.
+
+Grid lines on 0 or when equal or greater than to width/height are deleted. Applying a grid or resizing a frame will result in an error. Errors are handled by the consumer via the `error` event. `errorType: 'grid'`.
+
+```text
+0, 0 | 1, 0 | 2, 0
+0, 1 | 1, 1 | 2, 1
+0, 2 | 1, 2 | 2, 2
+```
+
+An example of a 9 segment grid for instance. Negative values offset from the right or bottom.
+
+> Note: When configuring exports all grid colors with `color: 0` will be visible.
+
+```json
+{
+  "grid": [{
+    "vertical": [
+      { "start": 10, "color": 0 },
+      { "start": -10, "color": 0 }
+    ],
+    "horizontal": [
+      { "start": 10, "color": 0 },
+      { "start": -10, "color": 0 }
+    ]
+  }]
+}
+```
+
+Specific grid colors are configured on the editor level and do not persist in this input component. In a font the first 5 colors are reserved for the below lines.
+
+- `1` - Ascender Line
+- `2` - Cap Line
+- `3` - Median / Mean line
+- `4` - Baseline
+- `5` - Decender Line
+
+### Repeating Grids
+
+A repeating grid is useful for tilesets and can be represented as.
+- `start` can be optional or null when `step` is defined.
+- `limit` can be optional or null. Null repeats for as many times as it can fit.
+- Similar to regular grids an error will throw if the first line is outside the `width` or `height`.
+
+```json
+{ "step": 10, "limit": null, "color": 0 },
+{ "start": 5, "step": 10, "limit": 10, "color": 0 },
+```
+
+## Export
+
+Exports by default include the entire canvas, but can be resized to a specific pixel size or grid. The `x`, `y`, `width`, and `height` are optional.
+
+Use `getExport(id)` with a `id` value to get the data grid. This is ideal for export previews.
+
+```json
+{
+  "exports": [{
+    "id": "uuid",
+    "unit": "pixel",
+    "path": ["file.png"],
+    "x": 0,
+    "y": 0,
+    "width": null,
+    "height": null,
+  }, {
+    "id": "uuid",
+    "unit": "grid",
+    "path": ["folder", "bottomRight.png"],
+    "x": 2,
+    "y": 2,
+    "width": 1,
+    "height": 1,
+  }]
+}
 ```
 
 ## History

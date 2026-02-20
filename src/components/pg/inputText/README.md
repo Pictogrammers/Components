@@ -25,3 +25,14 @@ import { PgInputText } from '@pictogrammers/components/pgInputText';
 | ---------- | -------- | ----------- |
 | change     |          | `{ detail: { value }` |
 | input      |          | `{ detail: { value }` |
+
+## CSS Variables
+
+| CSS Variables       | Default   | Description |
+| ------------------- | --------- | ----------- |
+| `--pg-button-padding-inline` | `0.5rem` | Padding inline. |
+| `--pg-button-padding-inline-start` | `0.5rem` | Padding inline start. |
+| `--pg-button-padding-inline-end` | `0.5rem` | Padding inline end. |
+| `--pg-button-padding-block` | `0.25rem` | Padding block. |
+| `--pg-button-padding-block-start` | `0.25rem` | Padding block start. |
+| `--pg-button-padding-block-end` | `0.25rem` | Padding block end. |

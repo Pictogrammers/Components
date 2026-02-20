@@ -10,7 +10,7 @@
 
 [part=value] {
   user-select: text;
-  --pg-input-text-padding: 0 0.25rem;
+  --pg-input-text-padding-inline: 0.25rem;
   --pg-input-text-border-color: transparent;
   --pg-input-text-font-family: var(--pg-json-font-family);
   display: inline-flex;
