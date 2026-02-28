@@ -18,7 +18,7 @@ function clearTimers() {
 })
 export default class PgButtonIncrement extends PgButton {
   @Prop(normalizeInt) incrementDelay = 300;
-  @Prop(normalizeInt) incrementStepDelay = 50;
+  @Prop(normalizeInt) incrementStepDelay = 100;
 
   connectedCallback() {
     super.connectedCallback();
@@ -35,11 +35,5 @@ export default class PgButtonIncrement extends PgButton {
     });
     this.$button.addEventListener('pointerup', clearTimers);
     this.$button.addEventListener('pointerleave', clearTimers);
-  }
-
-  render(changes) {
-    if (changes.incrementStepDelay) {
-      console.log(this.incrementStepDelay, '<<<<');
-    }
   }
 }

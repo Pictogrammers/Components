@@ -20,7 +20,7 @@ export default class XPgButtonBasic extends HTMLElement {
       const count = parseInt(this.$count1.textContent, 10);
       this.$count1.textContent = `${count + 1}`;
     });
-    this.$button2.incrementStepDelay = 100;
+    this.$button2.incrementStepDelay = 50;
     this.$button2.addEventListener('increment', () => {
       const count = parseInt(this.$count2.textContent, 10);
       this.$count2.textContent = `${count + 1}`;
