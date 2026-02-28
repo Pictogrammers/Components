@@ -318,12 +318,12 @@ An example of a 9 segment grid for instance. Negative values offset from the rig
 {
   "grid": [{
     "vertical": [
-      { "start": 10, "color": 0 },
-      { "start": -10, "color": 0 }
+      { "offset": 10, "color": 0 },
+      { "offset": -10, "color": 0 }
     ],
     "horizontal": [
-      { "start": 10, "color": 0 },
-      { "start": -10, "color": 0 }
+      { "offset": 10, "color": 0 },
+      { "offset": -10, "color": 0 }
     ]
   }]
 }
@@ -340,13 +340,20 @@ Specific grid colors are configured on the editor level and do not persist in th
 ### Repeating Grids
 
 A repeating grid is useful for tilesets and can be represented as.
-- `start` can be optional or null when `step` is defined.
+- `offset` can be optional or null when `step` is defined.
 - `limit` can be optional or null. Null repeats for as many times as it can fit.
 - Similar to regular grids an error will throw if the first line is outside the `width` or `height`.
 
+To create a repeating 20 pixel grid without an offset.
+
 ```json
-{ "step": 10, "limit": null, "color": 0 },
-{ "start": 5, "step": 10, "limit": 10, "color": 0 },
+{ "step": 20, "color": 0 },
+```
+
+To create a repeating 10 pixel grid with an offset `5` and limit `10`. The use case of this would be comps where a tileset does not evently sit in a viewport and needs to be centered.
+
+```json
+{ "offset": 5, "step": 10, "limit": 10, "color": 0 },
 ```
 
 ## Export

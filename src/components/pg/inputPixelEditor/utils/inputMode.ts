@@ -6,6 +6,7 @@ export const enum InputMode {
   SelectMagicWand,
   Stamp,
   Pixel,
+  Erase,
   Line,
   Rectangle,
   RectangleOutline,

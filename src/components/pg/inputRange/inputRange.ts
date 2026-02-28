@@ -9,17 +9,30 @@ import style from './inputRange.css';
   template
 })
 export default class PgInputRange extends HTMLElement {
-  @Prop() min: string = '0';
-  @Prop() max: string = '100';
-  @Prop() step: string = '1';
+  @Prop() value: number = 0;
+  @Prop() min: number = 0;
+  @Prop() max: number = 100;
+  @Prop() step: number = 1;
   @Prop() name: string = '';
 
   @Part() $input: HTMLInputElement;
 
-  render() {
-    this.$input.min = this.min;
-    this.$input.max = this.max;
-    this.$input.step = this.step;
+  render(changes: any) {
+    if (changes.min) {
+      this.$input.min = `${this.min}`;
+    }
+    if (changes.max) {
+      this.$input.max = `${this.max}`;
+    }
+    if (changes.step) {
+      this.$input.step = `${this.step}`;
+    }
+    if (changes.value) {
+      this.$input.value = `${this.value}`;
+    }
+    if (changes.name) {
+      this.$input.name = this.name;
+    }
   }
 
   connectedCallback() {
@@ -28,26 +41,24 @@ export default class PgInputRange extends HTMLElement {
   }
 
   #handleChange(e: any) {
-    e.stopPropagation();
     const { value } = e.target;
     this.dispatchEvent(
       new CustomEvent('change', {
         detail: {
           value,
-          name: this.name
+          name: this.name,
         }
       })
     );
   }
 
   #handleInput(e: any) {
-    e.stopPropagation();
     const { value } = e.target;
     this.dispatchEvent(
       new CustomEvent('input', {
         detail: {
           value,
-          name: this.name
+          name: this.name,
         }
       })
     );

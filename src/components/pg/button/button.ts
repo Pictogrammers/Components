@@ -19,8 +19,6 @@ export default class PgButton extends HTMLElement {
   @Prop(normalizeBoolean) end: boolean = false;
 
   @Part() $button: HTMLButtonElement;
-  @Part() $number: HTMLSpanElement;
-  @Part() $bar: HTMLSpanElement;
 
   connectedCallback() {
     this.$button.addEventListener('click', (e) => {
