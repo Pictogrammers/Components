@@ -26,5 +26,6 @@ export default class XPgInputNumberBasic extends HTMLElement {
   #handleInput(e: CustomEvent) {
     const { value } = e.detail;
     this.$value2.textContent = value;
+    this.$input.value = value;
   }
 }

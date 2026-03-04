@@ -1,4 +1,4 @@
-import { Component, normalizeInt, Part, Prop } from '@pictogrammers/element';
+import { Component, normalizeInt, Prop } from '@pictogrammers/element';
 
 import template from './buttonIncrement.html';
 import style from './buttonIncrement.css';
@@ -32,8 +32,16 @@ export default class PgButtonIncrement extends PgButton {
           this.dispatchEvent(new CustomEvent('increment'));
         }, this.incrementStepDelay);
       }, this.incrementDelay);
+      const pointerLeave = () => {
+        this.dispatchEvent(new CustomEvent('finish'));
+        clearTimers();
+        this.$button.removeEventListener('pointerleave', pointerLeave);
+      };
+      this.$button.addEventListener('pointerleave', pointerLeave);
     });
-    this.$button.addEventListener('pointerup', clearTimers);
-    this.$button.addEventListener('pointerleave', clearTimers);
+    this.$button.addEventListener('pointerup', () => {
+      this.dispatchEvent(new CustomEvent('finish'));
+      clearTimers();
+    });
   }
 }

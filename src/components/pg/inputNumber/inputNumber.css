@@ -6,13 +6,16 @@
 [part=input] {
   border: 1px solid var(--pg-input-text-border-color, #453C4F);
   border-radius: 0.125rem;
-  padding: var(--pg-input-text-padding, calc(0.5rem - 1px) 0.75rem);
+  padding-inline-start: var(--pg-input-number-padding-inline, var(--pg-input-number-padding-inline-start, 0.5rem));
+  padding-inline-end: var(--pg-input-number-padding-inline, var(--pg-input-number-padding-inline-end, 0.5rem));
+  padding-block-start: var(--pg-input-number-padding-block, var(--pg-input-number-padding-block-start, 0.25rem));
+  padding-block-end: var(--pg-input-number-padding-block, var(--pg-input-number-padding-block-start, 0.25rem));
   font-family: var(--pg-input-number-font-family, var(--pg-font-family));
   font-size: 1rem;
   outline: none;
   field-sizing: content;
-  min-width: calc(100% - 0.5rem - 2px);
-  max-width: calc(var(--pg-input-text-max-width, 100%) - 0.5rem - 2px);
+  min-width: calc(100% - 1rem - 2px);
+  max-width: calc(var(--pg-input-number-max-width, 100%) - 1.5rem - 2px);
   background-color: transparent;
   appearance: textfield;
 }
@@ -29,6 +32,32 @@
 [part=input]:active {
   box-shadow: 0 0 0 3px var(--pg-input-text-active-glow, rgb(79, 143, 249, 0.6));
 }
+
 [part=input]:focus {
   box-shadow: 0 0 0 3px var(--pg-input-text-focus-glow, rgb(79, 143, 249, 0.5));
+  z-index: 1;
+}
+
+[part=layout] {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+}
+
+[part=input]:has(+ [part=buttonMinus]) {
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+[part=buttonMinus] {
+  --pg-button-border-radius: 0;
+  margin-left: -1px;
+  --pg-button-padding-block: var(--pg-input-number-padding-block, unset);
+  --pg-button-padding-block-start: var(--pg-input-number-padding-block-start, unset);
+  --pg-button-padding-block-end: var(--pg-input-number-padding-block-end, unset);
+}
+
+[part=buttonPlus] {
+  --pg-button-border-radius: 0 0.25rem 0.25rem 0;
+  margin-left: -1px;
 }
