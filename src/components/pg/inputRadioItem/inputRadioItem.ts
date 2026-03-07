@@ -19,5 +19,8 @@ export default class PgInputRadioItem extends HTMLElement {
     if (changes.label) {
       this.$label.textContent = this.label;
     }
+    if (changes.value) {
+      this.$input.textContent = this.label;
+    }
   }
 }

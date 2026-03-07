@@ -1,0 +1,26 @@
+svg:hover [part="path"] {
+  fill: #4f8ff9;
+}
+
+label {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+[part="input"] {
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+[part="input"]:not(:checked) + svg [part="check"] {
+  display: none;
+}
+
+svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
