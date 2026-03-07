@@ -23,6 +23,21 @@ export default class PgInputRadio extends HTMLElement {
       container: this.$items,
       items: this.items,
       type: () => PgInputRadioItem,
+      create: ($item: PgInputRadioItem) => {
+        $item.addEventListener('change', () => {
+          Array.from(this.$items.children).forEach(($ele: PgInputRadioItem) => {
+            if ($ele === $item) {
+              $ele.checked = true;
+            } else {
+              $ele.checked = false;
+            }
+          });
+        });
+      }
     });
+  }
+
+  get radios() {
+    return [...this.$items.children];
   }
 }

@@ -11,9 +11,16 @@ import style from './inputRadioItem.css';
 export default class PgInputRadioItem extends HTMLElement {
   @Prop() label: string = '';
   @Prop() value: string = '';
+  @Prop() checked: boolean = false;
 
   @Part() $input: HTMLInputElement;
   @Part() $label: HTMLSpanElement;
+
+  connectedCallback() {
+    this.$input.addEventListener('change', () => {
+      this.dispatchEvent(new CustomEvent('change'));
+    });
+  }
 
   render(changes) {
     if (changes.label) {
@@ -21,6 +28,9 @@ export default class PgInputRadioItem extends HTMLElement {
     }
     if (changes.value) {
       this.$input.textContent = this.label;
+    }
+    if (changes.checked) {
+      this.$input.checked = this.checked;
     }
   }
 }
