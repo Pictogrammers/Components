@@ -23,7 +23,7 @@ export default class PgInputRadio extends HTMLElement {
       container: this.$items,
       items: this.items,
       type: () => PgInputRadioItem,
-      create: ($item: PgInputRadioItem) => {
+      create: ($item: PgInputRadioItem, item) => {
         $item.addEventListener('change', () => {
           Array.from(this.$items.children).forEach(($ele: PgInputRadioItem) => {
             if ($ele === $item) {
@@ -33,11 +33,23 @@ export default class PgInputRadio extends HTMLElement {
             }
           });
         });
+        // set initial checked
+        if (item.value === this.value) {
+          $item.checked = true;
+        }
       }
     });
   }
 
-  get radios() {
-    return [...this.$items.children];
+  render(changes) {
+    if (changes.value && this.items.length) {
+      Array.from(this.$items.children).forEach(($ele: PgInputRadioItem) => {
+        if ($ele.value === this.value) {
+          $ele.checked = true;
+        } else {
+          $ele.checked = false;
+        }
+      });
+    }
   }
 }
