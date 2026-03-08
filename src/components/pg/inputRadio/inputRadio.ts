@@ -32,6 +32,11 @@ export default class PgInputRadio extends HTMLElement {
               $ele.checked = false;
             }
           });
+          this.dispatchEvent(new CustomEvent('change', {
+            detail: {
+              value: item.value,
+            }
+          }))
         });
         // set initial checked
         if (item.value === this.value) {

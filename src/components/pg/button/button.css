@@ -80,7 +80,7 @@
 
 [part=button].active {
   box-shadow: 0 1px 0.25rem rgba(0, 0, 0, 0.5) inset;
-  background-color: rgba(69, 60, 79, 0.1);
+  background-color: rgb(236, 235, 237);
   color: var(--pg-button-color, #453C4F);
 }
 [part=button].active:hover {

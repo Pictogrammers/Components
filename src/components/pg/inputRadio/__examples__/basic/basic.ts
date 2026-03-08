@@ -23,8 +23,9 @@ export default class XPgInputRadioBasic extends HTMLElement {
     this.$input.addEventListener('change', this.handleChange.bind(this));
   }
 
-  handleChange(e) {
-    var value = e.target.value;
-    this.$value.innerText = value;
+  handleChange(e: any) {
+    const { value } = e.detail;
+    this.$input.value = value;
+    this.$value.textContent = value;
   }
 }
