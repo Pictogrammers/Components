@@ -51,23 +51,31 @@
 [part=layout] {
   display: grid;
   grid-template-columns: 1fr auto auto;
+  gap: var(--pg-input-number-gap, 0);
 }
 
 [part=input]:has(+ [part=buttonMinus]) {
   border-right: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  border-top-right-radius: var(--pg-input-number-minus-border-radius, var(--pg-input-number-minus-border-top-right-radius, 0));
+  border-bottom-right-radius: var(--pg-input-number-minus-border-radius, var(--pg-input-number-minus-border-top-right-radius, 0));;
 }
 
 [part=buttonMinus] {
-  --pg-button-border-radius: 0;
+  --pg-button-border-radius: var(--pg-input-number-minus-border-radius, var(--pg-input-number-minus-border-top-right-radius, 0));;
   margin-left: -1px;
-  --pg-button-padding-block: var(--pg-input-number-padding-block, unset);
-  --pg-button-padding-block-start: var(--pg-input-number-padding-block-start, unset);
-  --pg-button-padding-block-end: var(--pg-input-number-padding-block-end, unset);
+  --pg-button-padding-inline: var(--pg-input-number-minus-padding-inline, unset);
+  --pg-button-padding-block: var(--pg-input-number-minus-padding-block, unset);
 }
 
 [part=buttonPlus] {
-  --pg-button-border-radius: 0 0.25rem 0.25rem 0;
+  --pg-button-border-radius: var(
+    --pg-input-number-plus-border-radius,
+    var(--pg-input-number-plus-border-top-right-radius, 0)
+    var(--pg-input-number-plus-border-bottom-right-radius, 0.25rem)
+    var(--pg-input-number-plus-border-bottom-left-radius, 0.25rem)
+    var(--pg-input-number-plus-border-top-left-radius, 0)
+  );
   margin-left: -1px;
+  --pg-button-padding-inline: var(--pg-input-number-plus-padding-inline, unset);
+  --pg-button-padding-block: var(--pg-input-number-plus-padding-block, unset);
 }

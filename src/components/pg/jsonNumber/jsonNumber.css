@@ -14,6 +14,15 @@
   --pg-input-number-font-family: var(--pg-json-font-family);
   --pg-input-number-padding-block: 0;
   --pg-input-number-padding-inline: 0.25rem;
+  --pg-input-number-gap: 0.5rem;
+  --pg-input-number-minus-padding-inline: 0;
+  --pg-input-number-minus-padding-block: 0;
+  --pg-input-number-plus-padding-inline: 0;
+  --pg-input-number-plus-padding-block: 0;
+  --pg-icon-width: 1rem;
+  --pg-icon-height: 1rem;
+  --pg-input-number-plus-border-radius: 0.25rem;
+  --pg-input-number-minus-border-radius: 0.25rem;
   display: inline-flex;
   vertical-align: middle;
   margin: 0 -0.25rem;

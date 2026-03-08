@@ -19,6 +19,7 @@ export default class PgJsonNumber extends HTMLElement {
 
   connectedCallback() {
     this.$value.addEventListener('input', (e: any) => {
+      this.$value.value = e.detail.value;
       this.dispatchEvent(
         new CustomEvent('update', {
           detail: {
@@ -36,7 +37,7 @@ export default class PgJsonNumber extends HTMLElement {
       this.$key.textContent = this.key;
     }
     if (changes.value) {
-      this.$value.value = `${this.value}`;
+      this.$value.value = this.value;
     }
   }
 }
