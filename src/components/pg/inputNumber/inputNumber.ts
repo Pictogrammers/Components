@@ -43,18 +43,10 @@ export default class PgInputNumber extends HTMLElement {
       this.#triggerInput(this.value + this.step);
     });
     this.$buttonMinus.addEventListener('finish', (e: any) => {
-      this.dispatchEvent(new CustomEvent('change', {
-        detail: {
-          value: this.value,
-        },
-      }));
+      this.#triggerChange(this.value);
     });
     this.$buttonPlus.addEventListener('finish', (e: any) => {
-      this.dispatchEvent(new CustomEvent('change', {
-        detail: {
-          value: this.value,
-        },
-      }));
+      this.#triggerChange(this.value);
     });
   }
 
@@ -63,6 +55,12 @@ export default class PgInputNumber extends HTMLElement {
   render(changes) {
     if (changes.value && !this.skipValue) {
       this.$input.value = `${this.value}`;
+    }
+    if (changes.min) {
+      this.$input.min = `${this.min}`;
+    }
+    if (changes.max) {
+      this.$input.max = `${this.max}`;
     }
     if (changes.placeholder) {
       this.$input.placeholder = this.placeholder;
@@ -74,6 +72,9 @@ export default class PgInputNumber extends HTMLElement {
   }
 
   #triggerInput(value) {
+    if (value < this.min || value > this.max) {
+      return;
+    }
     this.dispatchEvent(
       new CustomEvent('input', {
         detail: {
@@ -91,14 +92,21 @@ export default class PgInputNumber extends HTMLElement {
     this.#triggerInput(value);
   }
 
-  handleChange(e) {
+  #triggerChange(value) {
+    if (value < this.min || value > this.max) {
+      return;
+    }
     this.dispatchEvent(
       new CustomEvent('change', {
         detail: {
-          value: e.target.value,
-          name: e.name
+          value: value,
+          name: this.name,
         }
       })
     );
+  }
+
+  handleChange(e) {
+    this.#triggerChange(e.target.value);
   }
 }
