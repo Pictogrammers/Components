@@ -24,9 +24,9 @@ export default class XPgInputSelectBasic extends HTMLElement {
     this.$input.addEventListener('change', this.#handleChange.bind(this));
   }
 
-  #handleChange(e) {
+  #handleChange(e: any) {
     const { value } = e.detail;
     this.$input.value = value;
-    this.$value.innerText = `${value}`;
+    this.$value.textContent = `${value}`;
   }
 }

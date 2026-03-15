@@ -25,12 +25,13 @@ export default class PgInputSelect extends HTMLElement {
 
   connectedCallback() {
     this.$button.addEventListener('click', this.#handleClick.bind(this));
+    this.$button.addEventListener('keydown', this.#handleKeyPress.bind(this));
   }
 
   render(changes) {
     if (changes.value || changes.default) {
       this.$label.textContent = this.value
-        ? this.value
+        ? (this.options.find(x => x.value === this.value) ?? { label: this.value }).label
         : this.default
           ? this.default.label
           : '\u00A0'; // nbsp
@@ -45,16 +46,68 @@ export default class PgInputSelect extends HTMLElement {
       source: this.$button,
       default: this.default,
       value: this.options.find(x => x.value === this.value) ?? null,
-      items: this.options
+      items: this.options,
     });
     if (result !== undefined) {
       this.dispatchEvent(new CustomEvent('change', {
         detail: {
-          value: result.value
-        }
+          value: result.value,
+        },
       }));
       this.$label.textContent = result.label;
     }
     this.#menuOpen = false;
+  }
+
+  #handleKeyPress(e: KeyboardEvent) {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        if (this.options.length <= 1) {
+          return;
+        }
+        this.#handleKeyDownArrowDown();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        if (this.options.length <= 1) {
+          return;
+        }
+        this.#handleKeyDownArrowUp();
+        break;
+    }
+  }
+
+  #handleKeyDownArrowDown() {
+    const index = this.options.findIndex(x => x.value === this.value);
+    let newValue = '';
+    if (index === -1 || index === this.options.length - 1) {
+      // select first or loop to top
+      newValue = this.options[0].value;
+    } else {
+      newValue = this.options[index + 1].value;
+    }
+    this.dispatchEvent(new CustomEvent('change', {
+      detail: {
+        value: newValue,
+      },
+    }));
+  }
+
+  #handleKeyDownArrowUp() {
+    const index = this.options.findIndex(x => x.value === this.value);
+    const normalizeIndex = index === -1 ? 0 : index;
+    let newValue = '';
+    if (normalizeIndex === 0) {
+      // loop to bottom
+      newValue = this.options[this.options.length - 1].value;
+    } else {
+      newValue = this.options[normalizeIndex - 1].value;
+    }
+    this.dispatchEvent(new CustomEvent('change', {
+      detail: {
+        value: newValue,
+      },
+    }));
   }
 }

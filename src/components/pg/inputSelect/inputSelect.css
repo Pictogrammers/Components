@@ -24,7 +24,7 @@
 [part=label] {
   grid-row: 1;
   grid-column: 1;
-  padding: var(--pg-input-select-padding, 0.5rem 0.75rem);
+  padding: var(--pg-input-select-padding, 0.25rem 0.75rem);
   font-size: var(--pg-input-select-font-size, 1rem);
 }
 
