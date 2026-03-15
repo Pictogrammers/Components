@@ -26,6 +26,16 @@ export default class PgInputNumber extends HTMLElement {
   connectedCallback() {
     this.$input.addEventListener('input', this.handleInput.bind(this));
     this.$input.addEventListener('change', this.handleChange.bind(this));
+    this.$input.addEventListener('beforeinput', (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowUp':
+          this.#triggerInput(this.value + this.step);
+          break;
+        case 'ArrowDown':
+          this.#triggerInput(this.value - this.step);
+          break;
+      }
+    });
     this.$buttonMinus.addEventListener('increment', (e: any) => {
       this.#triggerInput(this.value - this.step);
     });
