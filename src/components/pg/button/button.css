@@ -3,6 +3,11 @@
   width: fit-content;
 }
 
+:host:has(button.block) {
+  display: flex;
+  width: unset;
+}
+
 [part=button] {
   display: flex;
   align-items: center;

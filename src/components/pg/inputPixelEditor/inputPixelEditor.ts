@@ -1466,8 +1466,12 @@ export default class PgInputPixelEditor extends HTMLElement {
   #getLayerPaths() {
     return this.#data.map((layer, layerIndex) => {
       const colors = this.getLayerColorIndexes(layerIndex);
-      return colors.map((color) => {
-        return [color, bitmaskToPath(layer, { scale: 1, include: [color] })];
+      const paths = bitmaskToPath(layer, {
+        scale: 1,
+        include: colors.map((color) => ([color])),
+      });
+      return colors.map((color, i) => {
+        return [color, paths[i]];
       });
     });
   }
@@ -1489,7 +1493,7 @@ export default class PgInputPixelEditor extends HTMLElement {
               color,
               path: bitmaskToPath(this.#data[layerIndex], {
                 scale: 1,
-                include: [color]
+                include: [[color]]
               }),
             };
           });

@@ -91,6 +91,7 @@ export default class XPgTableBasic extends HTMLElement {
   newCount = 0;
   handlePushData() {
     this.$table.data.push(createTableItem({
+      selected: false,
       name: `new ${this.newCount++}`,
       age: this.newCount,
       favorite: {
