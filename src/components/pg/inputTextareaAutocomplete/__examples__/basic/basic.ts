@@ -18,6 +18,26 @@ export default class XPgInputTextareaBasic extends HTMLElement {
     this.$input.addEventListener('change', this.#handleChange.bind(this));
     this.$input.addEventListener('input', this.#handleInput.bind(this));
     this.$input.addEventListener('caret', this.#handleCaret.bind(this));
+
+    this.$input.addEventListener('caret', (e: any) => {
+      const { matchIndex, setOptions } = e.detail;
+      switch(matchIndex) {
+        case 1: // @username
+          setOptions([{
+            label: 'Dipper',
+            value: 'Dipper',
+          }]);
+          break;
+        case 2: // #TagName
+          setOptions([{
+            label: 'Movie',
+            value: 'Movie',
+          }]);
+          break;
+        default:
+          setOptions([]);
+      }
+    });
   }
 
   #handleChange(e: CustomEvent) {

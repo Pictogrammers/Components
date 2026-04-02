@@ -18,16 +18,43 @@ import { PgInputTextarea } from '@pictogrammers/components/pgInputTextareaAutoco
 | name        |          | Unique name in `pg-form` |
 | value       |          | Field value |
 | placeholder |          | Placeholder text |
+| tokens      |          | Tokens array |
+
+## Tokens
+
+Tokens will match if the cursor is before, after, or in side of a token regex. The most common is `@` for usernames or `#` for tags.
+
+```typescript
+this.$input.tokens = [
+  /@([a-zA-Z]+\w+)?/, // @username
+  /#([a-zA-Z]+\w+)?/ // #TagName
+];
+```
 
 ## Methods
 
 ### `setOptions`
 
 ```typescript
-this.$input.setOptions([{
-  label: 'name',
-  value: 'name'
-}]);
+this.$input.addEventListener('caret', (e: any) => {
+  const { matchIndex, setOptions } = e.detail;
+  switch(matchIndex) {
+    case 1: // @username
+      setOptions([{
+        label: 'Dipper',
+        value: 'Dipper',
+      }]);
+      break;
+    case 2: // #TagName
+      setOptions([{
+        label: 'Movie',
+        value: 'Movie',
+      }]);
+      break;
+    default:
+      setOptions([]);
+  }
+});
 ```
 
 ## Events

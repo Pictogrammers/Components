@@ -30,9 +30,11 @@ function getCursorRowCol(
 @Component({
   selector: 'pg-input-textarea-autocomplete',
   style,
-  template
+  template,
 })
 export default class PgInputTextareaAutocomplete extends PgInputTextarea {
+
+  @Prop() tokens = [];
 
   connectedCallback() {
     super.connectedCallback();
@@ -40,6 +42,7 @@ export default class PgInputTextareaAutocomplete extends PgInputTextarea {
     this.$input.addEventListener('input', this.handleCursorMove.bind(this));
     this.$input.addEventListener('click', this.handleCursorMove.bind(this));
     this.$input.addEventListener('keyup', this.handleCursorMove.bind(this));
+
   }
 
   focus() {
