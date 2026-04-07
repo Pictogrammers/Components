@@ -28,6 +28,11 @@ export default class PgPopoverAutocompleteItem extends HTMLElement {
   }
 
   connectedCallback() {
+    this.$label.addEventListener('mousedown', () => {
+      this.dispatchEvent(new CustomEvent('ignore', {
+        detail: { index: this.index }
+      }));
+    });
     this.$label.addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('select', {
         detail: { index: this.index, label: this.label, value: this.value }
@@ -65,6 +70,10 @@ export default class PgPopoverAutocompleteItem extends HTMLElement {
           break;
       }
     });
+  }
+
+  click() {
+    this.$label.click();
   }
 
   focus() {

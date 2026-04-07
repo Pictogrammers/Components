@@ -12,7 +12,7 @@ type OmitByPrefix<T, Prefix extends string> = {
   template,
 })
 export default class PgPopover extends HTMLElement {
-  static create<T extends typeof PgPopover>(this: T, props: Partial<OmitByPrefix<Omit<InstanceType<T>, keyof PgPopover>, '$'>>): InstanceType<T> {
+  static create<T extends typeof PgPopover>(this: T, props: Partial<OmitByPrefix<Omit<InstanceType<T>, Exclude<keyof PgPopover, 'source'>>, '$'>>): InstanceType<T> {
     var ele = document.createElement(this.name) as InstanceType<T>;
     props && Object.assign(ele, props);
     document.body.appendChild(ele);
@@ -24,13 +24,17 @@ export default class PgPopover extends HTMLElement {
 
   @Part() $popover: PgPopover;
 
+  visible = false;
+
   hide() {
     this.$popover.hidePopover();
+    this.visible = false;
   }
 
   show() {
     // @ts-ignore
     this.$popover.showPopover({ source: this.source });
+    this.visible = true;
   }
 
   destroy() {

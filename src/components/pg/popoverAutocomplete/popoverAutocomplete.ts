@@ -17,6 +17,7 @@ export default class PgPopoverAutocomplete extends PgPopover {
   @Prop() items: { label: string; value: string }[] = [];
 
   #index: number = -1;
+  #ignore: boolean = false;
 
   connectedCallback() {
     forEach({
@@ -24,9 +25,14 @@ export default class PgPopoverAutocomplete extends PgPopover {
       items: this.items,
       type: () => PgPopoverAutocompleteItem,
       create: ($item: PgPopoverAutocompleteItem, _item: { label: string; value: string }) => {
+        $item.addEventListener('ignore', (e: any) => {
+          this.#ignore = true;
+          this.#focusItem(e.detail.index);
+        });
         $item.addEventListener('select', (e: any) => {
           this.dispatchEvent(new CustomEvent('select', { detail: e.detail }));
-          this.destroy();
+          this.hide();
+          this.#ignore = false;
         });
         $item.addEventListener('left', (e: any) => {
           this.dispatchEvent(new CustomEvent('dismiss'));
@@ -41,7 +47,7 @@ export default class PgPopoverAutocomplete extends PgPopover {
           this.#focusItem(e.detail.index + 1);
         });
         $item.addEventListener('close', () => {
-          this.destroy();
+          this.hide();
           this.source?.focus();
         });
       }
@@ -60,6 +66,9 @@ export default class PgPopoverAutocomplete extends PgPopover {
   }
 
   handleBlur = (e: FocusEvent) => {
+    if (this.#ignore) {
+      return;
+    }
     this.hide();
   }
 
@@ -73,11 +82,17 @@ export default class PgPopoverAutocomplete extends PgPopover {
         e.preventDefault();
         break;
       case 'ArrowDown':
-        this.#focusItem(this.#index + 1);
+        if (this.visible) {
+          this.#focusItem(this.#index + 1);
+        } else {
+          // recreate autocomplete
+        }
         e.preventDefault();
         break;
       case 'Enter':
-        console.log('enter');
+        const item = this.$items.children[this.#index] as any;
+        item?.click();
+        e.preventDefault();
         break;
       case 'Escape':
         this.hide();
@@ -88,8 +103,7 @@ export default class PgPopoverAutocomplete extends PgPopover {
 
   #toggle(e: ToggleEvent) {
     if (e.newState === 'closed') {
-      //this.dispatchEvent(new CustomEvent('dismiss'));
-      console.log('close');
+      this.dispatchEvent(new CustomEvent('dismiss'));
     }
   }
 
@@ -97,6 +111,15 @@ export default class PgPopoverAutocomplete extends PgPopover {
     //if (index === initIndex) return;
     //if (index < 0) return this.#focusItem(this.items.length - 1, fallback, initIndex);
     //if (index >= this.items.length) return this.#focusItem(0, fallback, initIndex);
+    if (this.#index === index) {
+      return;
+    }
+    if (index < 0) {
+      index = this.items.length - 1;
+    }
+    if (index >= this.items.length) {
+      index = 0;
+    }
     const item = this.$items.children[index] as any;
     item?.focus();
     const previous = this.$items.children[this.#index] as any;
