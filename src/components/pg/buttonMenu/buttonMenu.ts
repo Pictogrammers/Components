@@ -48,7 +48,7 @@ export default class PgButtonMenu extends HTMLElement {
       source: this,
       default: this.default ?? this.items[0],
       value: this.items.find(x => x.value === this.value) ?? null,
-      items: this.items
+      items: this.items,
     });
     this.$icon.path = IconExpand;
     if (result !== undefined) {

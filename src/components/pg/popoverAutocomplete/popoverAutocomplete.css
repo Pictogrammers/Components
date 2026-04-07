@@ -1,0 +1,25 @@
+:host {
+  display: contents;
+}
+
+[part="popover"] {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  top: calc(anchor(bottom) - 1px);
+  left: anchor(left);
+  min-width: anchor-size(width);
+  overflow: visible;
+}
+
+[part="items"] {
+  display: flex;
+  flex-direction: column;
+  border-width: var(--pg-autocomplete-border-width, 1px);
+  border-color: var(--pg-autocomplete-border-color, #453C4F);
+  border-style: solid;
+  border-radius: 0.25rem;
+  background-color: var(--pg-autocomplete-background-color, #FFFFFF);
+  box-shadow: var(--pg-autocomplete-box-shadow, 0 0.125rem 0.5rem rgba(0, 0, 0, 0.25));
+}

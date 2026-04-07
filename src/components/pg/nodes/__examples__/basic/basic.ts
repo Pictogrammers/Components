@@ -12,6 +12,14 @@ export default class XPgInputNodesBasic extends HTMLElement {
   @Part() $nodes: PgNodes;
 
   connectedCallback() {
+    this.$nodes.items.push({
+      x: 2,
+      y: 2,
+      fields: [{
+        label: 'Name',
+        value: '10'
+      }]
+    });
     this.$nodes.addEventListener('change', this.#handleChange.bind(this));
     this.$nodes.addEventListener('input', this.#handleInput.bind(this));
   }
