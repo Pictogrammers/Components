@@ -165,9 +165,9 @@ export const demos = [
       poco.drawText("Top Right", myFont, black, poco.width - 4 - trW, 4);
       const cW = poco.getTextWidth("Center", myFont);
       poco.drawText("Center", myFont, black, (poco.width - cW) / 2, (poco.height - myFont.height) / 2);
-      poco.drawText("Bot Left", myFont, black, 4, poco.height - 4 - myFont.height);
-      const brW = poco.getTextWidth("Bot Right", myFont);
-      poco.drawText("Bot Right", myFont, black, poco.width - 4 - brW, poco.height - 4 - myFont.height);
+      poco.drawText("Bottom Left", myFont, black, 4, poco.height - 4 - myFont.height);
+      const brW = poco.getTextWidth("Bottom Right", myFont);
+      poco.drawText("Bottom Right", myFont, black, poco.width - 4 - brW, poco.height - 4 - myFont.height);
       poco.end();
     }
   },
@@ -212,17 +212,18 @@ export const demos = [
       poco.end();
     }
   },
-  {
-    label: "drawFrame",
-    detail: "poco.drawFrame(frame, {width, height}, x, y) — renders a ColorCell compressed image (placeholder in this mock).",
-    run({ poco }) {
-      const white = poco.makeColor(255, 255, 255);
-      poco.begin();
-      poco.fillRectangle(white, 0, 0, poco.width, poco.height);
-      poco.drawFrame(null, { width: 80,  height: 60 }, 10,  10);
-      poco.drawFrame(null, { width: 120, height: 80 }, 110, 10);
-      poco.drawFrame(null, { width: 50,  height: 50 }, 10,  80);
-      poco.end();
-    }
-  },
+  // ToDo: support resizing images if someone requests this feature
+  // {
+  //   label: "drawFrame",
+  //   detail: "poco.drawFrame(frame, {width, height}, x, y) — renders a ColorCell compressed image (placeholder in this mock).",
+  //   run({ poco }) {
+  //     const white = poco.makeColor(255, 255, 255);
+  //     poco.begin();
+  //     poco.fillRectangle(white, 0, 0, poco.width, poco.height);
+  //     poco.drawFrame(null, { width: 80,  height: 60 }, 10,  10);
+  //     poco.drawFrame(null, { width: 120, height: 80 }, 110, 10);
+  //     poco.drawFrame(null, { width: 50,  height: 50 }, 10,  80);
+  //     poco.end();
+  //   }
+  // },
 ];
