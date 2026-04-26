@@ -84,7 +84,7 @@ export default class XPgPocoBasic extends HTMLElement {
         }
     });
     // Resources - Font
-    this.$poco.setResourceBMP('myFont.bmp', mockMyFontBMP);
+    this.$poco.setResourceBMP('myFont.png', mockMyFontBMP);
     this.$poco.setResourceBMFJSON('myFont.fnt', mockMyFont);
   }
 

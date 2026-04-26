@@ -49,11 +49,14 @@ export class MockFont {
   static async load(fntUrl: string): Promise<MockFont> {
     const buffer = await fetch(fntUrl).then(r => r.arrayBuffer());
     const fnt = readFnt(buffer);
+    const bmpUrl = fnt.pages[0].replace('.png', '.bmp');
     // Load from resourceBMP if found
-    if (resourcesBMF.has(fnt.pages[0])) {
-      return MockFont.from(resourcesBMF.get(fnt.pages[0])!);
+    if (resourcesBMP.has(bmpUrl)) {
+      const mockBitmap = resourcesBMP.get(bmpUrl);
+      const { canvas, isGray } = MockFont._processAtlas(mockBitmap?._canvas!);
+      return new MockFont(fnt, canvas, isGray);
     }
-
+    /*
     // Backup request image
     const dir = fntUrl.substring(0, fntUrl.lastIndexOf('/') + 1);
     const image = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -64,23 +67,38 @@ export class MockFont {
     });
 
     const { canvas, isGray } = MockFont._processAtlas(image);
-    return new MockFont(fnt, canvas, isGray);
+    return new MockFont(fnt, canvas, isGray);*/
+    // @ts-ignore
+    return new MockFont(fnt, null, true);
   }
 
   static from(fnt: FntFont): MockFont {
+    const bmpUrl = fnt.pages[0].replace('.png', '.bmp');
+    if (resourcesBMP.has(bmpUrl)) {
+      const mockBitmap = resourcesBMP.get(bmpUrl);
+      const { canvas, isGray } = MockFont._processAtlas(mockBitmap?._canvas!);
+      return new MockFont(fnt, canvas, isGray);
+    }
+
+    // Backup request image
+    /*const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error(`Failed to load font texture: ${bmpUrl}`));
+      img.src = bmpUrl;
+    });
+
     const { canvas, isGray } = MockFont._processAtlas(image);
-    return new MockFont(fnt, canvas, isGray);
+    return new MockFont(fnt, canvas, isGray);*/
+    // @ts-ignore
+    return new MockFont(fnt, null, false);
   }
 
   // For opaque black-background atlases that are purely grayscale (R≈G≈B),
   // converts pixel luminance to the alpha channel so source-in colorization works.
   // Color atlases are stored as-is; the caller uses isGray to choose the draw path.
-  private static _processAtlas(image: HTMLImageElement): { canvas: HTMLCanvasElement; isGray: boolean } {
-    const canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
+  private static _processAtlas(canvas: HTMLCanvasElement): { canvas: HTMLCanvasElement; isGray: boolean } {
     const ctx = canvas.getContext('2d')!;
-    ctx.drawImage(image, 0, 0);
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const d = imageData.data;
@@ -557,7 +575,8 @@ export class MockResource {
     if (!(fileName.endsWith('.bmp') || fileName.endsWith('.png'))) {
       throw new Error(`setBMP only accepts ".png" and ".bmp"`);
     }
-    resourcesBMP.set(fileName, bitmap);
+    // Scripts always reference with `.bmp` extension
+    resourcesBMP.set(fileName.replace('.png', '.bmp'), bitmap);
   }
 
   static setBMF(fileName: string, buffer: ArrayBuffer | Uint8Array<ArrayBufferLike>) {
@@ -595,7 +614,5 @@ export function MockParseBMP(buffer: MockResource) {
 
 export function MockParseBMF(buffer: MockResource) {
   // this is a mock, so lookup stored file key
-  MockFont.load()
-  const { canvas, isGray } = MockFont._processAtlas(image);
-  return new MockFont(resourcesBMF.get(buffer.file)!, canvas, isGray);
+  return MockFont.from(resourcesBMF.get(buffer.file)!);
 }

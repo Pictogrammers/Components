@@ -35,7 +35,7 @@ export const mockMyFont = {
     "blueChnl": 0
   },
   "pages": [
-    "CleanBasic.png"
+    "myFont.png"
   ],
   "chars": [
     {
