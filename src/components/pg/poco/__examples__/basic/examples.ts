@@ -164,7 +164,13 @@ export const demos = [
       const trW = poco.getTextWidth("Top Right", myFont);
       poco.drawText("Top Right", myFont, black, poco.width - 4 - trW, 4);
       const cW = poco.getTextWidth("Center", myFont);
-      poco.drawText("Center", myFont, black, (poco.width - cW) / 2, (poco.height - myFont.height) / 2);
+      poco.drawText(
+        "Center",
+        myFont,
+        black,
+        Math.floor((poco.width - cW) / 2),
+        Math.floor((poco.height - myFont.height) / 2)
+      );
       poco.drawText("Bottom Left", myFont, black, 4, poco.height - 4 - myFont.height);
       const brW = poco.getTextWidth("Bottom Right", myFont);
       poco.drawText("Bottom Right", myFont, black, poco.width - 4 - brW, poco.height - 4 - myFont.height);
