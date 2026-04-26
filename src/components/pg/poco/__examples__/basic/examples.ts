@@ -146,7 +146,7 @@ export const demos = [
       poco.drawText("Hello, Poco!", myFont, white, 10, 10);
       poco.drawText("MyFont bitmap font.", myFont, black, 10, 10 + myFont.height + 4);
       poco.fillRectangle(white, 0, 80, poco.width, 1);
-      poco.drawText("This text is too long to fit without truncation.", myFont, black, 10, 90, 200);
+      poco.drawText("This text is too long to fit without truncation.", myFont, black, 10, 90, 195);
       poco.drawText("Full width fits fine.", myFont, black, 10, 90 + myFont.height + 4, poco.width - 20);
       poco.end();
     }
