@@ -4,6 +4,7 @@ import PgPoco from '../../poco';
 import { demos } from './examples';
 
 import template from './basic.html';
+import { mockMyFont, mockMyFontBMP } from './myFont';
 
 function extractBody(fn) {
   const src = fn.toString();
@@ -44,29 +45,29 @@ export default class XPgPocoBasic extends HTMLElement {
     this.$code.value = extractBody(demos[0].run);
     this.$run.addEventListener('click', this.handleRun.bind(this));
     this.$error.style.display = 'none';
-    // Load testing resources
-    this.$poco.setResource('colorBitmap.bmp', 40, 40, (ctx, w, h) => {
+    // Resources
+    this.$poco.setResourceBMPCanvas('colorBitmap.bmp', 40, 40, (ctx, w, h) => {
       ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
       ctx.fillStyle = "#000"; ctx.fillRect(4, 4, 32, 32);
       ctx.fillStyle = "#fff"; ctx.fillRect(8, 8, 24, 24);
       ctx.fillStyle = "#000"; ctx.fillRect(12, 12, 16, 16);
       ctx.fillStyle = "#fff"; ctx.fillRect(16, 16, 8, 8);
     });
-    this.$poco.setResource('monoBitmap.bmp', 32, 32, (ctx, w, h) => {
+    this.$poco.setResourceBMPCanvas('monoBitmap.bmp', 32, 32, (ctx, w, h) => {
       ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
       ctx.strokeStyle = "#000"; ctx.lineWidth = 1;
       ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
       ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w / 2, h / 2); ctx.lineTo(w, 0); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, h); ctx.lineTo(w / 2, h / 2); ctx.lineTo(w, h); ctx.stroke();
     });
-    this.$poco.setResource('grayBitmap.bmp', 32, 32, (ctx, w, h) => {
+    this.$poco.setResourceBMPCanvas('grayBitmap.bmp', 32, 32, (ctx, w, h) => {
       const grad = ctx.createRadialGradient(w / 2, h / 2, 2, w / 2, h / 2, w / 2);
       grad.addColorStop(0, "#fff");
       grad.addColorStop(1, "#000");
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
     });
-    this.$poco.setResource('circleMask.bmp', 40, 40, (ctx, w, h) => {
+    this.$poco.setResourceBMPCanvas('circleMask.bmp', 40, 40, (ctx, w, h) => {
       ctx.fillStyle = "#000"; ctx.fillRect(0, 0, w, h);
       const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
       grad.addColorStop(0, "#fff");
@@ -74,7 +75,7 @@ export default class XPgPocoBasic extends HTMLElement {
       ctx.fillStyle = grad;
       ctx.beginPath(); ctx.arc(w / 2, h / 2, w / 2, 0, Math.PI * 2); ctx.fill();
     });
-    this.$poco.setResource('patternBitmap.bmp', 30, 30, (ctx, w, h) => {
+    this.$poco.setResourceBMPCanvas('patternBitmap.bmp', 30, 30, (ctx, w, h) => {
       const size = 10;
       for (let r = 0; r < h; r += size)
         for (let c = 0; c < w; c += size) {
@@ -82,6 +83,9 @@ export default class XPgPocoBasic extends HTMLElement {
           ctx.fillRect(c, r, size, size);
         }
     });
+    // Resources - Font
+    this.$poco.setResourceBMP('myFont.bmp', mockMyFontBMP);
+    this.$poco.setResourceBMFJSON('myFont.fnt', mockMyFont);
   }
 
   handleRun() {
@@ -110,6 +114,7 @@ export default class XPgPocoBasic extends HTMLElement {
     } catch (e: any) {
       this.$error.textContent = e.message;
       this.$error.style.display = "block";
+      throw e;
     }
   }
 }

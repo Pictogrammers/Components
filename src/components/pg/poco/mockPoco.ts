@@ -49,7 +49,12 @@ export class MockFont {
   static async load(fntUrl: string): Promise<MockFont> {
     const buffer = await fetch(fntUrl).then(r => r.arrayBuffer());
     const fnt = readFnt(buffer);
+    // Load from resourceBMP if found
+    if (resourcesBMF.has(fnt.pages[0])) {
+      return MockFont.from(resourcesBMF.get(fnt.pages[0])!);
+    }
 
+    // Backup request image
     const dir = fntUrl.substring(0, fntUrl.lastIndexOf('/') + 1);
     const image = await new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
@@ -58,6 +63,11 @@ export class MockFont {
       img.src = dir + fnt.pages[0];
     });
 
+    const { canvas, isGray } = MockFont._processAtlas(image);
+    return new MockFont(fnt, canvas, isGray);
+  }
+
+  static from(fnt: FntFont): MockFont {
     const { canvas, isGray } = MockFont._processAtlas(image);
     return new MockFont(fnt, canvas, isGray);
   }
@@ -100,6 +110,21 @@ export class MockFont {
   }
 }
 
+function drawToCanvas(bytes: Uint8Array, canvas: HTMLCanvasElement): void {
+  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "image/png" });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+
+  img.onload = () => {
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    canvas.getContext("2d")!.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+  };
+
+  img.src = url;
+}
+
 export class MockBitmap {
   readonly _canvas: HTMLCanvasElement;
   readonly _imageData: ImageData;
@@ -123,6 +148,14 @@ export class MockBitmap {
     c.width = width;
     c.height = height;
     drawFn(c.getContext('2d')!, width, height);
+    return new MockBitmap(c);
+  }
+
+  static from(
+    buffer: Uint8Array,
+  ) {
+    const c = document.createElement('canvas');
+    drawToCanvas(buffer, c);
     return new MockBitmap(c);
   }
 }
@@ -175,7 +208,7 @@ export class MockPoco {
     this.ctx.restore();
   }
 
-  close(): void {}
+  close(): void { }
 
   // ── Color ──────────────────────────────────────────────────────────────────
 
@@ -515,38 +548,54 @@ export class MockPoco {
   }
 }
 
-const resources = new Map<string, MockBitmap>();
+// PNG and BMP are both handled in resourceBMP
+const resourcesBMP = new Map<string, MockBitmap>();
+const resourcesBMF = new Map<string, FntFont>();
 
 export class MockResource {
-  static set(fileName: string, bitmap: MockBitmap) {
-    resources.set(fileName, bitmap);
+  static setBMP(fileName: string, bitmap: MockBitmap) {
+    if (!(fileName.endsWith('.bmp') || fileName.endsWith('.png'))) {
+      throw new Error(`setBMP only accepts ".png" and ".bmp"`);
+    }
+    resourcesBMP.set(fileName, bitmap);
+  }
+
+  static setBMF(fileName: string, buffer: ArrayBuffer | Uint8Array<ArrayBufferLike>) {
+    if (!fileName.endsWith('.fnt')) {
+      throw new Error(`setBMP only accepts ".fnt"`);
+    }
+    resourcesBMF.set(fileName, readFnt(buffer));
+  }
+
+  // if you've already stored the json
+  static setBMFJSON(fileName: string, json: FntFont) {
+    if (!fileName.endsWith('.fnt')) {
+      throw new Error(`setBMP only accepts ".fnt"`);
+    }
+    resourcesBMF.set(fileName, json);
   }
 
   #file;
   constructor(fileName: string) {
-    if (!resources.has(fileName)) {
+    if (!(resourcesBMP.has(fileName) || resourcesBMF.has(fileName))) {
       throw new Error(`Unknown mock resource "${fileName}". Add with Resource.set(fileName, MockBitmap.create()).`);
     }
     this.#file = fileName;
   }
 
-  get mock() {
-    return resources.get(this.#file);
+  get file() {
+    return this.#file;
   }
 }
 
-export function MockParseBMP(buffer: any) {
-  return buffer.mock;
+export function MockParseBMP(buffer: MockResource) {
+  // this is a mock, so lookup stored file key
+  return resourcesBMP.get(buffer.file);
 }
 
-class MockBMFont {
-  constructor(buffer: any) {
-
-  }
-
-  bitmap: any;
-}
-
-export function MockParseBMF(buffer: any) {
-  return new MockBMFont(buffer);
+export function MockParseBMF(buffer: MockResource) {
+  // this is a mock, so lookup stored file key
+  MockFont.load()
+  const { canvas, isGray } = MockFont._processAtlas(image);
+  return new MockFont(resourcesBMF.get(buffer.file)!, canvas, isGray);
 }
