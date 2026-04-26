@@ -1,4 +1,4 @@
-import { Component, Part, Prop } from '@pictogrammers/element';
+import { Component, Part } from '@pictogrammers/element';
 
 import PgPoco from '../../poco';
 import { demos } from './examples';
@@ -47,7 +47,7 @@ export default class XPgPocoBasic extends HTMLElement {
   }
 
   handleRun() {
-    const { poco } = this.$poco;
+    const { poco, Resource: r2, parseBMP, parseBMF } = this.$poco;
     function safeExec(code, globals = {}) {
       const sandbox = new Proxy(globals, {
         has() { return true; },
@@ -63,7 +63,11 @@ export default class XPgPocoBasic extends HTMLElement {
     try {
       safeExec(this.$code.value, {
         console,
+        Math,
         poco,
+        Resource: r2,
+        parseBMP,
+        parseBMF,
       });
     } catch (e: any) {
       this.$error.textContent = e.message;

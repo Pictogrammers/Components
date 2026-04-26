@@ -517,17 +517,17 @@ export class MockPoco {
 
 const resources = new Map<string, string>();
 
-export class Resource {
+export class MockResource {
   constructor(file) {
 
   }
 }
 
-export function parseBMP(buffer: any) {
+export function MockParseBMP(buffer: any) {
   return buffer;
 }
 
-class BMFont {
+class MockBMFont {
   constructor(buffer: any) {
 
   }
@@ -535,6 +535,6 @@ class BMFont {
   bitmap: any;
 }
 
-export function parseBMF(buffer: any) {
-  return new BMFont(buffer);
+export function MockParseBMF(buffer: any) {
+  return new MockBMFont(buffer);
 }

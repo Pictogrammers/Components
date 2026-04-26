@@ -1,6 +1,6 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import { MockFont, MockPoco } from './mockPoco';
+import { MockFont, MockPoco, MockResource, MockParseBMP, MockParseBMF } from './mockPoco';
 
 import template from './poco.html';
 import style from './poco.css';
@@ -28,5 +28,17 @@ export default class PgPoco extends HTMLElement {
 
   get poco() {
     return this.#poco;
+  }
+
+  get Resource() {
+    return MockResource;
+  }
+
+  get parseBMP() {
+    return MockParseBMP;
+  }
+
+  get parseBMF() {
+    return MockParseBMF;
   }
 }
