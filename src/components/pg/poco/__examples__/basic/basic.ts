@@ -44,6 +44,44 @@ export default class XPgPocoBasic extends HTMLElement {
     this.$code.value = extractBody(demos[0].run);
     this.$run.addEventListener('click', this.handleRun.bind(this));
     this.$error.style.display = 'none';
+    // Load testing resources
+    this.$poco.setResource('colorBitmap.bmp', 40, 40, (ctx, w, h) => {
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#000"; ctx.fillRect(4, 4, 32, 32);
+      ctx.fillStyle = "#fff"; ctx.fillRect(8, 8, 24, 24);
+      ctx.fillStyle = "#000"; ctx.fillRect(12, 12, 16, 16);
+      ctx.fillStyle = "#fff"; ctx.fillRect(16, 16, 8, 8);
+    });
+    this.$poco.setResource('monoBitmap.bmp', 32, 32, (ctx, w, h) => {
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = "#000"; ctx.lineWidth = 1;
+      ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w / 2, h / 2); ctx.lineTo(w, 0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, h); ctx.lineTo(w / 2, h / 2); ctx.lineTo(w, h); ctx.stroke();
+    });
+    this.$poco.setResource('grayBitmap.bmp', 32, 32, (ctx, w, h) => {
+      const grad = ctx.createRadialGradient(w / 2, h / 2, 2, w / 2, h / 2, w / 2);
+      grad.addColorStop(0, "#fff");
+      grad.addColorStop(1, "#000");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+    });
+    this.$poco.setResource('circleMask.bmp', 40, 40, (ctx, w, h) => {
+      ctx.fillStyle = "#000"; ctx.fillRect(0, 0, w, h);
+      const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+      grad.addColorStop(0, "#fff");
+      grad.addColorStop(1, "#000");
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(w / 2, h / 2, w / 2, 0, Math.PI * 2); ctx.fill();
+    });
+    this.$poco.setResource('patternBitmap.bmp', 30, 30, (ctx, w, h) => {
+      const size = 10;
+      for (let r = 0; r < h; r += size)
+        for (let c = 0; c < w; c += size) {
+          ctx.fillStyle = ((r + c) / size % 2 === 0) ? "#000" : "#fff";
+          ctx.fillRect(c, r, size, size);
+        }
+    });
   }
 
   handleRun() {

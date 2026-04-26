@@ -177,10 +177,11 @@ export const demos = [
     run({ poco }) {
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
+      const gray   = poco.makeColor(180, 180, 180);
       poco.begin();
       poco.fillRectangle(white, 0, 0, poco.width, poco.height);
       poco.clip(20, 20, poco.width - 40, poco.height - 40);
-      poco.fillRectangle(black, 0, 0, poco.width, poco.height);
+      poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
       poco.clip(20, 20, 160, 100);
       poco.fillRectangle(black, 0, 0, poco.width, poco.height);
       poco.clip();

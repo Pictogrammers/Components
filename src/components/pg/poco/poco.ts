@@ -1,6 +1,6 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import { MockFont, MockPoco, MockResource, MockParseBMP, MockParseBMF } from './mockPoco';
+import { MockBitmap, MockPoco, MockResource, MockParseBMP, MockParseBMF } from './mockPoco';
 
 import template from './poco.html';
 import style from './poco.css';
@@ -40,5 +40,13 @@ export default class PgPoco extends HTMLElement {
 
   get parseBMF() {
     return MockParseBMF;
+  }
+
+  setResource(
+    fileName: string,
+    width: number,
+    height: number,
+    create: (ctx: CanvasRenderingContext2D, w: number, h: number) => void) {
+    MockResource.set(fileName, MockBitmap.create(width, height, create));
   }
 }

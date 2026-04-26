@@ -515,16 +515,28 @@ export class MockPoco {
   }
 }
 
-const resources = new Map<string, string>();
+const resources = new Map<string, MockBitmap>();
 
 export class MockResource {
-  constructor(file) {
+  static set(fileName: string, bitmap: MockBitmap) {
+    resources.set(fileName, bitmap);
+  }
 
+  #file;
+  constructor(fileName: string) {
+    if (!resources.has(fileName)) {
+      throw new Error(`Unknown mock resource "${fileName}". Add with Resource.set(fileName, MockBitmap.create()).`);
+    }
+    this.#file = fileName;
+  }
+
+  get mock() {
+    return resources.get(this.#file);
   }
 }
 
 export function MockParseBMP(buffer: any) {
-  return buffer;
+  return buffer.mock;
 }
 
 class MockBMFont {
