@@ -21,6 +21,8 @@ function dedent(str) {
   return lines.map(l => l.slice(minIndent)).join("\n").trim();
 }
 
+const trackTimers = new Map();
+
 @Component({
   selector: 'x-pg-poco-basic',
   template,
@@ -104,18 +106,50 @@ export default class XPgPocoBasic extends HTMLElement {
       const fn = new Function("sandbox", `with (sandbox) { ${code} }`);
       return fn.call(sandbox, sandbox);
     }
+    // Clear Existing Timers
+    trackTimers.forEach((id) => {
+      clearTimeout(id);
+    });
+    trackTimers.clear();
+    // Run Script in Isolation
     try {
       safeExec(this.$code.value, {
-        console,
+        trace: (message) => console.log(message),
         Math,
         poco,
         Resource: r2,
         parseBMP,
         parseBMF,
         Timer: {
-          set: (fn, delay, interval) => {
-            // todo: add delay support
-            setInterval(fn, interval);
+          set: (fn, delay, interval = 0) => {
+            if (delay <= 0 && interval <= 0) {
+              throw new Error('Invalid Timer.set(), delay > 0; interval > 0')
+            }
+            if (interval === 0) {
+                const id = setTimeout(() => {
+                  trackTimers.delete(id);
+                  fn();
+                }, delay);
+                trackTimers.set(id, id);
+                return id;
+            } else if (interval === delay) {
+              const id = setInterval(() => {
+                fn();
+              }, interval);
+              trackTimers.set(id, id);
+              return id;
+            }
+            const id = setTimeout(() => {
+              const id2 = setInterval(() => {
+                fn();
+              }, interval);
+              trackTimers.set(id, id2);
+            }, delay);
+            trackTimers.set(id, id);
+            return id;
+          },
+          clear: (id) => {
+            clearTimeout(trackTimers.get(id));
           }
         }
       });
