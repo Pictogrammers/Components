@@ -129,15 +129,31 @@ export class MockFont {
 }
 
 function drawToCanvas(bytes: Uint8Array, canvas: HTMLCanvasElement): void {
-  // PNG header: 8 bytes signature + 4 bytes length + 4 bytes "IHDR" + 4 bytes width + 4 bytes height
   const view = new DataView(bytes.buffer);
-  const width = view.getUint32(16, false);  // big-endian, offset 16
-  const height = view.getUint32(20, false); // big-endian, offset 20
+
+  const isPng = bytes[0] === 0x89 && bytes[1] === 0x50; // \x89P
+  const isBmp = bytes[0] === 0x42 && bytes[1] === 0x4d; // "BM"
+
+  let width: number;
+  let height: number;
+  let type: string;
+
+  if (isPng) {
+    width = view.getUint32(16, false); // big-endian
+    height = view.getUint32(20, false);
+    type = "image/png";
+  } else if (isBmp) {
+    width = view.getInt32(18, true);   // little-endian
+    height = Math.abs(view.getInt32(22, true)); // can be negative (top-down BMP)
+    type = "image/bmp";
+  } else {
+    throw new Error("Unsupported format");
+  }
 
   canvas.width = width;
   canvas.height = height;
 
-  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "image/png" });
+  const blob = new Blob([bytes.buffer as ArrayBuffer], { type });
   const url = URL.createObjectURL(blob);
   const img = new Image();
 
