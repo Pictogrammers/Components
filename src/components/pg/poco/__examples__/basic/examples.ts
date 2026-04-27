@@ -2,7 +2,7 @@ export const demos = [
   {
     label: "fillRectangle",
     detail: "poco.fillRectangle(color, x, y, w, h) — fills a solid rectangle.",
-    run({ poco }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
       poco.begin();
@@ -14,12 +14,12 @@ export const demos = [
           poco.fillRectangle(color, c * pw, r * ph, pw - 1, ph - 1);
         }
       poco.end();
-    }
+    `,
   },
   {
     label: "blendRectangle",
     detail: "poco.blendRectangle(color, blend, x, y, w, h) — blends color over background. blend 0=transparent, 255=opaque.",
-    run({ poco }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
       poco.begin();
@@ -31,12 +31,12 @@ export const demos = [
         poco.blendRectangle(black, blend, i * sw, 0, sw, poco.height);
       }
       poco.end();
-    }
+    `,
   },
   {
     label: "drawPixel",
     detail: "poco.drawPixel(color, x, y) — draws one pixel at a time.",
-    run({ poco }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
       poco.begin();
@@ -49,12 +49,12 @@ export const demos = [
         poco.drawPixel(black, x, y);
       }
       poco.end();
-    }
+    `,
   },
   {
     label: "drawBitmap",
     detail: "poco.drawBitmap(bits, x, y [,sx,sy,sw,sh]) — draws a full or partial bitmap.",
-    run({ poco, parseBMP, Resource }) {
+    run: `
       const white = poco.makeColor(255, 255, 255);
       const colorBitmap = parseBMP(new Resource("colorBitmap.bmp"));
       poco.begin();
@@ -64,28 +64,28 @@ export const demos = [
       for (let x = 0; x < poco.width; x += 42)
         poco.drawBitmap(colorBitmap, x, poco.height - 42);
       poco.end();
-    }
+    `,
   },
   {
     label: "drawMonochrome",
     detail: "poco.drawMonochrome(bits, fore, back, x, y) — draws 1-bit bitmap with explicit fore/back colors (undefined = skip that layer).",
-    run({ poco, parseBMP, Resource }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
       const monoBitmap = parseBMP(new Resource("monoBitmap.bmp"));
       poco.begin();
       poco.fillRectangle(black, 0, 0, poco.width, poco.height);
-      poco.drawMonochrome(monoBitmap, black, white,     10,  10);
-      poco.drawMonochrome(monoBitmap, black, undefined, 60,  10);
+      poco.drawMonochrome(monoBitmap, black, white, 10, 10);
+      poco.drawMonochrome(monoBitmap, black, undefined, 60, 10);
       poco.drawMonochrome(monoBitmap, undefined, black, 110, 10);
-      poco.drawMonochrome(monoBitmap, white, black,     160, 10);
+      poco.drawMonochrome(monoBitmap, white, black, 160, 10);
       poco.end();
-    }
+    `,
   },
   {
     label: "drawGray",
     detail: "poco.drawGray(bits, color, x, y [,sx,sy,sw,sh,blend]) — pixel brightness as alpha, blending color onto background.",
-    run({ poco, parseBMP, Resource }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
       const grayBitmap = parseBMP(new Resource("grayBitmap.bmp"));
@@ -101,42 +101,42 @@ export const demos = [
         poco.drawGray(grayBitmap, white, 10 + i * 75, 114, 0, 0, 32, 32, blend);
       }
       poco.end();
-    }
+    `,
   },
   {
     label: "drawMasked",
     detail: "poco.drawMasked(bits, x, y, sx, sy, sw, sh, mask, msx, msy [,blend]) — alpha-blends a bitmap through a gray-16 mask.",
-    run({ poco, parseBMP, Resource }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
       const colorBitmap = parseBMP(new Resource("colorBitmap.bmp"));
       const circleMask = parseBMP(new Resource("circleMask.bmp"));
       poco.begin();
       poco.fillRectangle(white, 0, 0, poco.width, poco.height);
-      poco.drawMasked(colorBitmap, 10,  10, 0, 0, 40, 40, circleMask, 0, 0);
-      poco.drawMasked(colorBitmap, 60,  10, 0, 0, 40, 40, circleMask, 0, 0, 128);
+      poco.drawMasked(colorBitmap, 10, 10, 0, 0, 40, 40, circleMask, 0, 0);
+      poco.drawMasked(colorBitmap, 60, 10, 0, 0, 40, 40, circleMask, 0, 0, 128);
       poco.drawMasked(colorBitmap, 110, 10, 0, 0, 40, 40, circleMask, 0, 0, 64);
       poco.fillRectangle(black, 0, 80, poco.width, 80);
       poco.drawMasked(colorBitmap, 10, 90, 0, 0, 40, 40, circleMask, 0, 0);
       poco.drawMasked(colorBitmap, 60, 90, 0, 0, 40, 40, circleMask, 0, 0, 180);
       poco.end();
-    }
+    `,
   },
   {
     label: "fillPattern",
     detail: "poco.fillPattern(bits, x, y, w, h [,sx,sy,sw,sh]) — tiles a bitmap region to fill an area.",
-    run({ poco, parseBMP, Resource }) {
+    run: `
       const patternBitmap = parseBMP(new Resource("patternBitmap.bmp"));
       poco.begin();
       poco.fillPattern(patternBitmap, 0, 0, poco.width, poco.height);
       poco.fillPattern(patternBitmap, 100, 60, 200, 120, 10, 10, 10, 10);
       poco.end();
-    }
+    `,
   },
   {
     label: "drawText",
     detail: "poco.drawText(text, font, color, x, y [,width]) — draws text using MyFont bitmap font; optional width truncates with '…'.",
-    run({ poco, parseBMF, parseBMP, Resource }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
       const myFont = parseBMF(new Resource("myFont.fnt"));
@@ -149,12 +149,12 @@ export const demos = [
       poco.drawText("This text is too long to fit without truncation.", myFont, black, 10, 90, 195);
       poco.drawText("Full width fits fine.", myFont, black, 10, 90 + myFont.height + 4, poco.width - 20);
       poco.end();
-    }
+    `,
   },
   {
     label: "getTextWidth",
     detail: "poco.getTextWidth(text, font) — measures pixel width using MyFont glyph metrics; used here to center and right-align strings.",
-    run({ poco, parseBMF, parseBMP, Resource }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const myFont = parseBMF(new Resource("myFont.fnt"));
       myFont.bitmap = parseBMP(new Resource("myFont.bmp"));
@@ -175,15 +175,15 @@ export const demos = [
       const brW = poco.getTextWidth("Bottom Right", myFont);
       poco.drawText("Bottom Right", myFont, black, poco.width - 4 - brW, poco.height - 4 - myFont.height);
       poco.end();
-    }
+    `,
   },
   {
     label: "clip",
     detail: "poco.clip(x,y,w,h) / poco.clip() — push/pop intersecting clip rectangles.",
-    run({ poco }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
-      const gray   = poco.makeColor(180, 180, 180);
+      const gray = poco.makeColor(180, 180, 180);
       poco.begin();
       poco.fillRectangle(white, 0, 0, poco.width, poco.height);
       poco.clip(20, 20, poco.width - 40, poco.height - 40);
@@ -195,12 +195,12 @@ export const demos = [
       poco.clip();
       poco.fillRectangle(black, 0, 0, 18, poco.height);
       poco.end();
-    }
+    `,
   },
   {
     label: "origin",
     detail: "poco.origin(x,y) / poco.origin() — push/pop drawing origin offsets.",
-    run({ poco }) {
+    run: `
       const black = poco.makeColor(0, 0, 0);
       const white = poco.makeColor(255, 255, 255);
       poco.begin();
@@ -216,13 +216,13 @@ export const demos = [
       poco.origin();
       poco.fillRectangle(black, poco.width - 20, poco.height - 20, 20, 20);
       poco.end();
-    }
+    `,
   },
   // ToDo: support resizing images if someone requests this feature
   // {
   //   label: "drawFrame",
   //   detail: "poco.drawFrame(frame, {width, height}, x, y) — renders a ColorCell compressed image (placeholder in this mock).",
-  //   run({ poco }) {
+  //   run: `
   //     const white = poco.makeColor(255, 255, 255);
   //     poco.begin();
   //     poco.fillRectangle(white, 0, 0, poco.width, poco.height);
@@ -230,12 +230,12 @@ export const demos = [
   //     poco.drawFrame(null, { width: 120, height: 80 }, 110, 10);
   //     poco.drawFrame(null, { width: 50,  height: 50 }, 10,  80);
   //     poco.end();
-  //   }
+  //   `,
   // },
   {
     label: "drawCharmander",
     detail: "animates a charmander with 107 sprites",
-    run({ poco, parseBMP, Resource, Timer }) {
+    run: `
       const white = poco.makeColor(200, 255, 255);
       const charmander = parseBMP(new Resource("charmander.bmp"));
       poco.begin();
@@ -253,6 +253,6 @@ export const demos = [
         poco.drawBitmap(charmander, 10, 10, sx, sy, 42, 42);
         poco.end();
       }, 40, 40);
-    }
+    `,
   },
 ];

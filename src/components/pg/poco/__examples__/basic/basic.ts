@@ -6,13 +6,6 @@ import { demos } from './examples';
 import template from './basic.html';
 import { mockCharmanderBMP, mockMyFont, mockMyFontBMP } from './myFont';
 
-function extractBody(fn) {
-  const src = fn.toString();
-  // Strip the "run() {" header and the closing "}"
-  const inner = src.replace(/^run\s*\(\s*[^\)]+\)\s*\{/, "").replace(/\}$/, "");
-  return dedent(inner);
-}
-
 function dedent(str) {
   const lines = str.split("\n");
   const nonEmpty = lines.filter(l => l.trim().length > 0);
@@ -38,11 +31,11 @@ export default class XPgPocoBasic extends HTMLElement {
       this.$list.add(newOption);
     });
     this.$list.addEventListener('change', (e: any) => {
-      this.$code.value = extractBody(demos[e.target.value].run);
+      this.$code.value = dedent(demos[e.target.value].run);
     });
     this.$poco.height = 400;
     this.$poco.height = 240;
-    this.$code.value = extractBody(demos[0].run);
+    this.$code.value = dedent(demos[0].run);
     this.$run.addEventListener('click', this.handleRun.bind(this));
     this.$error.style.display = 'none';
     // Resources
