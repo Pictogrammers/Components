@@ -21,8 +21,6 @@ function dedent(str) {
   return lines.map(l => l.slice(minIndent)).join("\n").trim();
 }
 
-const trackTimers = new Map();
-
 @Component({
   selector: 'x-pg-poco-basic',
   template,
@@ -90,73 +88,15 @@ export default class XPgPocoBasic extends HTMLElement {
     // Resources - Font
     this.$poco.setResourceBMP('myFont.png', mockMyFontBMP);
     this.$poco.setResourceBMFJSON('myFont.fnt', mockMyFont);
+    // Error handler
+    this.$poco.addEventListener('error', (e: any) => {
+      this.$error.textContent = e.detail.message;
+      this.$error.style.display = "block";
+    });
   }
 
   handleRun() {
-    const { poco, Resource: r2, parseBMP, parseBMF } = this.$poco;
-    function safeExec(code, globals = {}) {
-      const sandbox = new Proxy(globals, {
-        has() { return true; },
-        get(target, key) {
-          if (key in target) return target[key];
-          return undefined;
-        }
-      });
-
-      const fn = new Function("sandbox", `with (sandbox) { ${code} }`);
-      return fn.call(sandbox, sandbox);
-    }
-    // Clear Existing Timers
-    trackTimers.forEach((id) => {
-      clearTimeout(id);
-    });
-    trackTimers.clear();
-    // Run Script in Isolation
-    try {
-      safeExec(this.$code.value, {
-        trace: (message) => console.log(message),
-        Math,
-        poco,
-        Resource: r2,
-        parseBMP,
-        parseBMF,
-        Timer: {
-          set: (fn, delay, interval = 0) => {
-            if (delay <= 0 && interval <= 0) {
-              throw new Error('Invalid Timer.set(), delay > 0; interval > 0')
-            }
-            if (interval === 0) {
-                const id = setTimeout(() => {
-                  trackTimers.delete(id);
-                  fn();
-                }, delay);
-                trackTimers.set(id, id);
-                return id;
-            } else if (interval === delay) {
-              const id = setInterval(() => {
-                fn();
-              }, interval);
-              trackTimers.set(id, id);
-              return id;
-            }
-            const id = setTimeout(() => {
-              const id2 = setInterval(() => {
-                fn();
-              }, interval);
-              trackTimers.set(id, id2);
-            }, delay);
-            trackTimers.set(id, id);
-            return id;
-          },
-          clear: (id) => {
-            clearTimeout(trackTimers.get(id));
-          }
-        }
-      });
-    } catch (e: any) {
-      this.$error.textContent = e.message;
-      this.$error.style.display = "block";
-      throw e;
-    }
+    this.$error.style.display = "none";
+    this.$poco.run(this.$code.value);
   }
 }

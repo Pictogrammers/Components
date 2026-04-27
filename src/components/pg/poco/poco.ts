@@ -14,10 +14,12 @@ import { FntFont } from '@pictogrammers/fnt/dist/shared';
 export default class PgPoco extends HTMLElement {
   @Prop() width: number = 400;
   @Prop() height: number = 240;
+  @Prop() supressErrors: boolean = false;
 
   @Part() $canvas: HTMLCanvasElement;
 
   #poco: MockPoco;
+  #trackTimers: Map<number, number> = new Map();
 
   connectedCallback() {
     this.$canvas.width = this.width;
@@ -71,5 +73,78 @@ export default class PgPoco extends HTMLElement {
     json: FntFont,
   ) {
     MockResource.setBMFJSON(fileName, json);
+  }
+
+  run(script: string) {
+    function safeExec(code, globals = {}) {
+      const sandbox = new Proxy(globals, {
+        has() { return true; },
+        get(target, key) {
+          if (key in target) return target[key];
+          return undefined;
+        }
+      });
+
+      const fn = new Function("sandbox", `with (sandbox) { ${code} }`);
+      return fn.call(sandbox, sandbox);
+    }
+    // Clear Existing Timers
+    this.#trackTimers.forEach((id) => {
+      clearTimeout(id);
+    });
+    this.#trackTimers.clear();
+    // Run Script in Isolation
+    try {
+      safeExec(script, {
+        trace: (message) => console.log(message),
+        Math,
+        poco: this.#poco,
+        Resource: MockResource,
+        parseBMP: MockParseBMP,
+        parseBMF: MockParseBMF,
+        Timer: {
+          set: (fn, delay, interval = 0) => {
+            if (delay <= 0 && interval <= 0) {
+              throw new Error('Invalid Timer.set(), delay > 0; interval > 0')
+            }
+            if (interval === 0) {
+                const id = window.setTimeout(() => {
+                  this.#trackTimers.delete(id);
+                  fn();
+                }, delay);
+                this.#trackTimers.set(id, id);
+                return id;
+            } else if (interval === delay) {
+              const id = window.setInterval(() => {
+                fn();
+              }, interval);
+              this.#trackTimers.set(id, id);
+              return id;
+            }
+            const id = window.setTimeout(() => {
+              const id2 = window.setInterval(() => {
+                fn();
+              }, interval);
+              this.#trackTimers.set(id, id2);
+            }, delay);
+            this.#trackTimers.set(id, id);
+            return id;
+          },
+          clear: (id) => {
+            clearTimeout(this.#trackTimers.get(id));
+          }
+        },
+      });
+    } catch (e: any) {
+      const { message } = e;
+      this.dispatchEvent(new CustomEvent('error', {
+        detail: {
+          message,
+        }
+      }));
+      if (this.supressErrors) {
+        throw e;
+      }
+    }
   }
 }
