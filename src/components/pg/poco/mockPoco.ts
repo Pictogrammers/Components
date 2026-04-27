@@ -129,13 +129,19 @@ export class MockFont {
 }
 
 function drawToCanvas(bytes: Uint8Array, canvas: HTMLCanvasElement): void {
+  // PNG header: 8 bytes signature + 4 bytes length + 4 bytes "IHDR" + 4 bytes width + 4 bytes height
+  const view = new DataView(bytes.buffer);
+  const width = view.getUint32(16, false);  // big-endian, offset 16
+  const height = view.getUint32(20, false); // big-endian, offset 20
+
+  canvas.width = width;
+  canvas.height = height;
+
   const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "image/png" });
   const url = URL.createObjectURL(blob);
   const img = new Image();
 
   img.onload = () => {
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
     canvas.getContext("2d")!.drawImage(img, 0, 0);
     URL.revokeObjectURL(url);
   };
@@ -559,7 +565,7 @@ export class MockPoco {
     this.ctx.fillStyle = 'rgb(200,200,200)';
     this.ctx.fillRect(this._originX + x + 1, this._originY + y + 1, w - 2, h - 2);
     this.ctx.fillStyle = 'rgb(0,0,0)';
-    this.ctx.font = '10px sans-serif';
+    this.ctx.font = '10px myFont';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText('frame', this._originX + x + 4, this._originY + y + h / 2);
     this.ctx.restore();

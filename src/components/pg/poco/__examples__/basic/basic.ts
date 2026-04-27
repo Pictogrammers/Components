@@ -4,7 +4,7 @@ import PgPoco from '../../poco';
 import { demos } from './examples';
 
 import template from './basic.html';
-import { mockMyFont, mockMyFontBMP } from './myFont';
+import { mockCharmanderBMP, mockMyFont, mockMyFontBMP } from './myFont';
 
 function extractBody(fn) {
   const src = fn.toString();
@@ -83,6 +83,8 @@ export default class XPgPocoBasic extends HTMLElement {
           ctx.fillRect(c, r, size, size);
         }
     });
+    // Charmander
+    this.$poco.setResourceBMP('charmander.png', mockCharmanderBMP);
     // Resources - Font
     this.$poco.setResourceBMP('myFont.png', mockMyFontBMP);
     this.$poco.setResourceBMFJSON('myFont.fnt', mockMyFont);
@@ -110,6 +112,12 @@ export default class XPgPocoBasic extends HTMLElement {
         Resource: r2,
         parseBMP,
         parseBMF,
+        Timer: {
+          set: (fn, delay, interval) => {
+            // todo: add delay support
+            setInterval(fn, interval);
+          }
+        }
       });
     } catch (e: any) {
       this.$error.textContent = e.message;

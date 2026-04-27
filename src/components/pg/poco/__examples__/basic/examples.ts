@@ -232,4 +232,27 @@ export const demos = [
   //     poco.end();
   //   }
   // },
+  {
+    label: "drawCharmander",
+    detail: "animates a charmander with 107 sprites",
+    run({ poco, parseBMP, Resource, Timer }) {
+      const white = poco.makeColor(200, 255, 255);
+      const charmander = parseBMP(new Resource("charmander.bmp"));
+      poco.begin();
+      poco.fillRectangle(white, 0, 0, poco.width, poco.height);
+      poco.drawBitmap(charmander, 10, 60);
+      poco.end();
+      let i = 0;
+      Timer.set(() => {
+        if (++i === 107) { i = 0; }
+        poco.begin();
+        poco.fillRectangle(white, 10, 10, 42, 42);
+        // src, x, y, sx, sy, sw, sh
+        const sx = (i % 10) * 42;
+        const sy = Math.floor((i / 10)) * 42;
+        poco.drawBitmap(charmander, 10, 10, sx, sy, 42, 42);
+        poco.end();
+      }, 40, 40);
+    }
+  },
 ];
