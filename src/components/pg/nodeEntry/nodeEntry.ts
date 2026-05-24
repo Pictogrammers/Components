@@ -1,20 +1,17 @@
 import { Component, Prop, Part, forEach } from '@pictogrammers/element';
 
-import PgNodeEditorText from '../nodeEditorText/nodeEditorText';
-
-import template from './node.html';
-import style from './node.css';
+import template from './nodeEntry.html';
+import style from './nodeEntry.css';
 
 @Component({
-  selector: 'pg-node',
+  selector: 'pg-node-entry',
   style,
   template,
 })
-export default class PgNode extends HTMLElement {
+export default class PgNodeEntry extends HTMLElement {
   @Prop() x: number = 0;
   @Prop() y: number = 0;
   @Prop() node: number = 0;
-  @Prop() fields: any = [];
   // output pins
   @Prop() nodes: any = [];
 
@@ -23,14 +20,6 @@ export default class PgNode extends HTMLElement {
   @Part() $header: HTMLDivElement;
 
   connectedCallback() {
-    forEach({
-      container: this.$items,
-      items: this.fields,
-      type: (item) => PgNodeEditorText,
-      create: ($item, item) => {
-
-      },
-    });
     this.$header.addEventListener('click', this.#handleSelect.bind(this));
   }
 
@@ -39,7 +28,7 @@ export default class PgNode extends HTMLElement {
       this.nodes.forEach(({ key, label }: any) => {
         this.dispatchEvent(new CustomEvent('registernode', {
           detail: {
-            node: this.node,
+            node: `${this.node}`,
             key,
             label,
           }

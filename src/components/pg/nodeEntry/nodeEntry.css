@@ -14,7 +14,7 @@
 [part=node] {
   position: absolute;
   box-sizing: border-box;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(50, 162, 48, 0.5);
   border-radius: 0.25rem;
   background: #1D1D1D;
   color: #FFF;
@@ -24,5 +24,5 @@
 }
 
 [part=node]:hover {
-  border-color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(50, 162, 48, 0.75);
 }

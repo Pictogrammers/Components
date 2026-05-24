@@ -1,16 +1,14 @@
-# `<pg-nodes>`
+# `<pg-node-entry>`
 
-The `pg-nodes` component allows creating and linking `PgNode` extended data types.
-
-> If a `type` is omitted a `fields` property is required. See below for details.
+The `pg-node-entry` component is used for the entry node.
 
 ```typescript
-import '@pictogrammers/components/pgNodes';
-import { PgNodes } from '@pictogrammers/components/pgNodes';
+import '@pictogrammers/components/pgNodeEntry';
+import { PgNodeEntry } from '@pictogrammers/components/pgNodeEntry';
 ```
 
 ```html
-<pg-nodes></pg-nodes>
+<pg-node-entry></pg-node-entry>
 ```
 
 ## Attributes

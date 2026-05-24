@@ -10,21 +10,21 @@ label {
 }
 
 [part=label] {
-  font-size: 0.75rem;
-  line-height: 0.75rem;
-  padding-block-end: 0.25rem;
+  font-size: 0.625rem;
+  line-height: 0.875rem;
   padding-inline: 0.25rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 [part=input] {
   border: 0;
-  border-radius: 0.125rem;
+  border-radius: 0;
   padding-inline-start: 0.25rem;
   padding-inline-end: 0.25rem;
   padding-block-start: 0;
   padding-block-end: 0;
   font-family: var(--pg-input-text-font-family, var(--pg-font-family));
-  font-size: 1rem;
+  font-size: 0.875rem;
   outline: none;
   field-sizing: content;
   min-width: calc(
@@ -45,5 +45,5 @@ label {
   box-shadow: 0 0 0 3px var(--pg-input-text-active-glow, rgb(79, 143, 249, 0.6));
 }
 [part=input]:focus {
-  box-shadow: 0 0 0 3px var(--pg-input-text-focus-glow, rgb(79, 143, 249, 0.5));
+  box-shadow: 0 0 0 2px var(--pg-input-text-focus-glow, rgb(79, 143, 249, 0.75));
 }
