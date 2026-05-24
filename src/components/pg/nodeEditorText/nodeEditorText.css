@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  font-family: var(--pg-font-family, system-ui);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  padding-inline: 0.25rem;
+}
+
+[part=label] {
+  font-size: 0.75rem;
+  line-height: 0.75rem;
+  padding-block-end: 0.25rem;
+  padding-inline: 0.25rem;
+}
+
+[part=input] {
+  border: 0;
+  border-radius: 0.125rem;
+  padding-inline-start: 0.25rem;
+  padding-inline-end: 0.25rem;
+  padding-block-start: 0;
+  padding-block-end: 0;
+  font-family: var(--pg-input-text-font-family, var(--pg-font-family));
+  font-size: 1rem;
+  outline: none;
+  field-sizing: content;
+  min-width: calc(
+    100%
+    - var(--pg-input-text-padding-inline-start, var(--pg-input-text-padding-inline, 0.5rem))
+    - var(--pg-input-text-padding-inline-end, var(--pg-input-text-padding-inline, 0.5rem))
+    - 2px
+  );
+  background-color: #2B2B2B;
+  color: #FFF;
+}
+
+[part=input]:read-only {
+  border-color: transparent;
+}
+
+[part=input]:active {
+  box-shadow: 0 0 0 3px var(--pg-input-text-active-glow, rgb(79, 143, 249, 0.6));
+}
+[part=input]:focus {
+  box-shadow: 0 0 0 3px var(--pg-input-text-focus-glow, rgb(79, 143, 249, 0.5));
+}

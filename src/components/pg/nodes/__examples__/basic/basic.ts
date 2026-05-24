@@ -7,7 +7,7 @@ import template from './basic.html';
   selector: 'x-pg-nodes-basic',
   template,
 })
-export default class XPgInputNodesBasic extends HTMLElement {
+export default class XPgNodesBasic extends HTMLElement {
 
   @Part() $nodes: PgNodes;
 
@@ -17,8 +17,9 @@ export default class XPgInputNodesBasic extends HTMLElement {
       y: 2,
       fields: [{
         label: 'Name',
-        value: '10'
-      }]
+        value: 'Foo',
+        type: 'Text',
+      }],
     });
     this.$nodes.addEventListener('change', this.#handleChange.bind(this));
     this.$nodes.addEventListener('input', this.#handleInput.bind(this));

@@ -1,4 +1,6 @@
-import { Component, Prop, Part } from '@pictogrammers/element';
+import { Component, Prop, Part, forEach } from '@pictogrammers/element';
+
+import PgNode from '../node/node';
 
 import template from './nodes.html';
 import style from './nodes.css';
@@ -11,10 +13,17 @@ import style from './nodes.css';
 export default class PgNodes extends HTMLElement {
   @Prop() items: any = [];
 
-  @Part() $canvas: HTMLDivElement;
+  @Part() $items: HTMLDivElement;
 
   connectedCallback() {
+    forEach({
+      container: this.$items,
+      items: this.items,
+      type: (item) => PgNode,
+      create: ($item, item) => {
 
+      },
+    });
   }
 
   render(changes: any) {
