@@ -24,3 +24,11 @@
   width: 1rem;
   height: 1rem;
 }
+
+[part=svg] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60rem;
+  height: 40rem;
+}
