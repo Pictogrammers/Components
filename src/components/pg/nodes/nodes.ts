@@ -87,7 +87,7 @@ export default class PgNodes extends HTMLElement {
       create: ($item, item) => {
         this.#nextNodeId = Math.max(item.node, this.#nextNodeId) + 1;
         console.log('create', item.node);
-        connector.setNode(`${item.node}`, item.x * 16, item.y * 16, 192, 128);
+        connector.setNode(`${item.node}`, item.x * 16, item.y * 16, 192, 64);
         if (item.node !== 0) {
           connector.setInputPin(`${item.node}`, 'in', 16);
         }
