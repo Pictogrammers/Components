@@ -27,8 +27,17 @@
 
 [part=svg] {
   position: absolute;
+  pointer-events: none;
   top: 0;
   left: 0;
   width: 60rem;
   height: 40rem;
+}
+
+[part=svg] path {
+  pointer-events: stroke;
+}
+
+[part=svg] circle {
+  pointer-events: all;
 }

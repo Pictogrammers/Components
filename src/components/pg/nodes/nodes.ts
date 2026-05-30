@@ -19,8 +19,17 @@ export default class PgNodes extends HTMLElement {
   @Part() $items: HTMLDivElement;
   @Part() $forceScroll: HTMLDivElement;
 
+  #connector: NodeConnector | null = null;
+  #nodePinCounts = new Map<string, number>();
+
   connectedCallback() {
     const connector = new NodeConnector(this.$svg);
+    this.#connector = connector;
+
+    connector.on('change', (change) => {
+      console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
+    });
+
     forEach({
       container: this.$items,
       items: this.items,
@@ -30,7 +39,7 @@ export default class PgNodes extends HTMLElement {
         if (item.node !== 0) {
           connector.setInputPin(`${item.node}`, 'in', 16);
         }
-        connector.setOutputPin(`${item.node}`, 'out', 16);
+        connector.setOutputPin(`${item.node}`, 'nodes', 16);
         $item.addEventListener('registernode', this.#registerNode.bind(this));
       },
     });
@@ -41,6 +50,10 @@ export default class PgNodes extends HTMLElement {
   }
 
   #registerNode(e: any) {
-    console.log(e.detail.node, e.detail.label);
+    if (!this.#connector) return;
+    const { node, key } = e.detail;
+    const nodeId = `${node}`;
+    const index = this.#nodePinCounts.get(nodeId) ?? 0;
+    this.#nodePinCounts.set(nodeId, index + 1);
   }
 }
