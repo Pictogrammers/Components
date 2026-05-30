@@ -28,3 +28,7 @@
 [part=node]:hover {
   border-color: rgba(255, 255, 255, 0.75);
 }
+
+[part=node].selected {
+  border-color: blue;
+}
