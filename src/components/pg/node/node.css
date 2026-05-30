@@ -30,5 +30,6 @@
 }
 
 [part=node].selected {
-  border-color: blue;
+  outline: 2px solid #248BE5;
+  outline-offset: 2px;
 }

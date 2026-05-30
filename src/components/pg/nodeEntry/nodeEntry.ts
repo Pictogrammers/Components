@@ -50,4 +50,12 @@ export default class PgNodeEntry extends HTMLElement {
       }
     }));
   }
+
+  select() {
+    this.$node.classList.toggle('selected', true);
+  }
+
+  deselect() {
+    this.$node.classList.toggle('selected', false);
+  }
 }

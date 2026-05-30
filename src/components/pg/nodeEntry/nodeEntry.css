@@ -43,3 +43,8 @@ textarea:focus {
   box-shadow: 0 0 0 2px var(--pg-input-text-focus-glow, rgb(79, 143, 249, 0.75));
   outline: 0;
 }
+
+[part=node].selected {
+  outline: 2px solid #248BE5;
+  outline-offset: 2px;
+}
