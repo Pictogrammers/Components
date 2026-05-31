@@ -32,6 +32,8 @@ export default class PgNode extends HTMLElement {
       },
     });
     this.$header.addEventListener('click', this.#handleSelect.bind(this));
+    this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
+    this.$node.addEventListener('pointerout', this.#handlePointerOut.bind(this));
   }
 
   render(changes: any) {
@@ -60,6 +62,14 @@ export default class PgNode extends HTMLElement {
         nodeId: `${this.node}`,
       }
     }));
+  }
+
+  #handlePointerOver(e: any) {
+    this.$node.classList.toggle('resize', true);
+  }
+
+  #handlePointerOut(e: any) {
+    this.$node.classList.toggle('resize', false);
   }
 
   select() {
