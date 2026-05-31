@@ -1,0 +1,52 @@
+:host {
+  display: contents;
+}
+
+[part=northWest] {
+  border-top-left-radius: 0.5rem;
+  border-top: 2px solid red;
+  border-left: 2px solid red;
+  width: 0.5rem;
+  height: 0.5rem;
+}
+[part=north] {
+  border-top: 2px solid red;
+  width: 0.5rem;
+  height: 0.5rem;
+}
+[part=northEast] {
+  border-top-right-radius: 0.5rem;
+  border-top: 2px solid red;
+  border-right: 2px solid red;
+  width: 0.5rem;
+  height: 0.5rem;
+}
+[part=west] {
+  border-left: 2px solid red;
+  width: 0.5rem;
+  height: 0.5rem;
+}
+[part=east] {
+  border-right: 2px solid red;
+  width: 0.5rem;
+  height: 0.5rem;
+}
+[part=southWest] {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom: 2px solid red;
+  border-left: 2px solid red;
+  width: 0.5rem;
+  height: 0.5rem;
+}
+[part=south] {
+  border-bottom: 2px solid red;
+  width: 0.5rem;
+  height: 0.5rem;
+}
+[part=southEast] {
+  border-bottom-right-radius: 0.5rem;
+  border-bottom: 2px solid red;
+  border-right: 2px solid red;
+  width: 0.5rem;
+  height: 0.5rem;
+}
