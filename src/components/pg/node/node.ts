@@ -5,6 +5,8 @@ import PgNodeEditorText from '../nodeEditorText/nodeEditorText';
 import template from './node.html';
 import style from './node.css';
 
+const ANCHOR_NAME = '--node-resize-anchor';
+
 @Component({
   selector: 'pg-node',
   style,
@@ -33,7 +35,6 @@ export default class PgNode extends HTMLElement {
     });
     this.$header.addEventListener('click', this.#handleSelect.bind(this));
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
-    this.$node.addEventListener('pointerout', this.#handlePointerOut.bind(this));
   }
 
   render(changes: any) {
@@ -49,10 +50,10 @@ export default class PgNode extends HTMLElement {
       });
     }
     if (changes.x) {
-      this.$node.style.setProperty('left', `${this.x}rem`);
+      this.style.setProperty('left', `${this.x}rem`);
     }
     if (changes.y) {
-      this.$node.style.setProperty('top', `${this.y}rem`);
+      this.style.setProperty('top', `${this.y}rem`);
     }
   }
 
@@ -64,12 +65,25 @@ export default class PgNode extends HTMLElement {
     }));
   }
 
+  #resizeElement;
   #handlePointerOver(e: any) {
+    if (this.#resizeElement) {
+      this.#resizeElement.style.visibility = 'visible';
+      return;
+    }
+    // @ts-ignore
+    this.$node.style.anchorName = ANCHOR_NAME;
+    const ele = document.createElement('pg-node-resize');
+    ele.addEventListener('pointerout', this.#handlePointerOut.bind(this));
+    ele.style.setProperty('position-anchor', ANCHOR_NAME);
+    this.shadowRoot?.appendChild(ele);
+    this.#resizeElement = ele;
     this.$node.classList.toggle('resize', true);
   }
 
   #handlePointerOut(e: any) {
     this.$node.classList.toggle('resize', false);
+    this.#resizeElement.style.visibility = 'hidden';
   }
 
   select() {
