@@ -25,13 +25,17 @@ export default class PgNodeResize extends HTMLElement {
   connectedCallback() {
     drag({
       source: this.$northWest,
-      start(dx, dy) {
+      gridSize: this.gridSize,
+      start: (dx, dy) => {
         console.log(dx, dy);
       },
-      move(dx, dy) {
-        console.log(dx, dy);
+      move: (dx, dy) => {
+        console.log('move', dx, dy);
       },
-      end(dx, dy, complete) {
+      snap: (dx, dy) => {
+        console.log('snap', dx, dy);
+      },
+      end: (dx, dy, complete) => {
         console.log(dx, dy, complete);
       },
     });
