@@ -1,9 +1,10 @@
 :host {
-  position: fixed;
+  position: absolute;
   display: grid;
-  position-area: center;
-  width: calc(anchor-size(width) + 0.5rem);
-  height: calc(anchor-size(height) + 0.5rem);
+  width: calc(anchor-size(width) + 0.5rem + var(--node-resize-delta-width, 0px));
+  height: calc(anchor-size(height) + 0.5rem + var(--node-resize-delta-height, 0px));
+  top: calc(anchor(top) - 0.25rem + var(--node-resize-delta-y, 0px));
+  left: calc(anchor(left) - 0.25rem + var(--node-resize-delta-x, 0px));
   border: 0;
   background: transparent;
   --resize-radius: 0.25rem;

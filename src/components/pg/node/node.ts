@@ -4,6 +4,7 @@ import PgNodeEditorText from '../nodeEditorText/nodeEditorText';
 
 import template from './node.html';
 import style from './node.css';
+import PgNodeResize from '../nodeResize/nodeResize';
 
 const ANCHOR_NAME = '--node-resize-anchor';
 
@@ -15,6 +16,8 @@ const ANCHOR_NAME = '--node-resize-anchor';
 export default class PgNode extends HTMLElement {
   @Prop() x: number = 0;
   @Prop() y: number = 0;
+  @Prop() width: number = 12;
+  @Prop() height: number = 3;
   @Prop() node: number = 0;
   @Prop() fields: any = [];
   // output pins
@@ -73,9 +76,21 @@ export default class PgNode extends HTMLElement {
     }
     // @ts-ignore
     this.$node.style.anchorName = ANCHOR_NAME;
-    const ele = document.createElement('pg-node-resize');
+    const ele = document.createElement('pg-node-resize') as PgNodeResize;
     ele.addEventListener('pointerout', this.#handlePointerOut.bind(this));
     ele.style.setProperty('position-anchor', ANCHOR_NAME);
+    ele.x = this.x;
+    ele.y = this.y;
+    ele.width = this.width;
+    ele.height = this.height;
+    ele.addEventListener('change', (e: any) => {
+      const { x, y, width, height } = e.detail;
+      console.log(x, y, width, height);
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+    });
     this.shadowRoot?.appendChild(ele);
     this.#resizeElement = ele;
     this.$node.classList.toggle('resize', true);

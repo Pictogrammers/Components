@@ -90,10 +90,6 @@ export default class PgNodes extends HTMLElement {
             label: 'Add Node',
             value: 'addNode',
             type: PgMenuItem,
-          }, {
-            label: 'Delete Node',
-            value: 'deleteNode',
-            type: PgMenuItem,
           }],
         });
         if (!result) { return; }

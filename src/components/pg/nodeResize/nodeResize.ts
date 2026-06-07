@@ -12,6 +12,12 @@ import { drag } from './dragUtil';
 export default class PgNodeResize extends HTMLElement {
 
   @Prop() gridSize: number = 16;
+  @Prop() x: number = 0;
+  @Prop() y: number = 0;
+  @Prop() width: number = 12;
+  @Prop() height: number = 3;
+  @Prop() minWidth: number = 12;
+  @Prop() minHeight: number = 3;
 
   @Part() $northWest: HTMLDivElement;
   @Part() $north: HTMLDivElement;
@@ -23,25 +29,108 @@ export default class PgNodeResize extends HTMLElement {
   @Part() $southEast: HTMLDivElement;
 
   connectedCallback() {
+    let startX = 0,
+      startY = 0,
+      startWidth = 12,
+      startHeight = 3;
+    const start = () => {
+      startX = this.x;
+      startY = this.y;
+      startWidth = this.width;
+      startHeight = this.height;
+    };
     drag({
       source: this.$northWest,
       gridSize: this.gridSize,
-      start: (dx, dy) => {
-        console.log(dx, dy);
-      },
+      start,
       move: (dx, dy) => {
-        console.log('move', dx, dy);
+        this.previewX(dx);
+        this.previewY(dy);
+        this.previewWidth(dx * -1);
+        this.previewHeight(dy * -1);
       },
       snap: (dx, dy) => {
-        console.log('snap', dx, dy);
+        this.emit(
+          startX + dx,
+          startY + dy,
+          startWidth + dx * -1,
+          startHeight + dy * -1
+        );
       },
       end: (dx, dy, complete) => {
-        console.log(dx, dy, complete);
+        if (complete) {
+          this.emit(
+            startX + dx,
+            startY + dy,
+            startWidth + dx * -1,
+            startHeight + dy * -1
+          );
+        } else {
+          this.emit(startX, startY, startWidth, startHeight);
+        }
+      },
+    });
+    drag({
+      source: this.$south,
+      gridSize: this.gridSize,
+      start,
+      move: (dx, dy) => {
+        this.previewHeight(dy);
+      },
+      snap: (dx, dy) => {
+        this.emit(startX, startY, startWidth, startHeight + dy);
+      },
+      end: (dx, dy, complete) => {
+        if (complete) {
+          this.emit(
+            startX,
+            startY,
+            startWidth,
+            startHeight + dy
+          );
+          this.height = startHeight + dy;
+        } else {
+          this.emit(startX, startY, startWidth, startHeight);
+        }
       },
     });
   }
 
   render(changes: any) {
 
+  }
+
+  /**
+   * Emits delta size changes or 0 for no change.
+   * @param x Delta
+   * @param y Delta
+   * @param width Delta
+   * @param height Delta
+   */
+  emit(x: number, y: number, width: number, height: number) {
+    this.dispatchEvent(new CustomEvent('change', {
+      detail: {
+        x,
+        y,
+        width,
+        height,
+      }
+    }));
+  }
+
+  previewX(x: number) {
+    this.style.setProperty('--node-resize-delta-x', `${x}px`);
+  }
+
+  previewY(y: number) {
+    this.style.setProperty('--node-resize-delta-y', `${y}px`);
+  }
+
+  previewWidth(width: number) {
+    this.style.setProperty('--node-resize-delta-width', `${width}px`);
+  }
+
+  previewHeight(height: number) {
+    this.style.setProperty('--node-resize-delta-height', `${height}px`);
   }
 }
