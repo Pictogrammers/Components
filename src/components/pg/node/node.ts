@@ -90,6 +90,7 @@ export default class PgNode extends HTMLElement {
     ele.y = this.y;
     ele.width = this.width;
     ele.height = this.height;
+    ele.minHeight = this.getMinHeight();
     ele.addEventListener('change', (e: any) => {
       const { x, y, width, height } = e.detail;
       console.log(x, y, width, height);
@@ -97,6 +98,10 @@ export default class PgNode extends HTMLElement {
       this.y = y;
       this.width = width;
       this.height = height;
+      ele.x = x;
+      ele.y = y;
+      ele.width = width;
+      ele.height = height;
     });
     this.shadowRoot?.appendChild(ele);
     this.#resizeElement = ele;
@@ -114,5 +119,11 @@ export default class PgNode extends HTMLElement {
 
   deselect() {
     this.$node.classList.toggle('selected', false);
+  }
+
+  getMinHeight() {
+    return Array.from(this.$items.children).reduce((val, $item: any) => {
+      return val + $item.height;
+    }, 2);
   }
 }

@@ -38,10 +38,10 @@ export function drag({ source, gridSize, start, move, snap, end }: DragConfig): 
     lastDx = e.clientX - startX;
     lastDy = e.clientY - startY;
     move?.(lastDx, lastDy);
-    const snapDx = lastDx < 0
+    const snapDx = lastDx + halfGridSize < 0
       ? Math.ceil((lastDx + halfGridSize) / gridSize)
       : Math.floor((lastDx + halfGridSize) / gridSize);
-    const snapDy = lastDy < 0
+    const snapDy = lastDy + halfGridSize < 0
       ? Math.ceil((lastDy + halfGridSize) / gridSize)
       : Math.floor((lastDy + halfGridSize) / gridSize);
     if (snapDx !== lastSnapDx || snapDy !== lastSnapDy) {
@@ -52,10 +52,12 @@ export function drag({ source, gridSize, start, move, snap, end }: DragConfig): 
   };
 
   const onPointerUp = (e: PointerEvent) => {
-    const dx = e.clientX - startX < 0
+    const dx = e.clientX + halfGridSize - startX < 0
       ? Math.ceil((e.clientX + halfGridSize - startX) / gridSize)
       : Math.floor((e.clientX + halfGridSize - startX) / gridSize);
-    const dy = Math.floor((e.clientY - startY) / gridSize);
+    const dy = e.clientY + halfGridSize - startY < 0
+      ? Math.ceil((e.clientY + halfGridSize - startY) / gridSize)
+      : Math.floor((e.clientY + halfGridSize - startY) / gridSize);
     stopDrag();
     end?.(dx, dy, true);
   };

@@ -131,6 +131,11 @@ export default class PgNodes extends HTMLElement {
             type: PgMenuItem,
           }],
         });
+        switch(result.value) {
+          case 'deleteNode':
+            this.#deleteNode(nodeId);
+            break;
+        }
       }
     });
 
@@ -180,5 +185,13 @@ export default class PgNodes extends HTMLElement {
     this.#selected.add(nodeId);
     e.target.select();
     console.log('select', nodeId);
+  }
+
+  #deleteNode(nodeId: string) {
+    const index = this.items.findIndex(x => String(x.node) === nodeId);
+    if (index > 0) {
+      this.items.splice(index, 1);
+      this.#connector?.removeNode(nodeId);
+    }
   }
 }

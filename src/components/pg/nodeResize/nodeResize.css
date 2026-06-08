@@ -169,3 +169,14 @@
 [part=southEast]:hover::before {
   border-color: var(--node-resize-hover);
 }
+
+[part=northWest].stop::before,
+[part=north].stop::before,
+[part=northEast].stop::before,
+[part=west].stop::before,
+[part=east].stop::before,
+[part=southWest].stop::before,
+[part=south].stop::before,
+[part=southWest].stop::before {
+  border-color: red;
+}

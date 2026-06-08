@@ -77,10 +77,19 @@ export default class PgNodeResize extends HTMLElement {
       gridSize: this.gridSize,
       start,
       move: (dx, dy) => {
+        console.log('dy', dy);
+        if (startHeight === this.minHeight) {
+          this.$south.classList.toggle('stop', dy < 0);
+        }
         this.previewHeight(dy);
       },
       snap: (dx, dy) => {
-        this.emit(startX, startY, startWidth, startHeight + dy);
+        if (startHeight + dy > this.minHeight) {
+          this.emit(startX, startY, startWidth, startHeight + dy);
+        } else {
+          this.emit(startX, startY, startWidth, this.minHeight);
+
+        }
       },
       end: (dx, dy, complete) => {
         if (complete) {
@@ -90,11 +99,12 @@ export default class PgNodeResize extends HTMLElement {
             startWidth,
             startHeight + dy
           );
-          this.height = startHeight + dy;
         } else {
           this.emit(startX, startY, startWidth, startHeight);
         }
+        this.$south.classList.toggle('stop', false);
         this.classList.toggle('preview', false);
+        this.previewHeight(0);
       },
     });
   }
