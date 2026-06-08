@@ -28,12 +28,13 @@ export default class PgNode extends HTMLElement {
   @Part() $header: HTMLDivElement;
 
   connectedCallback() {
+    this.height = 2;
     forEach({
       container: this.$items,
       items: this.fields,
       type: (item) => PgNodeEditorText,
-      create: ($item, item) => {
-
+      create: ($item: PgNodeEditorText, item) => {
+        this.height += $item.height;
       },
     });
     this.$header.addEventListener('click', this.#handleSelect.bind(this));
@@ -57,6 +58,12 @@ export default class PgNode extends HTMLElement {
     }
     if (changes.y) {
       this.style.setProperty('top', `${this.y}rem`);
+    }
+    if (changes.width) {
+      this.style.setProperty('--pg-node-width', `${this.width}rem`);
+    }
+    if (changes.height) {
+      this.style.setProperty('--pg-node-height', `${this.height}rem`);
     }
   }
 

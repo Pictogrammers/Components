@@ -10,8 +10,13 @@
   --resize-radius: 0.25rem;
   grid-template-columns: 0.75rem auto 0.75rem;
   grid-template-rows: 0.75rem auto 0.75rem;
-  --node-resize-hover: blue;
+  --node-resize-outline: transparent;
+  --node-resize-hover: #248BE5;
   pointer-events: none;
+}
+
+:host(.preview) {
+  --node-resize-outline: rgba(36, 139, 229, 0.5);
 }
 
 [part=northWest] {
@@ -27,8 +32,8 @@
   content: ' ';
   display: flex;
   border-top-left-radius: var(--resize-radius);
-  border-top: 2px solid red;
-  border-left: 2px solid red;
+  border-top: 2px solid var(--node-resize-outline);
+  border-left: 2px solid var(--node-resize-outline);
   width: 0.375rem;
   height: 0.375rem;
 }
@@ -45,7 +50,7 @@
 [part=north]::before {
   content: ' ';
   display: flex;
-  border-top: 2px solid red;
+  border-top: 2px solid var(--node-resize-outline);
   height: 0.375rem;
 }
 [part=north]:hover::before {
@@ -64,8 +69,8 @@
   content: ' ';
   display: flex;
   border-top-right-radius: var(--resize-radius);
-  border-top: 2px solid red;
-  border-right: 2px solid red;
+  border-top: 2px solid var(--node-resize-outline);
+  border-right: 2px solid var(--node-resize-outline);
   width: 0.375rem;
   height: 0.375rem;
 }
@@ -82,7 +87,7 @@
 [part=west]::before {
   content: ' ';
   display: flex;
-  border-left: 2px solid red;
+  border-left: 2px solid var(--node-resize-outline);
   width: 0.375rem;
   height: 100%;
 }
@@ -99,7 +104,7 @@
 [part=east]::before {
   content: ' ';
   display: flex;
-  border-right: 2px solid red;
+  border-right: 2px solid var(--node-resize-outline);
   width: 0.375rem;
   height: 100%;
 }
@@ -119,8 +124,8 @@
   content: ' ';
   display: flex;
   border-bottom-left-radius: var(--resize-radius);
-  border-bottom: 2px solid red;
-  border-left: 2px solid red;
+  border-bottom: 2px solid var(--node-resize-outline);
+  border-left: 2px solid var(--node-resize-outline);
   width: 0.375rem;
   height: 0.375rem;
 }
@@ -137,7 +142,7 @@
 [part=south]::before {
   content: ' ';
   display: flex;
-  border-bottom: 2px solid red;
+  border-bottom: 2px solid var(--node-resize-outline);
   height: 0.375rem;
 }
 [part=south]:hover::before {
@@ -156,8 +161,8 @@
   content: ' ';
   display: flex;
   border-bottom-right-radius: var(--resize-radius);
-  border-bottom: 2px solid red;
-  border-right: 2px solid red;
+  border-bottom: 2px solid var(--node-resize-outline);
+  border-right: 2px solid var(--node-resize-outline);
   width: 0.375rem;
   height: 0.375rem;
 }

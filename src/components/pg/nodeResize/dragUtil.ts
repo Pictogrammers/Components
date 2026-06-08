@@ -15,6 +15,7 @@ export function drag({ source, gridSize, start, move, snap, end }: DragConfig): 
   let lastSnapDx = 0;
   let lastSnapDy = 0;
   let activePointerId: number | null = null;
+  const halfGridSize = gridSize / 2;
 
   const onPointerDown = (e: PointerEvent) => {
     e.preventDefault();
@@ -37,8 +38,12 @@ export function drag({ source, gridSize, start, move, snap, end }: DragConfig): 
     lastDx = e.clientX - startX;
     lastDy = e.clientY - startY;
     move?.(lastDx, lastDy);
-    const snapDx = Math.floor(lastDx / gridSize);
-    const snapDy = Math.floor(lastDy / gridSize);
+    const snapDx = lastDx < 0
+      ? Math.ceil((lastDx + halfGridSize) / gridSize)
+      : Math.floor((lastDx + halfGridSize) / gridSize);
+    const snapDy = lastDy < 0
+      ? Math.ceil((lastDy + halfGridSize) / gridSize)
+      : Math.floor((lastDy + halfGridSize) / gridSize);
     if (snapDx !== lastSnapDx || snapDy !== lastSnapDy) {
       lastSnapDx = snapDx;
       lastSnapDy = snapDy;
@@ -47,23 +52,33 @@ export function drag({ source, gridSize, start, move, snap, end }: DragConfig): 
   };
 
   const onPointerUp = (e: PointerEvent) => {
-    const dx = Math.floor((e.clientX - startX) / gridSize);
+    const dx = e.clientX - startX < 0
+      ? Math.ceil((e.clientX + halfGridSize - startX) / gridSize)
+      : Math.floor((e.clientX + halfGridSize - startX) / gridSize);
     const dy = Math.floor((e.clientY - startY) / gridSize);
     stopDrag();
     end?.(dx, dy, true);
   };
 
   const onPointerCancel = () => {
-    const dx = Math.floor(lastDx / gridSize);
-    const dy = Math.floor(lastDy / gridSize);
+    const dx = lastDx < 0
+      ? Math.ceil((lastDx + halfGridSize) / gridSize)
+      : Math.floor((lastDx + halfGridSize) / gridSize);
+    const dy = lastDy < 0
+      ? Math.ceil((lastDy + halfGridSize) / gridSize)
+      : Math.floor((lastDy + halfGridSize) / gridSize);
     stopDrag();
     end?.(dx, dy, false);
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') { return; }
-    const dx = Math.floor(lastDx / gridSize);
-    const dy = Math.floor(lastDy / gridSize);
+    const dx = lastDx < 0
+      ? Math.ceil((lastDx + halfGridSize) / gridSize)
+      : Math.floor((lastDx + halfGridSize) / gridSize);
+    const dy = lastDy < 0
+      ? Math.ceil((lastDy + halfGridSize) / gridSize)
+      : Math.floor((lastDy + halfGridSize) / gridSize);
     if (activePointerId !== null) {
       source.releasePointerCapture(activePointerId);
     }

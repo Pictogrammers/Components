@@ -38,6 +38,7 @@ export default class PgNodeResize extends HTMLElement {
       startY = this.y;
       startWidth = this.width;
       startHeight = this.height;
+      this.classList.toggle('preview', true);
     };
     drag({
       source: this.$northWest,
@@ -68,6 +69,7 @@ export default class PgNodeResize extends HTMLElement {
         } else {
           this.emit(startX, startY, startWidth, startHeight);
         }
+        this.classList.toggle('preview', false);
       },
     });
     drag({
@@ -92,6 +94,7 @@ export default class PgNodeResize extends HTMLElement {
         } else {
           this.emit(startX, startY, startWidth, startHeight);
         }
+        this.classList.toggle('preview', false);
       },
     });
   }
@@ -119,18 +122,18 @@ export default class PgNodeResize extends HTMLElement {
   }
 
   previewX(x: number) {
-    this.style.setProperty('--node-resize-delta-x', `${x}px`);
+    this.style.setProperty('--node-resize-delta-x', `${x % this.gridSize}px`);
   }
 
   previewY(y: number) {
-    this.style.setProperty('--node-resize-delta-y', `${y}px`);
+    this.style.setProperty('--node-resize-delta-y', `${y % this.gridSize}px`);
   }
 
   previewWidth(width: number) {
-    this.style.setProperty('--node-resize-delta-width', `${width}px`);
+    this.style.setProperty('--node-resize-delta-width', `${width % this.gridSize}px`);
   }
 
   previewHeight(height: number) {
-    this.style.setProperty('--node-resize-delta-height', `${height}px`);
+    this.style.setProperty('--node-resize-delta-height', `${((height + (this.gridSize / 2)) % this.gridSize) - (this.gridSize / 2)}px`);
   }
 }
