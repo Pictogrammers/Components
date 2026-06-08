@@ -57,8 +57,14 @@ export default class PgNodes extends HTMLElement {
               e.preventDefault();
               this.getNodeById(x).x += 1;
               break;
+            case 'Delete':
+              this.#deleteNode(x);
+              break;
           }
         });
+        if (e.key === 'Delete') {
+          this.#selected.clear();
+        }
         console.log(e.key);
       }
     });
@@ -134,6 +140,7 @@ export default class PgNodes extends HTMLElement {
         switch(result.value) {
           case 'deleteNode':
             this.#deleteNode(nodeId);
+            this.#selected.clear();
             break;
         }
       }
