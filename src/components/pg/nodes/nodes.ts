@@ -43,19 +43,31 @@ export default class PgNodes extends HTMLElement {
           switch(e.key) {
             case 'ArrowUp':
               e.preventDefault();
-              this.getNodeById(x).y -= 1;
+              const node1 = this.getNodeById(x);
+              const ny1 = node1.y - 1;
+              node1.y = ny1;
+              this.#updatePins(x);
               break;
             case 'ArrowDown':
               e.preventDefault();
-              this.getNodeById(x).y += 1;
+              const node2 = this.getNodeById(x);
+              const ny2 = node2.y + 1;
+              node2.y = ny2;
+              this.#updatePins(x);
               break;
             case 'ArrowLeft':
               e.preventDefault();
-              this.getNodeById(x).x -= 1;
+              const node3 = this.getNodeById(x);
+              const nx1 = node3.x - 1;
+              node3.x = nx1;
+              this.#updatePins(x);
               break;
             case 'ArrowRight':
               e.preventDefault();
-              this.getNodeById(x).x += 1;
+              const node4 = this.getNodeById(x);
+              const nx2 = node4.x + 1;
+              node4.x = nx2;
+              this.#updatePins(x);
               break;
             case 'Delete':
               this.#deleteNode(x);
@@ -187,8 +199,15 @@ export default class PgNodes extends HTMLElement {
     this.#nodePinCounts.set(nodeId, index + 1);
   }
 
+  #shiftOrCtrl: boolean = false;
   #handleSelect(e: any) {
     const { nodeId } = e.detail;
+    if (!this.#shiftOrCtrl) {
+      this.#selected.forEach((value) => {
+        this.getNodeById(value).deselect();
+      });
+      this.#selected.clear();
+    }
     this.#selected.add(nodeId);
     e.target.select();
     console.log('select', nodeId);
@@ -200,5 +219,16 @@ export default class PgNodes extends HTMLElement {
       this.items.splice(index, 1);
       this.#connector?.removeNode(nodeId);
     }
+  }
+
+  #updatePins(nodeId: string) {
+    const { x, y, width, height } = this.getNodeById(nodeId);
+    this.#connector?.setNode(
+      nodeId,
+      x * this.gridSize,
+      y * this.gridSize,
+      (width ?? 12) * this.gridSize,
+      (height ?? 3) * this.gridSize
+    );
   }
 }

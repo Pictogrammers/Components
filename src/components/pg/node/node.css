@@ -33,7 +33,7 @@
 
 [part=node].selected {
   outline: 2px solid #248BE5;
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
 [part=node].resize {
