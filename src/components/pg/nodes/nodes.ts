@@ -72,6 +72,9 @@ export default class PgNodes extends HTMLElement {
             case 'Delete':
               this.#deleteNode(x);
               break;
+            case 'Escape':
+              this.clearSelection();
+              break;
           }
         });
         if (e.key === 'Delete') {
@@ -83,11 +86,7 @@ export default class PgNodes extends HTMLElement {
 
     this.$grid.addEventListener('click', (e: any) => {
       if (e.target.part.contains('grid')) {
-        console.log('grid');
-        this.#selected.forEach((value) => {
-          this.getNodeById(value).deselect();
-        });
-        this.#selected.clear();
+        this.clearSelection();
       } else {
         console.log('node');
       }
@@ -165,7 +164,7 @@ export default class PgNodes extends HTMLElement {
       create: ($item, item) => {
         this.#nextNodeId = Math.max(item.node, this.#nextNodeId) + 1;
         console.log('create', item.node);
-        connector.setNode(`${item.node}`, item.x * 16, item.y * 16, 192, 64);
+        connector.setNode(`${item.node}`, item.x * 16, item.y * 16, (item.width ?? 12) * 16, (item.height ?? 4) * 16);
         if (item.node !== 0) {
           connector.setInputPin(`${item.node}`, 'in', 16);
         }

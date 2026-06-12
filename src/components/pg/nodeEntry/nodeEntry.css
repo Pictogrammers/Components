@@ -20,13 +20,24 @@
   border-radius: 0.25rem;
   background: #1D1D1D;
   color: #FFF;
-  width: 12rem;
-  min-height: 3rem;
+  width: var(--pg-node-width, 12rem);
+  min-height: var(--pg-node-height, 3rem);
   padding-block-end: 0.25rem;
 }
 
 [part=node]:hover {
   border-color: rgba(50, 162, 48, 0.75);
+}
+
+[part=node].resize::before {
+  content: ' ';
+  position: absolute;
+  border: 6px solid rgba(255, 255, 255, 0.2);
+  left: -0.5rem;
+  top: -0.5rem;
+  right: -0.5rem;
+  bottom: -0.5rem;
+  border-radius: 0.5rem;
 }
 
 textarea {

@@ -135,6 +135,9 @@ export default class PgNodeResize extends HTMLElement {
         this.style.setProperty('--node-resize-delta-height', '0px');
       },
     });
+    this.$header.addEventListener('click', () => {
+      this.dispatchEvent(new CustomEvent('select'));
+    });
   }
 
   render(_changes: any) {}

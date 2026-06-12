@@ -37,7 +37,6 @@ export default class PgNode extends HTMLElement {
         this.height += $item.height;
       },
     });
-    this.$header.addEventListener('click', this.#handleSelect.bind(this));
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
   }
 
@@ -103,6 +102,7 @@ export default class PgNode extends HTMLElement {
       ele.height = height;
       this.dispatchEvent(new CustomEvent('change', { detail: { x, y, width, height } }));
     });
+    ele.addEventListener('select', this.#handleSelect.bind(this));
     this.shadowRoot?.appendChild(ele);
     this.#resizeElement = ele;
     this.$node.classList.toggle('resize', true);
