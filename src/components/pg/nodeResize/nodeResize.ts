@@ -91,15 +91,10 @@ export default class PgNodeResize extends HTMLElement {
 
   render(_changes: any) {}
 
-  // Mirrors dragUtil's snap: floor for positive deltas, ceil for negative.
-  // Returns pixel residual past the last snap boundary so CSS preview tracks smoothly.
+  // Returns the pixel residual past the last snap boundary (mirrors dragUtil's snapUnits).
   #subGrid(delta: number): number {
     const { gridSize } = this;
-    const half = gridSize / 2;
-    const snapped = delta + half < 0
-      ? Math.ceil((delta + half) / gridSize) * gridSize
-      : Math.floor((delta + half) / gridSize) * gridSize;
-    return delta - snapped;
+    return delta - Math.floor((delta + gridSize / 2) / gridSize) * gridSize;
   }
 
   #compute(

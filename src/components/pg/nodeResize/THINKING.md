@@ -7,7 +7,7 @@ anchor. The preview CSS vars must then represent the **remaining sub-grid offset
 overlay tracks the cursor smoothly. If the formula is wrong, the overlay jumps by ~gridSize
 pixels at each snap boundary.
 
-## dragUtil snap algorithm (asymmetric)
+## dragUtil snap algorithm (asymmetric — the root bug)
 
 ```
 snapDx = (lastDx + half < 0)
@@ -16,8 +16,18 @@ snapDx = (lastDx + half < 0)
 ```
 
 Because of ceil vs floor the first snap threshold is **asymmetric**:
-- Positive drag: first snap at +8 px (half a grid unit)
-- Negative drag: first snap at -24 px (1.5 grid units)
+- Positive drag: first snap at +8 px  (half grid unit) ← works correctly (south)
+- Negative drag: first snap at -24 px (1.5 grid units) ← broken (north)
+
+Negative example step-by-step with gridSize=16, half=8:
+  dy=-8:  (-8+8)/16 = 0/16 = 0,    ceil(0) = 0   → no snap yet
+  dy=-16: (-16+8)/16 = -8/16 = -0.5, ceil(-0.5) = 0 → still no snap
+  dy=-24: (-24+8)/16 = -16/16 = -1,  ceil(-1)  = -1 → FIRST snap (at 1.5 grid units!)
+
+**Fix: use Math.floor for ALL values** — this rounds toward −∞ symmetrically:
+  dy=+8:  floor((8+8)/16)  = floor(1)      = 1   → snap ✓
+  dy=-8:  floor((-8+8)/16) = floor(0)      = 0   → no snap yet
+  dy=-9:  floor((-9+8)/16) = floor(-0.0625)= -1  → snap (≈half grid unit) ✓
 
 ## Correct sub-grid formula
 
