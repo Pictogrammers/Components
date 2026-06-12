@@ -90,6 +90,7 @@ export default class PgNode extends HTMLElement {
     ele.width = this.width;
     ele.height = this.height;
     ele.minHeight = this.getMinHeight();
+    ele.minWidth = this.getMinWidth();
     ele.addEventListener('change', (e: any) => {
       const { x, y, width, height } = e.detail;
       this.x = x;
