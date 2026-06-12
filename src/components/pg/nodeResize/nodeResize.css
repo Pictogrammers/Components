@@ -19,6 +19,11 @@
   --node-resize-outline: rgba(36, 139, 229, 0.5);
 }
 
+[part=header] {
+  height: 1rem;
+  pointer-events: all;
+}
+
 [part=northWest] {
   width: 0.75rem;
   height: 0.75rem;

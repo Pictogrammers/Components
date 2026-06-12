@@ -19,6 +19,7 @@ export default class PgNodeResize extends HTMLElement {
   @Prop() minWidth: number = 12;
   @Prop() minHeight: number = 3;
 
+  @Part() $header: HTMLDivElement;
   @Part() $northWest: HTMLDivElement;
   @Part() $north: HTMLDivElement;
   @Part() $northEast: HTMLDivElement;
