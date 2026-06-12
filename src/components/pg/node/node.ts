@@ -128,4 +128,8 @@ export default class PgNode extends HTMLElement {
       return val + $item.height;
     }, 2);
   }
+
+  getMinWidth() {
+    return 10;
+  }
 }

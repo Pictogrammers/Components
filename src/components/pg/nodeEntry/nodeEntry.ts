@@ -15,7 +15,7 @@ export default class PgNodeEntry extends HTMLElement {
   @Prop() x: number = 0;
   @Prop() y: number = 0;
   @Prop() width: number = 12;
-  @Prop() height: number = 4;
+  @Prop() height: number = 5;
   @Prop() node: number = 0;
   @Prop() nodes: any = [];
 
@@ -113,5 +113,9 @@ export default class PgNodeEntry extends HTMLElement {
   getMinHeight() {
     // header (1.5rem) + textarea (2.75rem) + bottom padding (0.25rem) = 4.5rem → 5 grid units
     return 5;
+  }
+
+  getMinWidth() {
+    return 6;
   }
 }
