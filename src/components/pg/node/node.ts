@@ -64,6 +64,12 @@ export default class PgNode extends HTMLElement {
     if (changes.height) {
       this.style.setProperty('--pg-node-height', `${this.height}rem`);
     }
+    if (this.#resizeElement) {
+      if (changes.x) this.#resizeElement.x = this.x;
+      if (changes.y) this.#resizeElement.y = this.y;
+      if (changes.width) this.#resizeElement.width = this.width;
+      if (changes.height) this.#resizeElement.height = this.height;
+    }
   }
 
   #handleSelect(_e: any) {

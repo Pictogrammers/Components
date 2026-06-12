@@ -9,6 +9,11 @@ import PgMenuItem from '../menuItem/menuItem';
 import template from './nodes.html';
 import style from './nodes.css';
 
+type NodeState = { x: number; y: number; width: number; height: number };
+type UndoTransform = { type: 'transform'; nodeId: string; before: NodeState; after: NodeState };
+type UndoDelete = { type: 'delete'; item: any; index: number };
+type UndoItem = UndoTransform | UndoDelete;
+
 @Component({
   selector: 'pg-nodes',
   style,
@@ -28,6 +33,10 @@ export default class PgNodes extends HTMLElement {
   #nodePinCounts = new Map<string, number>();
   #selected = new Set<string>();
 
+  #undo: UndoItem[] = [];
+  #redo: UndoItem[] = [];
+  #nodeStates = new Map<string, NodeState>();
+
   connectedCallback() {
     const connector = new NodeConnector(this.$svg);
     connector.bridgeColor = '#0a0c14';
@@ -37,40 +46,51 @@ export default class PgNodes extends HTMLElement {
       console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
     });
 
-    document.addEventListener('keydown', (e: any) => {
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'z') {
+        e.preventDefault();
+        e.shiftKey ? this.#applyRedo() : this.#applyUndo();
+        return;
+      }
+
       if (this.#selected.size > 0) {
-        this.#selected.forEach((x) => {
-          switch(e.key) {
-            case 'ArrowUp':
+        this.#selected.forEach((id) => {
+          const node = this.getNodeById(id) as any;
+          switch (e.key) {
+            case 'ArrowUp': {
               e.preventDefault();
-              const node1 = this.getNodeById(x);
-              const ny1 = node1.y - 1;
-              node1.y = ny1;
-              this.#updatePins(x);
+              const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width, height: node.height };
+              node.y -= 1;
+              this.#pushTransform(id, before, { x: node.x, y: node.y, width: node.width, height: node.height });
+              this.#updatePins(id);
               break;
-            case 'ArrowDown':
+            }
+            case 'ArrowDown': {
               e.preventDefault();
-              const node2 = this.getNodeById(x);
-              const ny2 = node2.y + 1;
-              node2.y = ny2;
-              this.#updatePins(x);
+              const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width, height: node.height };
+              node.y += 1;
+              this.#pushTransform(id, before, { x: node.x, y: node.y, width: node.width, height: node.height });
+              this.#updatePins(id);
               break;
-            case 'ArrowLeft':
+            }
+            case 'ArrowLeft': {
               e.preventDefault();
-              const node3 = this.getNodeById(x);
-              const nx1 = node3.x - 1;
-              node3.x = nx1;
-              this.#updatePins(x);
+              const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width, height: node.height };
+              node.x -= 1;
+              this.#pushTransform(id, before, { x: node.x, y: node.y, width: node.width, height: node.height });
+              this.#updatePins(id);
               break;
-            case 'ArrowRight':
+            }
+            case 'ArrowRight': {
               e.preventDefault();
-              const node4 = this.getNodeById(x);
-              const nx2 = node4.x + 1;
-              node4.x = nx2;
-              this.#updatePins(x);
+              const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width, height: node.height };
+              node.x += 1;
+              this.#pushTransform(id, before, { x: node.x, y: node.y, width: node.width, height: node.height });
+              this.#updatePins(id);
               break;
+            }
             case 'Delete':
-              this.#deleteNode(x);
+              this.#deleteNodeWithUndo(id);
               break;
             case 'Escape':
               this.clearSelection();
@@ -80,15 +100,12 @@ export default class PgNodes extends HTMLElement {
         if (e.key === 'Delete') {
           this.#selected.clear();
         }
-        console.log(e.key);
       }
     });
 
     this.$grid.addEventListener('click', (e: any) => {
       if (e.target.part.contains('grid')) {
         this.clearSelection();
-      } else {
-        console.log('node');
       }
     });
 
@@ -103,35 +120,18 @@ export default class PgNodes extends HTMLElement {
           source: this.$items,
           x: e.clientX,
           y: e.clientY,
-          items: [{
-            label: 'Add Node',
-            value: 'addNode',
-            type: PgMenuItem,
-          }],
+          items: [{ label: 'Add Node', value: 'addNode', type: PgMenuItem }],
         });
         if (!result) { return; }
-        switch(result.value) {
-          case 'addNode':
-            this.items.push({
-              node: this.#nextNodeId,
-              x,
-              y,
-              fields: [{
-                label: 'Name',
-                value: 'Foo',
-                type: 'Text',
-              }],
-              nodes: [{
-                key: 't',
-                label: 'True'
-              }, {
-                key: 'f',
-                label: 'False'
-              }],
-            });
-            break;
+        if (result.value === 'addNode') {
+          this.items.push({
+            node: this.#nextNodeId,
+            x,
+            y,
+            fields: [{ label: 'Name', value: 'Foo', type: 'Text' }],
+            nodes: [{ key: 't', label: 'True' }, { key: 'f', label: 'False' }],
+          });
         }
-        console.log(result, x, y);
       } else {
         this.clearSelection();
         // @ts-ignore
@@ -142,17 +142,11 @@ export default class PgNodes extends HTMLElement {
           source: this.$items,
           x: e.clientX,
           y: e.clientY,
-          items: [{
-            label: 'Delete Node',
-            value: 'deleteNode',
-            type: PgMenuItem,
-          }],
+          items: [{ label: 'Delete Node', value: 'deleteNode', type: PgMenuItem }],
         });
-        switch(result.value) {
-          case 'deleteNode':
-            this.#deleteNode(nodeId);
-            this.#selected.clear();
-            break;
+        if (result?.value === 'deleteNode') {
+          this.#deleteNodeWithUndo(nodeId);
+          this.#selected.clear();
         }
       }
     });
@@ -162,16 +156,22 @@ export default class PgNodes extends HTMLElement {
       items: this.items,
       type: (item) => item.node === 0 ? PgNodeEntry : PgNode,
       create: ($item, item) => {
+        const nodeId = `${item.node}`;
         this.#nextNodeId = Math.max(item.node, this.#nextNodeId) + 1;
-        console.log('create', item.node);
-        connector.setNode(`${item.node}`, item.x * 16, item.y * 16, (item.width ?? 12) * 16, (item.height ?? 4) * 16);
+        connector.setNode(nodeId, item.x * 16, item.y * 16, (item.width ?? 12) * 16, (item.height ?? 4) * 16);
         if (item.node !== 0) {
-          connector.setInputPin(`${item.node}`, 'in', 16);
+          connector.setInputPin(nodeId, 'in', 16);
         }
-        connector.setOutputPin(`${item.node}`, 'nodes', 16);
+        connector.setOutputPin(nodeId, 'nodes', 16);
         $item.addEventListener('registernode', this.#registerNode.bind(this));
         $item.addEventListener('select', this.#handleSelect.bind(this));
         $item.addEventListener('change', this.#handleChange.bind(this));
+        this.#nodeStates.set(nodeId, {
+          x: item.x,
+          y: item.y,
+          width: item.width ?? 12,
+          height: item.height ?? 4,
+        });
       },
     });
   }
@@ -187,9 +187,7 @@ export default class PgNodes extends HTMLElement {
     this.#selected.clear();
   }
 
-  render(changes: any) {
-
-  }
+  render(_changes: any) {}
 
   #registerNode(e: any) {
     if (!this.#connector) return;
@@ -210,19 +208,99 @@ export default class PgNodes extends HTMLElement {
     }
     this.#selected.add(nodeId);
     e.target.select();
-    console.log('select', nodeId);
   }
 
   #handleChange(e: any) {
-    this.#updatePins(String((e.target as any).node));
+    const nodeId = String((e.target as any).node);
+    const { x, y, width, height } = e.detail;
+    const before = this.#nodeStates.get(nodeId) ?? { x, y, width, height };
+    this.#pushTransform(nodeId, before, { x, y, width, height });
+    this.#updatePins(nodeId);
+  }
+
+  // Push a transform onto the undo stack, merging with the previous entry when it targets
+  // the same node — keeps the stack from growing on every snap during a single drag.
+  #pushTransform(nodeId: string, before: NodeState, after: NodeState) {
+    const last = this.#undo.at(-1);
+    if (last?.type === 'transform' && last.nodeId === nodeId) {
+      last.after = after;
+    } else {
+      this.#undo.push({ type: 'transform', nodeId, before, after });
+    }
+    this.#redo = [];
+    this.#nodeStates.set(nodeId, after);
+  }
+
+  #applyUndo() {
+    const item = this.#undo.pop();
+    if (!item) return;
+    this.#redo.push(item);
+    this.#applyItem(item, 'undo');
+  }
+
+  #applyRedo() {
+    const item = this.#redo.pop();
+    if (!item) return;
+    this.#undo.push(item);
+    this.#applyItem(item, 'redo');
+  }
+
+  #applyItem(item: UndoItem, direction: 'undo' | 'redo') {
+    switch (item.type) {
+      case 'transform': {
+        const state = direction === 'undo' ? item.before : item.after;
+        const node = this.getNodeById(item.nodeId) as any;
+        if (!node) return;
+        node.x = state.x;
+        node.y = state.y;
+        node.width = state.width;
+        node.height = state.height;
+        this.#nodeStates.set(item.nodeId, state);
+        this.#updatePins(item.nodeId);
+        break;
+      }
+      case 'delete': {
+        if (direction === 'undo') {
+          // Re-insert the item; forEach recreates the element and calls create for connector setup
+          this.items.splice(item.index, 0, item.item);
+          this.#nodeStates.set(String(item.item.node), {
+            x: item.item.x,
+            y: item.item.y,
+            width: item.item.width ?? 12,
+            height: item.item.height ?? 4,
+          });
+        } else {
+          this.#deleteNode(String(item.item.node));
+        }
+        break;
+      }
+    }
   }
 
   #deleteNode(nodeId: string) {
-    const index = this.items.findIndex(x => String(x.node) === nodeId);
+    const index = this.items.findIndex((x: any) => String(x.node) === nodeId);
     if (index > 0) {
       this.items.splice(index, 1);
       this.#connector?.removeNode(nodeId);
+      this.#nodeStates.delete(nodeId);
     }
+  }
+
+  #deleteNodeWithUndo(nodeId: string) {
+    const index = this.items.findIndex((x: any) => String(x.node) === nodeId);
+    if (index <= 0) return;
+    // Capture current live state from the DOM element, not the stale item data
+    const node = this.getNodeById(nodeId) as any;
+    const item = {
+      ...this.items[index],
+      x: node.x,
+      y: node.y,
+      width: node.width,
+      height: node.height,
+    };
+    this.#deleteNode(nodeId);
+    this.#undo.push({ type: 'delete', item, index });
+    this.#redo = [];
   }
 
   #updatePins(nodeId: string) {
