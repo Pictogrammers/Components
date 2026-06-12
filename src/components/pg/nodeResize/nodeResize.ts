@@ -104,6 +104,37 @@ export default class PgNodeResize extends HTMLElement {
     addHandle(this.$southWest, -1,  1);
     addHandle(this.$south,      0,  1);
     addHandle(this.$southEast,  1,  1);
+
+    // Header: translate the whole node — no resize, both x and y move together
+    drag({
+      source: this.$header,
+      gridSize: this.gridSize,
+      start,
+      move: (dx, dy) => {
+        const gs = this.gridSize;
+        const snapDx = Math.floor((dx + gs / 2) / gs);
+        const snapDy = Math.floor((dy + gs / 2) / gs);
+        this.style.setProperty('--node-resize-delta-x',      `${dx - snapDx * gs}px`);
+        this.style.setProperty('--node-resize-delta-y',      `${dy - snapDy * gs}px`);
+        this.style.setProperty('--node-resize-delta-width',  '0px');
+        this.style.setProperty('--node-resize-delta-height', '0px');
+      },
+      snap: (dx, dy) => {
+        this.emit(startX + dx, startY + dy, startWidth, startHeight);
+      },
+      end: (dx, dy, complete) => {
+        if (complete) {
+          this.emit(startX + dx, startY + dy, startWidth, startHeight);
+        } else {
+          this.emit(startX, startY, startWidth, startHeight);
+        }
+        this.classList.toggle('preview', false);
+        this.style.setProperty('--node-resize-delta-x',      '0px');
+        this.style.setProperty('--node-resize-delta-y',      '0px');
+        this.style.setProperty('--node-resize-delta-width',  '0px');
+        this.style.setProperty('--node-resize-delta-height', '0px');
+      },
+    });
   }
 
   render(_changes: any) {}
