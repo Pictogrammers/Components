@@ -72,10 +72,51 @@ For a west handle (wDir=-1), dx is the raw pointer delta:
 `subGrid` is NOT an odd function (asymmetric snap means subGrid(-dx) ≠ -subGrid(dx)).
 So calling previewWidth(-dx) with an internal formula on -dx is wrong.
 
-## Fix
+## Fix (session 2)
 
 Compute `sgX = subGrid(dx)` and `sgY = subGrid(dy)` once per `move` event, then:
 - delta-x   = sgX          (when wDir == -1)
 - delta-width = wDir * sgX  (when wDir != 0)
 - delta-y   = sgY          (when hDir == -1)
 - delta-height = hDir * sgY (when hDir != 0)
+
+---
+
+## Min-size clamping for preview (session 3)
+
+### Goal
+When the drag would push width/height below the minimum:
+- Handle turns red (`.stop` class)
+- Overlay stops moving (preview freezes at min size)
+
+### Why the previous approach was incomplete
+The `stop` class was already toggled in `move`, but the CSS vars kept tracking the cursor
+past the minimum. The overlay visually shrank below minWidth/minHeight.
+
+### New formula
+
+Instead of computing sub-grid residuals via `#subGrid`, derive the delta directly from
+clamped pixel values vs the snapped anchor:
+
+```
+snapDx = floor((dx + gs/2) / gs)   // mirrors dragUtil
+snappedW = max(startWidth + wDir * snapDx, minWidth)   // grid units
+
+effectiveWPx = max(startWidth * gs + wDir * dx, minWidth * gs)  // cursor-tracking, clamped
+dw = effectiveWPx - snappedW * gs   // delta relative to anchor
+
+--node-resize-delta-width = dw
+--node-resize-delta-x     = -dw   (west handles only; keeps right edge fixed)
+```
+
+### Why this works for both normal and clamped cases
+
+Normal (no clamp): effectiveWPx = snappedWPx + (wDir * dx % gs) → same as old subGrid approach.
+At min: effectiveWPx = minWidth * gs = snappedW * gs → dw = 0 → overlay freezes. ✓
+
+### Why delta-x = -dw for west handles
+
+Right edge is fixed at startX*gs + startWidth*gs.
+effectiveLeft = rightEdge - effectiveWPx
+anchorLeft    = rightEdge - snappedW*gs
+delta-x = effectiveLeft - anchorLeft = snappedW*gs - effectiveWPx = -dw ✓

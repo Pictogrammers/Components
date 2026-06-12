@@ -39,25 +39,41 @@ export default class PgNodeResize extends HTMLElement {
       this.classList.toggle('preview', true);
     };
 
-    // wDir: -1 = west edge (x + width change), 0 = no width, 1 = east edge (width only)
-    // hDir: -1 = north edge (y + height change), 0 = no height, 1 = south edge (height only)
+    // wDir: -1 = west edge moves (x + width change), 0 = no width, 1 = east edge (width only)
+    // hDir: -1 = north edge moves (y + height change), 0 = no height, 1 = south edge (height only)
     const addHandle = (source: HTMLElement, wDir: -1 | 0 | 1, hDir: -1 | 0 | 1) => {
       drag({
         source,
         gridSize: this.gridSize,
         start,
         move: (dx, dy) => {
-          // Sub-grid residual must mirror dragUtil's asymmetric floor/ceil snap algorithm.
-          // For positive deltas: floor; for negative: ceil. This avoids a ~gridSize jump
-          // each time snap fires and the anchor moves.
-          const sgX = this.#subGrid(dx);
-          const sgY = this.#subGrid(dy);
-          this.style.setProperty('--node-resize-delta-x',      `${wDir === -1 ? sgX : 0}px`);
-          this.style.setProperty('--node-resize-delta-width',  `${wDir !== 0 ? wDir * sgX : 0}px`);
-          this.style.setProperty('--node-resize-delta-y',      `${hDir === -1 ? sgY : 0}px`);
-          this.style.setProperty('--node-resize-delta-height', `${hDir !== 0 ? hDir * sgY : 0}px`);
-          const atMinW = wDir !== 0 && startWidth + wDir * dx < this.minWidth;
-          const atMinH = hDir !== 0 && startHeight + hDir * dy < this.minHeight;
+          const gs = this.gridSize;
+
+          // Snap units — must mirror dragUtil's snapUnits exactly
+          const snapDx = Math.floor((dx + gs / 2) / gs);
+          const snapDy = Math.floor((dy + gs / 2) / gs);
+
+          // Snapped dimension in grid units, clamped to min (what the anchor currently reflects)
+          const snappedW = wDir !== 0 ? Math.max(startWidth  + wDir * snapDx, this.minWidth)  : startWidth;
+          const snappedH = hDir !== 0 ? Math.max(startHeight + hDir * snapDy, this.minHeight) : startHeight;
+
+          // Pixel-accurate cursor tracking, clamped so the preview never goes below min.
+          // When clamped, effectivePx === snappedPx and the delta becomes 0 (overlay freezes).
+          const effectiveWPx = wDir !== 0 ? Math.max(startWidth  * gs + wDir * dx, this.minWidth  * gs) : startWidth  * gs;
+          const effectiveHPx = hDir !== 0 ? Math.max(startHeight * gs + hDir * dy, this.minHeight * gs) : startHeight * gs;
+
+          // Sub-pixel delta from the snapped anchor position
+          const dw = effectiveWPx - snappedW * gs;
+          const dh = effectiveHPx - snappedH * gs;
+
+          // For west/north handles the opposite edge is fixed, so x/y shift opposite to size.
+          this.style.setProperty('--node-resize-delta-x',      `${wDir === -1 ? -dw : 0}px`);
+          this.style.setProperty('--node-resize-delta-width',  `${dw}px`);
+          this.style.setProperty('--node-resize-delta-y',      `${hDir === -1 ? -dh : 0}px`);
+          this.style.setProperty('--node-resize-delta-height', `${dh}px`);
+
+          const atMinW = wDir !== 0 && startWidth  * gs + wDir * dx < this.minWidth  * gs;
+          const atMinH = hDir !== 0 && startHeight * gs + hDir * dy < this.minHeight * gs;
           source.classList.toggle('stop', atMinW || atMinH);
         },
         snap: (dx, dy) => {
@@ -91,12 +107,6 @@ export default class PgNodeResize extends HTMLElement {
 
   render(_changes: any) {}
 
-  // Returns the pixel residual past the last snap boundary (mirrors dragUtil's snapUnits).
-  #subGrid(delta: number): number {
-    const { gridSize } = this;
-    return delta - Math.floor((delta + gridSize / 2) / gridSize) * gridSize;
-  }
-
   #compute(
     startX: number, startY: number,
     startWidth: number, startHeight: number,
@@ -105,7 +115,6 @@ export default class PgNodeResize extends HTMLElement {
   ): [number, number, number, number] {
     const newWidth  = wDir !== 0 ? Math.max(startWidth  + wDir * dx, this.minWidth)  : startWidth;
     const newHeight = hDir !== 0 ? Math.max(startHeight + hDir * dy, this.minHeight) : startHeight;
-    // West/north edges: shift x/y to keep the opposite edge stationary
     const newX = wDir === -1 ? startX + (startWidth  - newWidth)  : startX;
     const newY = hDir === -1 ? startY + (startHeight - newHeight) : startY;
     return [newX, newY, newWidth, newHeight];
