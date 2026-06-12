@@ -177,6 +177,6 @@
 [part=east].stop::before,
 [part=southWest].stop::before,
 [part=south].stop::before,
-[part=southWest].stop::before {
+[part=southEast].stop::before {
   border-color: red;
 }

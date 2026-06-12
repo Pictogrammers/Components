@@ -32,8 +32,8 @@ export default class PgNode extends HTMLElement {
     forEach({
       container: this.$items,
       items: this.fields,
-      type: (item) => PgNodeEditorText,
-      create: ($item: PgNodeEditorText, item) => {
+      type: (_item) => PgNodeEditorText,
+      create: ($item: PgNodeEditorText, _item) => {
         this.height += $item.height;
       },
     });
@@ -67,7 +67,7 @@ export default class PgNode extends HTMLElement {
     }
   }
 
-  #handleSelect(e: any) {
+  #handleSelect(_e: any) {
     this.dispatchEvent(new CustomEvent('select', {
       detail: {
         nodeId: `${this.node}`,
@@ -75,8 +75,8 @@ export default class PgNode extends HTMLElement {
     }));
   }
 
-  #resizeElement;
-  #handlePointerOver(e: any) {
+  #resizeElement: PgNodeResize | null = null;
+  #handlePointerOver(_e: any) {
     if (this.#resizeElement) {
       this.#resizeElement.style.visibility = 'visible';
       return;
@@ -93,7 +93,6 @@ export default class PgNode extends HTMLElement {
     ele.minHeight = this.getMinHeight();
     ele.addEventListener('change', (e: any) => {
       const { x, y, width, height } = e.detail;
-      console.log(x, y, width, height);
       this.x = x;
       this.y = y;
       this.width = width;
@@ -102,15 +101,18 @@ export default class PgNode extends HTMLElement {
       ele.y = y;
       ele.width = width;
       ele.height = height;
+      this.dispatchEvent(new CustomEvent('change', { detail: { x, y, width, height } }));
     });
     this.shadowRoot?.appendChild(ele);
     this.#resizeElement = ele;
     this.$node.classList.toggle('resize', true);
   }
 
-  #handlePointerOut(e: any) {
+  #handlePointerOut(_e: any) {
     this.$node.classList.toggle('resize', false);
-    this.#resizeElement.style.visibility = 'hidden';
+    if (this.#resizeElement) {
+      this.#resizeElement.style.visibility = 'hidden';
+    }
   }
 
   select() {

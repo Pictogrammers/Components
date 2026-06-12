@@ -172,6 +172,7 @@ export default class PgNodes extends HTMLElement {
         connector.setOutputPin(`${item.node}`, 'nodes', 16);
         $item.addEventListener('registernode', this.#registerNode.bind(this));
         $item.addEventListener('select', this.#handleSelect.bind(this));
+        $item.addEventListener('change', this.#handleChange.bind(this));
       },
     });
   }
@@ -211,6 +212,10 @@ export default class PgNodes extends HTMLElement {
     this.#selected.add(nodeId);
     e.target.select();
     console.log('select', nodeId);
+  }
+
+  #handleChange(e: any) {
+    this.#updatePins(String((e.target as any).node));
   }
 
   #deleteNode(nodeId: string) {

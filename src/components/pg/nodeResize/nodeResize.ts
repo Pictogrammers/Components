@@ -1,4 +1,4 @@
-import { Component, Prop, Part, forEach } from '@pictogrammers/element';
+import { Component, Prop, Part } from '@pictogrammers/element';
 
 import template from './nodeResize.html';
 import style from './nodeResize.css';
@@ -29,10 +29,8 @@ export default class PgNodeResize extends HTMLElement {
   @Part() $southEast: HTMLDivElement;
 
   connectedCallback() {
-    let startX = 0,
-      startY = 0,
-      startWidth = 12,
-      startHeight = 3;
+    let startX = 0, startY = 0, startWidth = 0, startHeight = 0;
+
     const start = () => {
       startX = this.x;
       startY = this.y;
@@ -40,110 +38,87 @@ export default class PgNodeResize extends HTMLElement {
       startHeight = this.height;
       this.classList.toggle('preview', true);
     };
-    drag({
-      source: this.$northWest,
-      gridSize: this.gridSize,
-      start,
-      move: (dx, dy) => {
-        this.previewX(dx);
-        this.previewY(dy);
-        this.previewWidth(dx * -1);
-        this.previewHeight(dy * -1);
-      },
-      snap: (dx, dy) => {
-        this.emit(
-          startX + dx,
-          startY + dy,
-          startWidth + dx * -1,
-          startHeight + dy * -1
-        );
-      },
-      end: (dx, dy, complete) => {
-        if (complete) {
-          this.emit(
-            startX + dx,
-            startY + dy,
-            startWidth + dx * -1,
-            startHeight + dy * -1
-          );
-        } else {
-          this.emit(startX, startY, startWidth, startHeight);
-        }
-        this.classList.toggle('preview', false);
-      },
-    });
-    drag({
-      source: this.$south,
-      gridSize: this.gridSize,
-      start,
-      move: (dx, dy) => {
-        console.log('dy', dy);
-        if (startHeight === this.minHeight) {
-          this.$south.classList.toggle('stop', dy < 0);
-        }
-        this.previewHeight(dy);
-      },
-      snap: (dx, dy) => {
-        if (startHeight + dy > this.minHeight) {
-          this.emit(startX, startY, startWidth, startHeight + dy);
-        } else {
-          this.emit(startX, startY, startWidth, this.minHeight);
 
-        }
-      },
-      end: (dx, dy, complete) => {
-        if (complete) {
-          this.emit(
-            startX,
-            startY,
-            startWidth,
-            startHeight + dy
-          );
-        } else {
-          this.emit(startX, startY, startWidth, startHeight);
-        }
-        this.$south.classList.toggle('stop', false);
-        this.classList.toggle('preview', false);
-        this.previewHeight(0);
-      },
-    });
+    // wDir: -1 = west edge (x + width change), 0 = no width, 1 = east edge (width only)
+    // hDir: -1 = north edge (y + height change), 0 = no height, 1 = south edge (height only)
+    const addHandle = (source: HTMLElement, wDir: -1 | 0 | 1, hDir: -1 | 0 | 1) => {
+      drag({
+        source,
+        gridSize: this.gridSize,
+        start,
+        move: (dx, dy) => {
+          // Sub-grid residual must mirror dragUtil's asymmetric floor/ceil snap algorithm.
+          // For positive deltas: floor; for negative: ceil. This avoids a ~gridSize jump
+          // each time snap fires and the anchor moves.
+          const sgX = this.#subGrid(dx);
+          const sgY = this.#subGrid(dy);
+          this.style.setProperty('--node-resize-delta-x',      `${wDir === -1 ? sgX : 0}px`);
+          this.style.setProperty('--node-resize-delta-width',  `${wDir !== 0 ? wDir * sgX : 0}px`);
+          this.style.setProperty('--node-resize-delta-y',      `${hDir === -1 ? sgY : 0}px`);
+          this.style.setProperty('--node-resize-delta-height', `${hDir !== 0 ? hDir * sgY : 0}px`);
+          const atMinW = wDir !== 0 && startWidth + wDir * dx < this.minWidth;
+          const atMinH = hDir !== 0 && startHeight + hDir * dy < this.minHeight;
+          source.classList.toggle('stop', atMinW || atMinH);
+        },
+        snap: (dx, dy) => {
+          this.emit(...this.#compute(startX, startY, startWidth, startHeight, dx, dy, wDir, hDir));
+        },
+        end: (dx, dy, complete) => {
+          if (complete) {
+            this.emit(...this.#compute(startX, startY, startWidth, startHeight, dx, dy, wDir, hDir));
+          } else {
+            this.emit(startX, startY, startWidth, startHeight);
+          }
+          source.classList.toggle('stop', false);
+          this.classList.toggle('preview', false);
+          this.style.setProperty('--node-resize-delta-x', '0px');
+          this.style.setProperty('--node-resize-delta-y', '0px');
+          this.style.setProperty('--node-resize-delta-width', '0px');
+          this.style.setProperty('--node-resize-delta-height', '0px');
+        },
+      });
+    };
+
+    addHandle(this.$northWest, -1, -1);
+    addHandle(this.$north,      0, -1);
+    addHandle(this.$northEast,  1, -1);
+    addHandle(this.$west,      -1,  0);
+    addHandle(this.$east,       1,  0);
+    addHandle(this.$southWest, -1,  1);
+    addHandle(this.$south,      0,  1);
+    addHandle(this.$southEast,  1,  1);
   }
 
-  render(changes: any) {
+  render(_changes: any) {}
 
+  // Mirrors dragUtil's snap: floor for positive deltas, ceil for negative.
+  // Returns pixel residual past the last snap boundary so CSS preview tracks smoothly.
+  #subGrid(delta: number): number {
+    const { gridSize } = this;
+    const half = gridSize / 2;
+    const snapped = delta + half < 0
+      ? Math.ceil((delta + half) / gridSize) * gridSize
+      : Math.floor((delta + half) / gridSize) * gridSize;
+    return delta - snapped;
   }
 
-  /**
-   * Emits delta size changes or 0 for no change.
-   * @param x Delta
-   * @param y Delta
-   * @param width Delta
-   * @param height Delta
-   */
+  #compute(
+    startX: number, startY: number,
+    startWidth: number, startHeight: number,
+    dx: number, dy: number,
+    wDir: -1 | 0 | 1, hDir: -1 | 0 | 1
+  ): [number, number, number, number] {
+    const newWidth  = wDir !== 0 ? Math.max(startWidth  + wDir * dx, this.minWidth)  : startWidth;
+    const newHeight = hDir !== 0 ? Math.max(startHeight + hDir * dy, this.minHeight) : startHeight;
+    // West/north edges: shift x/y to keep the opposite edge stationary
+    const newX = wDir === -1 ? startX + (startWidth  - newWidth)  : startX;
+    const newY = hDir === -1 ? startY + (startHeight - newHeight) : startY;
+    return [newX, newY, newWidth, newHeight];
+  }
+
   emit(x: number, y: number, width: number, height: number) {
     this.dispatchEvent(new CustomEvent('change', {
-      detail: {
-        x,
-        y,
-        width,
-        height,
-      }
+      detail: { x, y, width, height },
     }));
-  }
-
-  previewX(x: number) {
-    this.style.setProperty('--node-resize-delta-x', `${x % this.gridSize}px`);
-  }
-
-  previewY(y: number) {
-    this.style.setProperty('--node-resize-delta-y', `${y % this.gridSize}px`);
-  }
-
-  previewWidth(width: number) {
-    this.style.setProperty('--node-resize-delta-width', `${width % this.gridSize}px`);
-  }
-
-  previewHeight(height: number) {
-    this.style.setProperty('--node-resize-delta-height', `${((height + (this.gridSize / 2)) % this.gridSize) - (this.gridSize / 2)}px`);
   }
 }
