@@ -21,6 +21,7 @@ type UndoItem = UndoTransform | UndoDelete;
 })
 export default class PgNodes extends HTMLElement {
   @Prop() items: any = [];
+  @Prop() nodes: any = [];
   @Prop() gridSize: number = 16;
 
   @Part() $grid: HTMLDivElement;

@@ -37,8 +37,12 @@ export default class XPgNodesBasic extends HTMLElement {
         type: 'Text',
       }],
       nodes: [{
-        key: 'nodes',
-        label: 'nodes'
+        key: 't',
+        label: 'True'
+      },
+      {
+        key: 'f',
+        label: 'False'
       }],
     });
     this.$nodes.items.push({

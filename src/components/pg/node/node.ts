@@ -5,6 +5,7 @@ import PgNodeEditorText from '../nodeEditorText/nodeEditorText';
 import template from './node.html';
 import style from './node.css';
 import PgNodeResize from '../nodeResize/nodeResize';
+import PgNodeOutput from '../nodeOutput/nodeOutput';
 
 const ANCHOR_NAME = '--node-resize-anchor';
 
@@ -25,6 +26,7 @@ export default class PgNode extends HTMLElement {
 
   @Part() $node: HTMLDivElement;
   @Part() $items: HTMLDivElement;
+  @Part() $nodes: HTMLDivElement;
   @Part() $header: HTMLDivElement;
 
   connectedCallback() {
@@ -37,6 +39,18 @@ export default class PgNode extends HTMLElement {
         this.height += $item.height;
       },
     });
+
+
+    forEach({
+      container: this.$nodes,
+      items: this.nodes,
+      type: (item) => {
+        return item.key === 'nodes' ? null : PgNodeOutput;
+      },
+      create: ($item, item) => {
+        console.log('output', item);
+      },
+    })
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
   }
 
