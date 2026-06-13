@@ -40,15 +40,22 @@ export default class PgNode extends HTMLElement {
       },
     });
 
-
     forEach({
       container: this.$nodes,
       items: this.nodes,
       type: (item) => {
         return item.key === 'nodes' ? null : PgNodeOutput;
       },
-      create: ($item, item) => {
-        console.log('output', item);
+      connect: ($item, item) => {
+        const top = this.$node.getBoundingClientRect().top;
+        this.dispatchEvent(new CustomEvent('registernodeoutput', {
+          detail: {
+            node: String(this.node),
+            key: item.key,
+            label: item.label,
+            offset: $item.getBoundingClientRect().top - top + 10,
+          }
+        }));
       },
     })
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));

@@ -35,18 +35,3 @@
   outline: 2px solid #248BE5;
   outline-offset: 1px;
 }
-
-[part=node].resize {
-  position: relative;
-}
-
-[part=node].resize::before {
-  content: ' ';
-  position: absolute;
-  border: 6px solid rgba(255, 255, 255, 0.2);
-  left: -0.5rem;
-  top: -0.5rem;
-  right: -0.5rem;
-  bottom: -0.5rem;
-  border-radius: 0.5rem;
-}

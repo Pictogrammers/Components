@@ -121,17 +121,31 @@ export default class PgNodes extends HTMLElement {
           source: this.$items,
           x: e.clientX,
           y: e.clientY,
-          items: [{ label: 'Add Node', value: 'addNode', type: PgMenuItem }],
+          items: [
+            { label: 'Add Node', value: 'addNode', type: PgMenuItem },
+            { label: 'Add Node Bool', value: 'addNodeBool', type: PgMenuItem }
+          ],
         });
         if (!result) { return; }
-        if (result.value === 'addNode') {
-          this.items.push({
-            node: this.#nextNodeId,
-            x,
-            y,
-            fields: [{ label: 'Name', value: 'Foo', type: 'Text' }],
-            nodes: [{ key: 't', label: 'True' }, { key: 'f', label: 'False' }],
-          });
+        switch(result.value) {
+          case 'addNode':
+            this.items.push({
+              node: this.#nextNodeId,
+              x,
+              y,
+              fields: [{ label: 'Name', value: 'Foo', type: 'Text' }],
+              nodes: [{ key: 'nodes', label: 'Nodes' }],
+            });
+            break;
+          case 'addNodeBool':
+            this.items.push({
+              node: this.#nextNodeId,
+              x,
+              y,
+              fields: [{ label: 'Name', value: 'Foo', type: 'Text' }],
+              nodes: [{ key: 't', label: 'True' }, { key: 'f', label: 'False' }],
+            });
+            break;
         }
       } else {
         this.clearSelection();
@@ -163,8 +177,11 @@ export default class PgNodes extends HTMLElement {
         if (item.node !== 0) {
           connector.setInputPin(nodeId, 'in', 16);
         }
-        connector.setOutputPin(nodeId, 'nodes', 16);
+        if (item.nodes.some(x => x.key === 'nodes')) {
+          connector.setOutputPin(nodeId, 'nodes', 16);
+        }
         $item.addEventListener('registernode', this.#registerNode.bind(this));
+        $item.addEventListener('registernodeoutput', this.#registerNodeOutput.bind(this));
         $item.addEventListener('select', this.#handleSelect.bind(this));
         $item.addEventListener('change', this.#handleChange.bind(this));
         this.#nodeStates.set(nodeId, {
@@ -196,6 +213,11 @@ export default class PgNodes extends HTMLElement {
     const nodeId = `${node}`;
     const index = this.#nodePinCounts.get(nodeId) ?? 0;
     this.#nodePinCounts.set(nodeId, index + 1);
+  }
+
+  #registerNodeOutput(e: any) {
+    const { node, key, offset } = e.detail;
+    this.#connector?.setOutputPin(node, key, offset);
   }
 
   #shiftOrCtrl: boolean = false;

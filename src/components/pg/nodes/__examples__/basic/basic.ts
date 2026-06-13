@@ -55,11 +55,8 @@ export default class XPgNodesBasic extends HTMLElement {
         type: 'Text',
       }],
       nodes: [{
-        key: 't',
-        label: 'True'
-      }, {
-        key: 'f',
-        label: 'False'
+        key: 'nodes',
+        label: 'Nodes'
       }],
     });
     this.$nodes.addEventListener('change', this.#handleChange.bind(this));

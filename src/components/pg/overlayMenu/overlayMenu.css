@@ -13,4 +13,5 @@
   min-width: calc(anchor-size(width) + calc(2 * var(--pg-menu-padding, 0.25rem)));
   translate: var(--pg-overlay-menu-_x, 0) var(--pg-overlay-menu-_y, 0);
   overflow: visible;
+  position-visibility: always;
 }

@@ -10,8 +10,22 @@ label {
 }
 
 [part=label] {
-  font-size: 0.625rem;
-  line-height: 0.875rem;
+  position: relative;
+  font-size: 0.75rem;
+  line-height: 1rem;
   padding-inline: 0.25rem;
   color: rgba(255, 255, 255, 0.8);
+}
+
+[part=label]::before {
+  position: absolute;
+  content: ' ';
+  width: 0.5rem;
+  height: 0.5rem;
+  transform: rotate(45deg);
+  border-top: 2px solid rgba(255, 255, 255, 0.5);
+  border-right: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-right-radius: 0.25rem;
+  left: calc(-0.5rem - 1px);
+  top: 0.25rem;
 }

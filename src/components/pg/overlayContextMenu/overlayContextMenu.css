@@ -13,4 +13,5 @@
   left: anchor(left);
   min-width: 10rem;
   margin: var(--pg-overlay-menu-_y, 0) 0 0 var(--pg-overlay-menu-_x, 0);
+  position-visibility: always;
 }

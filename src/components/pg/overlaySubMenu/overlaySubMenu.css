@@ -13,6 +13,7 @@
   left: calc(anchor(right) - 0.125rem - 1px);
   translate: var(--pg-overlay-menu-_x, 0) var(--pg-overlay-menu-_y, 0);
   position-try-fallbacks: --custom-right, --custom-left;
+  position-visibility: always;
 }
 
 @position-try --custom-right {

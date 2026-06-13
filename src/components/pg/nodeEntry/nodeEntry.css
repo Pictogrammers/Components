@@ -29,17 +29,6 @@
   border-color: rgba(67, 227, 64, 0.75);
 }
 
-[part=node].resize::before {
-  content: ' ';
-  position: absolute;
-  border: 6px solid rgba(255, 255, 255, 0.2);
-  left: -0.5rem;
-  top: -0.5rem;
-  right: -0.5rem;
-  bottom: -0.5rem;
-  border-radius: 0.5rem;
-}
-
 textarea {
   background-color: #2B2B2B;
   border: 0;
@@ -47,7 +36,7 @@ textarea {
   font-family: var(--pg-input-text-font-family, var(--pg-font-family, system-ui));
   margin-inline: 0.25rem;
   resize: none;
-  height: 2.75rem;
+  flex: 1;
 }
 
 textarea:focus {
