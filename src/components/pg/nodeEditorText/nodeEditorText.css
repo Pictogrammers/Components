@@ -18,7 +18,7 @@ label {
 
 [part=input] {
   border: 0;
-  border-radius: 0;
+  border-radius: 0.125rem;
   padding-inline-start: 0.25rem;
   padding-inline-end: 0.25rem;
   padding-block-start: 0;
@@ -35,6 +35,7 @@ label {
   );
   background-color: #2B2B2B;
   color: #FFF;
+  outline: 1px solid #444;
 }
 
 [part=input]:read-only {
@@ -42,8 +43,8 @@ label {
 }
 
 [part=input]:active {
-  box-shadow: 0 0 0 3px var(--pg-input-text-active-glow, rgb(79, 143, 249, 0.6));
+  outline-color: rgb(79, 143, 249, 0.75);
 }
 [part=input]:focus {
-  box-shadow: 0 0 0 2px var(--pg-input-text-focus-glow, rgb(79, 143, 249, 0.75));
+  outline-color: rgb(79, 143, 249, 0.75);
 }

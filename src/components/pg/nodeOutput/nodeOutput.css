@@ -6,26 +6,27 @@
 label {
   display: flex;
   flex-direction: column;
-  padding-inline: 0.25rem;
 }
 
 [part=label] {
   position: relative;
+  display: flex;
   font-size: 0.75rem;
   line-height: 1rem;
-  padding-inline: 0.25rem;
+  padding-right: 1.125rem;
   color: rgba(255, 255, 255, 0.8);
+  justify-content: right;
 }
 
-[part=label]::before {
+[part=label]::after {
   position: absolute;
   content: ' ';
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.25rem;
+  height: 0.25rem;
   transform: rotate(45deg);
   border-top: 2px solid rgba(255, 255, 255, 0.5);
   border-right: 2px solid rgba(255, 255, 255, 0.5);
-  border-top-right-radius: 0.25rem;
-  left: calc(-0.5rem - 1px);
-  top: 0.25rem;
+  border-top-right-radius: 0.125rem;
+  right: 0.5rem;
+  top: 0.4rem;
 }

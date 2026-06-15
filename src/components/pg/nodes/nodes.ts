@@ -23,6 +23,7 @@ export default class PgNodes extends HTMLElement {
   @Prop() items: any = [];
   @Prop() nodes: any = [];
   @Prop() gridSize: number = 16;
+  @Prop() menuItems: any = [];
 
   @Part() $grid: HTMLDivElement;
   @Part() $svg: SVGSVGElement;
