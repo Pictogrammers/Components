@@ -1,5 +1,5 @@
 export const nodeExamples = [{
-  name: '',
+  name: 'conditional',
   node: {
     node: this.#nextNodeId,
     x,

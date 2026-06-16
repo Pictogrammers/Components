@@ -61,6 +61,9 @@ export default class XPgNodesBasic extends HTMLElement {
     });
     this.$nodes.addEventListener('change', this.#handleChange.bind(this));
     this.$nodes.addEventListener('input', this.#handleInput.bind(this));
+    this.$nodes.addEventListener('menuopen', (e: any) => {
+      this.$nodes.menuItems.push()
+    });
   }
 
   #handleChange(e: CustomEvent) {

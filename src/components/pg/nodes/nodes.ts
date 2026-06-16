@@ -11,8 +11,9 @@ import style from './nodes.css';
 
 type NodeState = { x: number; y: number; width: number; height: number };
 type UndoTransform = { type: 'transform'; nodeId: string; before: NodeState; after: NodeState };
+type UndoMultiTransform = { type: 'multi-transform'; primaryNodeId: string; transforms: Array<{ nodeId: string; before: NodeState; after: NodeState }> };
 type UndoDelete = { type: 'delete'; item: any; index: number };
-type UndoItem = UndoTransform | UndoDelete;
+type UndoItem = UndoTransform | UndoMultiTransform | UndoDelete;
 
 @Component({
   selector: 'pg-nodes',
@@ -29,6 +30,7 @@ export default class PgNodes extends HTMLElement {
   @Part() $svg: SVGSVGElement;
   @Part() $items: HTMLDivElement;
   @Part() $forceScroll: HTMLDivElement;
+  @Part() $selection: HTMLDivElement;
 
   #nextNodeId: number = 0;
   #connector: NodeConnector | null = null;
@@ -38,6 +40,10 @@ export default class PgNodes extends HTMLElement {
   #undo: UndoItem[] = [];
   #redo: UndoItem[] = [];
   #nodeStates = new Map<string, NodeState>();
+
+  #dragOrigin: { x: number; y: number } | null = null;
+  #isDragging: boolean = false;
+  #wasSelectionDrag: boolean = false;
 
   connectedCallback() {
     const connector = new NodeConnector(this.$svg);
@@ -106,9 +112,105 @@ export default class PgNodes extends HTMLElement {
     });
 
     this.$grid.addEventListener('click', (e: any) => {
+      if (this.#wasSelectionDrag) {
+        this.#wasSelectionDrag = false;
+        return;
+      }
       if (e.target.part.contains('grid')) {
         this.clearSelection();
       }
+    });
+
+    this.$grid.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (!e.isPrimary) return;
+      const ele = e.target as HTMLElement;
+      if (!ele.part?.contains('grid')) return;
+
+      const rect = this.$grid.getBoundingClientRect();
+      this.#dragOrigin = {
+        x: e.clientX - rect.left + this.$grid.scrollLeft,
+        y: e.clientY - rect.top + this.$grid.scrollTop,
+      };
+      this.#isDragging = false;
+
+      const cancelDrag = () => {
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('keydown', onKeyDown);
+        this.$grid.classList.remove('selecting');
+        this.$selection.classList.remove('active');
+        this.#dragOrigin = null;
+        this.#isDragging = false;
+      };
+
+      const onKeyDown = (ev: KeyboardEvent) => {
+        if (ev.key === 'Escape') cancelDrag();
+      };
+
+      const onMove = (ev: PointerEvent) => {
+        if (!this.#dragOrigin) return;
+        const r = this.$grid.getBoundingClientRect();
+        const curX = ev.clientX - r.left + this.$grid.scrollLeft;
+        const curY = ev.clientY - r.top + this.$grid.scrollTop;
+        const w = Math.abs(curX - this.#dragOrigin.x);
+        const h = Math.abs(curY - this.#dragOrigin.y);
+        if (w > 4 || h > 4) {
+          this.#isDragging = true;
+          this.$grid.classList.add('selecting');
+          this.$selection.classList.add('active');
+          this.$selection.style.left = `${Math.min(this.#dragOrigin.x, curX)}px`;
+          this.$selection.style.top = `${Math.min(this.#dragOrigin.y, curY)}px`;
+          this.$selection.style.width = `${w}px`;
+          this.$selection.style.height = `${h}px`;
+        }
+      };
+
+      const onUp = (ev: PointerEvent) => {
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('keydown', onKeyDown);
+        this.$grid.classList.remove('selecting');
+        this.$selection.classList.remove('active');
+
+        if (!this.#dragOrigin || !this.#isDragging) {
+          this.#dragOrigin = null;
+          this.#isDragging = false;
+          return;
+        }
+
+        const origin = this.#dragOrigin;
+        this.#dragOrigin = null;
+        this.#isDragging = false;
+        this.#wasSelectionDrag = true;
+
+        const r = this.$grid.getBoundingClientRect();
+        const curX = ev.clientX - r.left + this.$grid.scrollLeft;
+        const curY = ev.clientY - r.top + this.$grid.scrollTop;
+        const selX = Math.min(origin.x, curX);
+        const selY = Math.min(origin.y, curY);
+        const selW = Math.abs(curX - origin.x);
+        const selH = Math.abs(curY - origin.y);
+
+        if (!ev.shiftKey) {
+          this.clearSelection();
+        }
+
+        Array.from(this.$items.children).forEach((child: any) => {
+          const nodeId = String(child.node);
+          const nx = child.x * this.gridSize;
+          const ny = child.y * this.gridSize;
+          const nw = (child.width ?? 12) * this.gridSize;
+          const nh = (child.height ?? 4) * this.gridSize;
+          if (nx < selX + selW && nx + nw > selX && ny < selY + selH && ny + nh > selY) {
+            this.#selected.add(nodeId);
+            child.select();
+          }
+        });
+      };
+
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+      document.addEventListener('keydown', onKeyDown);
     });
 
     this.$grid.addEventListener('contextmenu', async (e: MouseEvent) => {
@@ -185,12 +287,16 @@ export default class PgNodes extends HTMLElement {
         $item.addEventListener('registernodeoutput', this.#registerNodeOutput.bind(this));
         $item.addEventListener('select', this.#handleSelect.bind(this));
         $item.addEventListener('change', this.#handleChange.bind(this));
+      },
+      connect: ($item: any, item) => {
+        const nodeId = `${item.node}`;
         this.#nodeStates.set(nodeId, {
-          x: item.x,
-          y: item.y,
-          width: item.width ?? 12,
-          height: item.height ?? 4,
+          x: $item.x,
+          y: $item.y,
+          width: $item.width ?? 12,
+          height: $item.height ?? 4,
         });
+         connector.setNode(nodeId, $item.x * 16, $item.y * 16, ($item.width ?? 12) * 16, ($item.height ?? 4) * 16);
       },
     });
   }
@@ -238,6 +344,45 @@ export default class PgNodes extends HTMLElement {
     const nodeId = String((e.target as any).node);
     const { x, y, width, height } = e.detail;
     const before = this.#nodeStates.get(nodeId) ?? { x, y, width, height };
+
+    if (this.#selected.has(nodeId) && this.#selected.size > 1) {
+      const dx = x - before.x;
+      const dy = y - before.y;
+      const last = this.#undo.at(-1);
+      if (last?.type === 'multi-transform' && last.primaryNodeId === nodeId) {
+        for (const t of last.transforms) {
+          const cur = this.#nodeStates.get(t.nodeId) ?? t.after;
+          const newAfter: NodeState = t.nodeId === nodeId
+            ? { x, y, width, height }
+            : { x: cur.x + dx, y: cur.y + dy, width: cur.width, height: cur.height };
+          t.after = newAfter;
+          if (t.nodeId !== nodeId) {
+            const other = this.getNodeById(t.nodeId) as any;
+            if (other) { other.x = newAfter.x; other.y = newAfter.y; }
+          }
+          this.#nodeStates.set(t.nodeId, newAfter);
+          this.#updatePins(t.nodeId);
+        }
+      } else {
+        const transforms = Array.from(this.#selected).map((id) => {
+          const state = this.#nodeStates.get(id) ?? { x: 0, y: 0, width: 12, height: 4 };
+          const after: NodeState = id === nodeId
+            ? { x, y, width, height }
+            : { x: state.x + dx, y: state.y + dy, width: state.width, height: state.height };
+          if (id !== nodeId) {
+            const other = this.getNodeById(id) as any;
+            if (other) { other.x = after.x; other.y = after.y; }
+          }
+          this.#nodeStates.set(id, after);
+          this.#updatePins(id);
+          return { nodeId: id, before: { ...state }, after };
+        });
+        this.#undo.push({ type: 'multi-transform', primaryNodeId: nodeId, transforms });
+        this.#redo = [];
+      }
+      return;
+    }
+
     this.#pushTransform(nodeId, before, { x, y, width, height });
     this.#updatePins(nodeId);
   }
@@ -281,6 +426,20 @@ export default class PgNodes extends HTMLElement {
         node.height = state.height;
         this.#nodeStates.set(item.nodeId, state);
         this.#updatePins(item.nodeId);
+        break;
+      }
+      case 'multi-transform': {
+        for (const t of item.transforms) {
+          const state = direction === 'undo' ? t.before : t.after;
+          const node = this.getNodeById(t.nodeId) as any;
+          if (!node) continue;
+          node.x = state.x;
+          node.y = state.y;
+          node.width = state.width;
+          node.height = state.height;
+          this.#nodeStates.set(t.nodeId, state);
+          this.#updatePins(t.nodeId);
+        }
         break;
       }
       case 'delete': {

@@ -11,6 +11,11 @@
   background-image: linear-gradient(#1a1d2e 1px, transparent 1px), linear-gradient(90deg, #1a1d2e 1px, transparent 1px);
   background-size: 1rem 1rem;
   background-attachment: local;
+  user-select: none;
+}
+
+[part=grid].selecting {
+  cursor: default;
 }
 
 [part=grid]:hover {
@@ -40,4 +45,18 @@
 
 [part=svg] circle {
   pointer-events: all;
+}
+
+[part=selection] {
+  position: absolute;
+  display: none;
+  border: 1px solid #248BE5;
+  background: rgba(36, 139, 229, 0.1);
+  pointer-events: none;
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+[part=selection].active {
+  display: block;
 }

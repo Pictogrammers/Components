@@ -46,7 +46,10 @@ export default class PgNode extends HTMLElement {
       type: (item) => {
         return item.key === 'nodes' ? null : PgNodeOutput;
       },
-      connect: ($item, item) => {
+      create: ($item: PgNodeOutput, _item) => {
+        this.height += $item.height;
+      },
+      connect: ($item: any, item) => {
         const top = this.$node.getBoundingClientRect().top;
         this.dispatchEvent(new CustomEvent('registernodeoutput', {
           detail: {
