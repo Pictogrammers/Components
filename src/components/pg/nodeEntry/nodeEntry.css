@@ -48,3 +48,14 @@ textarea:focus {
   outline: 2px solid #248BE5;
   outline-offset: 2px;
 }
+
+[part=node].debug {
+  border-color: #4ade80;
+  box-shadow: 0 0 0.5rem rgba(74, 222, 128, 0.75);
+  outline: 1px solid #1a1d2e;
+  outline-offset: 0;
+}
+
+[part=node].debug [part=header] {
+  color: #4ade80;
+}

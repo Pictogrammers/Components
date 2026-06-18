@@ -33,3 +33,10 @@ import { PgNodes } from '@pictogrammers/components/pgNodes';
 | CSS Variables       | Default   | Description |
 | ------------------- | --------- | ----------- |
 | n/a   |  |  |
+
+
+### Custom Editors
+
+```typescript
+this.$node.editors.push(PgNodeEditorText);
+```

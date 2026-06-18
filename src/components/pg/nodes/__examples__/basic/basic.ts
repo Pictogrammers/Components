@@ -2,6 +2,9 @@ import { Component, Part } from '@pictogrammers/element';
 import PgNodes from '../../nodes';
 
 import template from './basic.html';
+import PgNodeEditorText from 'components/pg/nodeEditorText/nodeEditorText';
+import PgNodeEditorRange from 'components/pg/nodeEditorRange/nodeEditorRange';
+import PgNodeEditorNumber from 'components/pg/nodeEditorNumber/nodeEditorNumber';
 
 @Component({
   selector: 'x-pg-nodes-basic',
@@ -12,6 +15,15 @@ export default class XPgNodesBasic extends HTMLElement {
   @Part() $nodes: PgNodes;
 
   connectedCallback() {
+    // Editors
+    this.$nodes.editors.push(PgNodeEditorText);
+    this.$nodes.editors.push(PgNodeEditorNumber);
+    this.$nodes.editors.push(PgNodeEditorRange);
+    // Node Types
+    //this.$nodes.types.push({
+
+    //});
+    // Nodes
     this.$nodes.items.push({
       node: 0,
       x: 2,

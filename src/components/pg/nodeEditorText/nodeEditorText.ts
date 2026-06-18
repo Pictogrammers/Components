@@ -47,4 +47,8 @@ export default class PgNodeEditorText extends HTMLElement {
   get height() {
     return 2;
   }
+
+  get type() {
+    return 'Text';
+  }
 }

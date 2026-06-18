@@ -18,6 +18,7 @@ export default class PgNodeEntry extends HTMLElement {
   @Prop() height: number = 5;
   @Prop() node: number = 0;
   @Prop() nodes: any = [];
+  @Prop() debug: boolean = false;
 
   @Part() $node: HTMLDivElement;
   @Part() $header: HTMLDivElement;
@@ -50,6 +51,9 @@ export default class PgNodeEntry extends HTMLElement {
     }
     if (changes.height) {
       this.$node.style.setProperty('--pg-node-height', `${this.height}rem`);
+    }
+    if (changes.debug) {
+      this.$node.classList.toggle('debug', this.debug);
     }
     if (this.#resizeElement) {
       if (changes.x) this.#resizeElement.x = this.x;

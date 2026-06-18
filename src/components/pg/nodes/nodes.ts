@@ -25,6 +25,10 @@ export default class PgNodes extends HTMLElement {
   @Prop() nodes: any = [];
   @Prop() gridSize: number = 16;
   @Prop() menuItems: any = [];
+  // Field Editors
+  @Prop() editors: any = [];
+  // Scripts
+  @Prop() scripts: any = [];
 
   @Part() $grid: HTMLDivElement;
   @Part() $svg: SVGSVGElement;
@@ -36,6 +40,7 @@ export default class PgNodes extends HTMLElement {
   #connector: NodeConnector | null = null;
   #nodePinCounts = new Map<string, number>();
   #selected = new Set<string>();
+  #debug: string | null = null;
 
   #undo: UndoItem[] = [];
   #redo: UndoItem[] = [];
@@ -220,14 +225,14 @@ export default class PgNodes extends HTMLElement {
       const y = Math.floor((e.clientY - rect.top + this.$grid.scrollTop) / this.gridSize);
       const ele = e.target as HTMLDivElement;
       if (ele.part.contains('grid')) {
+        const { scripts } = this;
         const result = await PgOverlayContextMenu.open({
           source: this.$items,
           x: e.clientX,
           y: e.clientY,
-          items: [
-            { label: 'Add Node', value: 'addNode', type: PgMenuItem },
-            { label: 'Add Node Bool', value: 'addNodeBool', type: PgMenuItem }
-          ],
+          items: scripts.map((editor: any) => {
+            return { label: scripts.description, value: scripts.name, type: PgMenuItem }
+          }),
         });
         if (!result) { return; }
         switch(result.value) {
@@ -296,7 +301,13 @@ export default class PgNodes extends HTMLElement {
           width: $item.width ?? 12,
           height: $item.height ?? 4,
         });
-         connector.setNode(nodeId, $item.x * 16, $item.y * 16, ($item.width ?? 12) * 16, ($item.height ?? 4) * 16);
+        connector.setNode(
+          nodeId,
+          $item.x * 16,
+          $item.y * 16,
+          ($item.width ?? 12) * 16,
+          ($item.height ?? 4) * 16
+        );
       },
     });
   }
@@ -495,5 +506,15 @@ export default class PgNodes extends HTMLElement {
       (width ?? 12) * this.gridSize,
       (height ?? 3) * this.gridSize
     );
+  }
+
+  debug(nodeId: string | null) {
+    if (this.#debug !== null) {
+      this.getNodeById(this.#debug).debug = false;
+    }
+    if (nodeId !== null) {
+      this.getNodeById(nodeId).debug = true;
+      this.#debug = nodeId;
+    }
   }
 }

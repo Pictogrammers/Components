@@ -23,6 +23,7 @@ export default class PgNode extends HTMLElement {
   @Prop() fields: any = [];
   // output pins
   @Prop() nodes: any = [];
+  @Prop() debug: boolean = false;
 
   @Part() $node: HTMLDivElement;
   @Part() $items: HTMLDivElement;
@@ -87,6 +88,9 @@ export default class PgNode extends HTMLElement {
     }
     if (changes.height) {
       this.style.setProperty('--pg-node-height', `${this.height}rem`);
+    }
+    if (changes.debug) {
+      this.$node.classList.toggle('debug', this.debug);
     }
     if (this.#resizeElement) {
       if (changes.x) this.#resizeElement.x = this.x;
