@@ -17,17 +17,31 @@ export default class PgNodeEntry extends HTMLElement {
   @Prop() width: number = 12;
   @Prop() height: number = 5;
   @Prop() itemId: number = 0;
+  @Prop() fields: any = [];
   @Prop() debug: boolean = false;
 
   @Part() $node: HTMLDivElement;
   @Part() $header: HTMLDivElement;
+  @Part() $input: HTMLTextAreaElement;
 
   connectedCallback() {
     this.height = this.getMinHeight();
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
+    this.$input.addEventListener('input', () => {
+      this.dispatchEvent(new CustomEvent('input', { detail: { key: 'description', value: this.$input.value } }));
+    });
+    this.$input.addEventListener('change', () => {
+      this.dispatchEvent(new CustomEvent('change', { detail: { key: 'description', value: this.$input.value } }));
+    });
   }
 
   render(changes: any) {
+    if (changes.fields) {
+      const field = this.fields.find((f: any) => f.key === 'description');
+      if (field) {
+        this.$input.value = field.value ?? '';
+      }
+    }
     if (changes.x) {
       this.$node.style.setProperty('left', `${this.x}rem`);
     }

@@ -57,7 +57,7 @@ export default class PgNode extends HTMLElement {
             node: String(this.itemId),
             key: item.key,
             label: item.label,
-            offset: $item.getBoundingClientRect().top - top + 10,
+            offset: $item.getBoundingClientRect().top - top + 31,
           }
         }));
       },

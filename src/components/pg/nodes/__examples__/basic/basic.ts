@@ -91,8 +91,7 @@ export default class XPgNodesBasic extends HTMLElement {
       width: 10,
       height: 4,
       args: {
-        key: 'description',
-        value: 'Script description',
+        description: 'Script description',
       },
       nodes: {
         then: [1],

@@ -37,6 +37,7 @@ export default class PgNodes extends HTMLElement {
 
   #nextNodeId: number = 0;
   #connector: NodeConnector | null = null;
+  #connectionsScheduled: boolean = false;
   #nodePinCounts = new Map<string, number>();
   #selected = new Set<string>();
   #debug: string | null = null;
@@ -293,6 +294,7 @@ export default class PgNodes extends HTMLElement {
         } else {
           // Entry node (id 0): always has a single 'then' output
           connector.setOutputPin(nodeId, 'then', 16);
+          $item.fields = [{ key: 'description', value: item.args?.description ?? '' }];
         }
 
         $item.addEventListener('registernode', this.#registerNode.bind(this));
@@ -315,19 +317,21 @@ export default class PgNodes extends HTMLElement {
           ($item.width ?? 12) * 16,
           ($item.height ?? 4) * 16
         );
-      },
-    });
-
-    // Wire initial connections after all nodes are registered
-    queueMicrotask(() => {
-      this.items.forEach((item: any) => {
-        if (!item.nodes || typeof item.nodes !== 'object') return;
-        Object.entries(item.nodes as Record<string, number[]>).forEach(([key, targets]) => {
-          targets.forEach((targetId: number) => {
-            connector.connect(`${item.id}`, key, `${targetId}`, 'in');
+        if (!this.#connectionsScheduled) {
+          this.#connectionsScheduled = true;
+          queueMicrotask(() => {
+            this.#connectionsScheduled = false;
+            this.items.forEach((i: any) => {
+              if (!i.nodes || typeof i.nodes !== 'object') return;
+              Object.entries(i.nodes as Record<string, number[]>).forEach(([key, targets]) => {
+                targets.forEach((targetId: number) => {
+                  connector.connect(`${i.id}`, key, `${targetId}`, 'in');
+                });
+              });
+            });
           });
-        });
-      });
+        }
+      },
     });
   }
 
