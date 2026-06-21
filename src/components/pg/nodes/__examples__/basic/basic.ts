@@ -67,6 +67,32 @@ export default class XPgNodesBasic extends HTMLElement {
         }
       },
     }, {
+      name: 'lessThan',
+      label: 'Less Than',
+      args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+      }, {
+        key: 'value',
+        label: 'Value',
+        editor: 'Text',
+      }],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ state, t, f, key, value }: any) => {
+        if (state.get(key) < value) {
+          return t;
+        } else {
+          return f;
+        }
+      },
+    }, {
       name: 'log',
       label: 'Log',
       args: [{
@@ -88,10 +114,10 @@ export default class XPgNodesBasic extends HTMLElement {
       id: 0,
       x: 2,
       y: 2,
-      width: 10,
+      width: 12,
       height: 4,
       args: {
-        description: 'Script description',
+        description: 'Basic example.',
       },
       nodes: {
         then: [1],
@@ -101,7 +127,7 @@ export default class XPgNodesBasic extends HTMLElement {
       id: 1,
       x: 16,
       y: 2,
-      node: 'equals',
+      node: 'lessThan',
       args: {
         key: 'health',
         value: '5',
@@ -121,7 +147,7 @@ export default class XPgNodesBasic extends HTMLElement {
         value: '10',
       },
       nodes: {
-        then: [],
+        then: [4],
       },
     });
     this.$script.items.push({
@@ -132,6 +158,18 @@ export default class XPgNodesBasic extends HTMLElement {
       args: {
         key: 'health',
         value: '20',
+      },
+      nodes: {
+        then: [4],
+      },
+    });
+    this.$script.items.push({
+      id: 4,
+      x: 44,
+      y: 8,
+      node: 'log',
+      args: {
+        message: 'Health increased to ${health}',
       },
       nodes: {
         then: [],
