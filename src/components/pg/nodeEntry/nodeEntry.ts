@@ -16,8 +16,7 @@ export default class PgNodeEntry extends HTMLElement {
   @Prop() y: number = 0;
   @Prop() width: number = 12;
   @Prop() height: number = 5;
-  @Prop() node: number = 0;
-  @Prop() nodes: any = [];
+  @Prop() itemId: number = 0;
   @Prop() debug: boolean = false;
 
   @Part() $node: HTMLDivElement;
@@ -29,17 +28,6 @@ export default class PgNodeEntry extends HTMLElement {
   }
 
   render(changes: any) {
-    if (changes.nodes) {
-      this.nodes.forEach(({ key, label }: any) => {
-        this.dispatchEvent(new CustomEvent('registernode', {
-          detail: {
-            node: `${this.node}`,
-            key,
-            label,
-          }
-        }));
-      });
-    }
     if (changes.x) {
       this.$node.style.setProperty('left', `${this.x}rem`);
     }
@@ -66,7 +54,7 @@ export default class PgNodeEntry extends HTMLElement {
   #handleSelect(_e: any) {
     this.dispatchEvent(new CustomEvent('select', {
       detail: {
-        nodeId: `${this.node}`,
+        nodeId: `${this.itemId}`,
       }
     }));
   }
@@ -122,7 +110,6 @@ export default class PgNodeEntry extends HTMLElement {
   }
 
   getMinHeight() {
-    // header (1.5rem) + textarea (2.75rem) + bottom padding (0.25rem) = 4.5rem → 5 grid units
     return 5;
   }
 

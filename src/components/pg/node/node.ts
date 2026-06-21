@@ -19,15 +19,15 @@ export default class PgNode extends HTMLElement {
   @Prop() y: number = 0;
   @Prop() width: number = 12;
   @Prop() height: number = 3;
-  @Prop() node: number = 0;
+  @Prop() itemId: number = 0;
+  @Prop() label: string = '';
   @Prop() fields: any = [];
-  // output pins
-  @Prop() nodes: any = [];
+  @Prop() outputs: any = [];
   @Prop() debug: boolean = false;
 
   @Part() $node: HTMLDivElement;
   @Part() $items: HTMLDivElement;
-  @Part() $nodes: HTMLDivElement;
+  @Part() $outputs: HTMLDivElement;
   @Part() $header: HTMLDivElement;
 
   connectedCallback() {
@@ -42,10 +42,10 @@ export default class PgNode extends HTMLElement {
     });
 
     forEach({
-      container: this.$nodes,
-      items: this.nodes,
+      container: this.$outputs,
+      items: this.outputs,
       type: (item) => {
-        return item.key === 'nodes' ? null : PgNodeOutput;
+        return item.key === 'then' ? null : PgNodeOutput;
       },
       create: ($item: PgNodeOutput, _item) => {
         this.height += $item.height;
@@ -54,28 +54,31 @@ export default class PgNode extends HTMLElement {
         const top = this.$node.getBoundingClientRect().top;
         this.dispatchEvent(new CustomEvent('registernodeoutput', {
           detail: {
-            node: String(this.node),
+            node: String(this.itemId),
             key: item.key,
             label: item.label,
             offset: $item.getBoundingClientRect().top - top + 10,
           }
         }));
       },
-    })
+    });
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
   }
 
   render(changes: any) {
-    if (changes.nodes) {
-      this.nodes.forEach(({ key, label }: any) => {
+    if (changes.outputs) {
+      this.outputs.forEach(({ key, label }: any) => {
         this.dispatchEvent(new CustomEvent('registernode', {
           detail: {
-            node: this.node,
+            node: this.itemId,
             key,
             label,
           }
         }));
       });
+    }
+    if (changes.label) {
+      this.$header.textContent = this.label;
     }
     if (changes.x) {
       this.style.setProperty('left', `${this.x}rem`);
@@ -103,7 +106,7 @@ export default class PgNode extends HTMLElement {
   #handleSelect(_e: any) {
     this.dispatchEvent(new CustomEvent('select', {
       detail: {
-        nodeId: `${this.node}`,
+        nodeId: `${this.itemId}`,
       }
     }));
   }

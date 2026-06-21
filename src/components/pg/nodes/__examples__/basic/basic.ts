@@ -12,79 +12,137 @@ import PgNodeEditorNumber from 'components/pg/nodeEditorNumber/nodeEditorNumber'
 })
 export default class XPgNodesBasic extends HTMLElement {
 
-  @Part() $nodes: PgNodes;
+  @Part() $script: PgNodes;
 
   connectedCallback() {
-    // Editors
-    this.$nodes.editors.push(PgNodeEditorText);
-    this.$nodes.editors.push(PgNodeEditorNumber);
-    this.$nodes.editors.push(PgNodeEditorRange);
-    // Node Types
-    //this.$nodes.types.push({
-
-    //});
-    // Nodes
-    this.$nodes.items.push({
-      node: 0,
+    // Node Editors
+    this.$script.editors.push(PgNodeEditorText);
+    this.$script.editors.push(PgNodeEditorNumber);
+    this.$script.editors.push(PgNodeEditorRange);
+    // Node type registry
+    this.$script.nodes.push({
+      name: 'setState',
+      label: 'Set',
+      args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+      }, {
+        key: 'value',
+        label: 'Value',
+        editor: 'Text',
+      }],
+      nodes: [{
+        key: 'then',
+        label: 'Then',
+      }],
+      handler: ({ state, nodes, key, value }: any) => {
+        state.set(key, value);
+        return nodes;
+      },
+    }, {
+      name: 'equals',
+      label: 'State Equals',
+      args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+      }, {
+        key: 'value',
+        label: 'Value',
+        editor: 'Text',
+      }],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ state, t, f, key, value }: any) => {
+        if (state.get(key) === value) {
+          return t;
+        } else {
+          return f;
+        }
+      },
+    }, {
+      name: 'log',
+      label: 'Log',
+      args: [{
+        key: 'message',
+        label: 'Message',
+        editor: 'Text',
+      }],
+      nodes: [{
+        key: 'then',
+        label: 'Then',
+      }],
+      handler: ({ nodes, message }: any) => {
+        console.log(message);
+        return nodes;
+      },
+    });
+    // Items
+    this.$script.items.push({
+      id: 0,
       x: 2,
       y: 2,
       width: 10,
       height: 4,
-      nodes: [{
-        key: 'nodes',
-        label: 'nodes'
-      }],
+      args: {
+        key: 'description',
+        value: 'Script description',
+      },
+      nodes: {
+        then: [1],
+      },
     });
-    this.$nodes.items.push({
-      node: 1,
+    this.$script.items.push({
+      id: 1,
       x: 16,
       y: 2,
-      fields: [{
-        label: 'Name',
-        value: 'Foo',
-        type: 'Text',
-      }, {
-        label: 'Field 2',
-        value: 'hmm',
-        type: 'Text',
-      }],
-      nodes: [{
-        key: 't',
-        label: 'True'
+      node: 'equals',
+      args: {
+        key: 'health',
+        value: '5',
       },
-      {
-        key: 'f',
-        label: 'False'
-      }],
+      nodes: {
+        t: [2],
+        f: [3],
+      },
     });
-    this.$nodes.items.push({
-      node: 2,
+    this.$script.items.push({
+      id: 2,
       x: 30,
       y: 2,
-      fields: [{
-        label: 'Name',
-        value: 'Foo',
-        type: 'Text',
-      }],
-      nodes: [{
-        key: 'nodes',
-        label: 'Nodes'
-      }],
+      node: 'setState',
+      args: {
+        key: 'health',
+        value: '10',
+      },
+      nodes: {
+        then: [],
+      },
     });
-    this.$nodes.addEventListener('change', this.#handleChange.bind(this));
-    this.$nodes.addEventListener('input', this.#handleInput.bind(this));
-    this.$nodes.addEventListener('menuopen', (e: any) => {
-      this.$nodes.menuItems.push()
+    this.$script.items.push({
+      id: 3,
+      x: 30,
+      y: 10,
+      node: 'setState',
+      args: {
+        key: 'health',
+        value: '20',
+      },
+      nodes: {
+        then: [],
+      },
     });
+    this.$script.addEventListener('change', this.#handleChange.bind(this));
+    this.$script.addEventListener('input', this.#handleInput.bind(this));
   }
 
-  #handleChange(e: CustomEvent) {
-    const { item } = e.detail;
-    //this.$value1.textContent = value;
-  }
+  #handleChange(_e: CustomEvent) {}
 
-  #handleInput(e: CustomEvent) {
-    const { item } = e.detail;
-    //this.$value2.textContent = value;
-  }
+  #handleInput(_e: CustomEvent) {}
 }

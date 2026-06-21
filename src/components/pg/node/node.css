@@ -36,7 +36,7 @@
   outline-offset: 1px !important;
 }
 
-[part=nodes] {
+[part=outputs] {
   margin-bottom: -0.125rem;
   margin-top: 0.125rem;
 }
