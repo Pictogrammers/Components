@@ -40,7 +40,7 @@ export default class PgNodes extends HTMLElement {
   #connectionsScheduled: boolean = false;
   #nodePinCounts = new Map<number, number>();
   #selected = new Set<number>();
-  #debug: number | null = null;
+  #debug: number = -1;
 
   #undo: UndoItem[] = [];
   #redo: UndoItem[] = [];
@@ -527,12 +527,12 @@ export default class PgNodes extends HTMLElement {
     );
   }
 
-  debug(nodeId: number | null) {
-    if (this.#debug !== null) {
+  debug(nodeId: number = 0) {
+    if (this.#debug !== -1) {
       this.getNodeById(this.#debug).debug = false;
     }
     this.#debug = nodeId;
-    if (nodeId !== null) {
+    if (nodeId !== -1) {
       this.getNodeById(nodeId).debug = true;
     }
   }

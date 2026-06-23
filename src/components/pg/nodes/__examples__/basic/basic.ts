@@ -179,7 +179,7 @@ export default class XPgNodesBasic extends HTMLElement {
     });
     this.$script.addEventListener('change', this.#handleChange.bind(this));
     this.$script.addEventListener('input', this.#handleInput.bind(this));
-    this.$debug.addEventListener('click', this.#handleDebug.bind());
+    this.$debug.addEventListener('click', this.#handleDebug.bind(this));
   }
 
   #handleChange(_e: CustomEvent) {}
