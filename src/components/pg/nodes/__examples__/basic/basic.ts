@@ -15,6 +15,7 @@ export default class XPgNodesBasic extends HTMLElement {
   @Part() $script: PgNodes;
 
   @Part() $debug: HTMLButtonElement;
+  @Part() $debugNext: HTMLButtonElement;
 
   connectedCallback() {
     // Node Editors
@@ -180,6 +181,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$script.addEventListener('change', this.#handleChange.bind(this));
     this.$script.addEventListener('input', this.#handleInput.bind(this));
     this.$debug.addEventListener('click', this.#handleDebug.bind(this));
+    this.$debugNext.addEventListener('click', this.#handleDebugNext.bind(this));
   }
 
   #handleChange(_e: CustomEvent) {}
@@ -188,5 +190,9 @@ export default class XPgNodesBasic extends HTMLElement {
 
   #handleDebug(e: CustomEvent) {
     this.$script.debug();
+  }
+
+  #handleDebugNext(e: CustomEvent) {
+    this.$script.debugNext();
   }
 }

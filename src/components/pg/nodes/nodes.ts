@@ -40,7 +40,7 @@ export default class PgNodes extends HTMLElement {
   #connectionsScheduled: boolean = false;
   #nodePinCounts = new Map<number, number>();
   #selected = new Set<number>();
-  #debug: number = -1;
+  #debug: number[] = [];
 
   #undo: UndoItem[] = [];
   #redo: UndoItem[] = [];
@@ -528,12 +528,31 @@ export default class PgNodes extends HTMLElement {
   }
 
   debug(nodeId: number = 0) {
-    if (this.#debug !== -1) {
-      this.getNodeById(this.#debug).debug = false;
-    }
-    this.#debug = nodeId;
+    this.#debug.push(nodeId);
     if (nodeId !== -1) {
       this.getNodeById(nodeId).debug = true;
     }
+  }
+
+  async debugNext() {
+    // Unhightlight
+    const next = this.#debug.pop();
+    if (next !== undefined) {
+      this.getNodeById(next).debug = false;
+    }
+    // Process next
+    const item = this.items.find(x => x.id === next);
+    const node = this.nodes.find(x => x.name === item.node);
+    console.log(item);
+    const nodes = {};
+    const result = await node.handler({
+      state: this.#state,
+      ...nodes,
+    });
+  }
+
+  #state = new Map<string, string>();
+  get state() {
+    return this.#state;
   }
 }
