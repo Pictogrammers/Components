@@ -10,8 +10,8 @@ import template from './nodes.html';
 import style from './nodes.css';
 
 type NodeState = { x: number; y: number; width: number; height: number };
-type UndoTransform = { type: 'transform'; nodeId: string; before: NodeState; after: NodeState };
-type UndoMultiTransform = { type: 'multi-transform'; primaryNodeId: string; transforms: Array<{ nodeId: string; before: NodeState; after: NodeState }> };
+type UndoTransform = { type: 'transform'; nodeId: number; before: NodeState; after: NodeState };
+type UndoMultiTransform = { type: 'multi-transform'; primaryNodeId: number; transforms: Array<{ nodeId: number; before: NodeState; after: NodeState }> };
 type UndoDelete = { type: 'delete'; item: any; index: number };
 type UndoItem = UndoTransform | UndoMultiTransform | UndoDelete;
 
@@ -38,13 +38,13 @@ export default class PgNodes extends HTMLElement {
   #nextNodeId: number = 0;
   #connector: NodeConnector | null = null;
   #connectionsScheduled: boolean = false;
-  #nodePinCounts = new Map<string, number>();
-  #selected = new Set<string>();
-  #debug: string | null = null;
+  #nodePinCounts = new Map<number, number>();
+  #selected = new Set<number>();
+  #debug: number | null = null;
 
   #undo: UndoItem[] = [];
   #redo: UndoItem[] = [];
-  #nodeStates = new Map<string, NodeState>();
+  #nodeStates = new Map<number, NodeState>();
 
   #dragOrigin: { x: number; y: number } | null = null;
   #isDragging: boolean = false;
@@ -201,7 +201,7 @@ export default class PgNodes extends HTMLElement {
         }
 
         Array.from(this.$items.children).forEach((child: any) => {
-          const nodeId = String(child.itemId);
+          const nodeId = child.itemId as number;
           const nx = child.x * this.gridSize;
           const ny = child.y * this.gridSize;
           const nw = (child.width ?? 12) * this.gridSize;
@@ -245,8 +245,7 @@ export default class PgNodes extends HTMLElement {
         });
       } else {
         this.clearSelection();
-        // @ts-ignore
-        const nodeId = String(ele.itemId);
+        const nodeId = (ele as any).itemId as number;
         this.getNodeById(nodeId).select();
         this.#selected.add(nodeId);
         const result = await PgOverlayContextMenu.open({
@@ -267,13 +266,13 @@ export default class PgNodes extends HTMLElement {
       items: this.items,
       type: (item) => !item.node ? PgNodeEntry : PgNode,
       create: ($item: any, item) => {
-        const nodeId = `${item.id}`;
-        this.#nextNodeId = Math.max(item.id, this.#nextNodeId) + 1;
-        connector.setNode(nodeId, item.x * 16, item.y * 16, (item.width ?? 12) * 16, (item.height ?? 4) * 16);
+        const nodeId = item.id as number;
+        this.#nextNodeId = Math.max(nodeId, this.#nextNodeId) + 1;
+        connector.setNode(String(nodeId), item.x * 16, item.y * 16, (item.width ?? 12) * 16, (item.height ?? 4) * 16);
 
         if (item.node) {
           // Regular node: set input pin and look up output slots from type registry
-          connector.setInputPin(nodeId, 'in', 16);
+          connector.setInputPin(String(nodeId), 'in', 16);
           const nodeType = this.nodes.find((n: any) => n.name === item.node);
           if (nodeType) {
             $item.label = nodeType.label;
@@ -287,13 +286,13 @@ export default class PgNodes extends HTMLElement {
             if (nodeType.nodes) {
               $item.outputs = nodeType.nodes;
               nodeType.nodes.forEach((slot: any, i: number) => {
-                connector.setOutputPin(nodeId, slot.key, 16 + i * 16);
+                connector.setOutputPin(String(nodeId), slot.key, 16 + i * 16);
               });
             }
           }
         } else {
           // Entry node (id 0): always has a single 'then' output
-          connector.setOutputPin(nodeId, 'then', 16);
+          connector.setOutputPin(String(nodeId), 'then', 16);
           $item.fields = [{ key: 'description', value: item.args?.description ?? '' }];
         }
 
@@ -303,7 +302,7 @@ export default class PgNodes extends HTMLElement {
         $item.addEventListener('change', this.#handleChange.bind(this));
       },
       connect: ($item: any, item) => {
-        const nodeId = `${item.id}`;
+        const nodeId = item.id as number;
         this.#nodeStates.set(nodeId, {
           x: $item.x,
           y: $item.y,
@@ -311,7 +310,7 @@ export default class PgNodes extends HTMLElement {
           height: $item.height ?? 4,
         });
         connector.setNode(
-          nodeId,
+          String(nodeId),
           $item.x * 16,
           $item.y * 16,
           ($item.width ?? 12) * 16,
@@ -325,7 +324,7 @@ export default class PgNodes extends HTMLElement {
               if (!i.nodes || typeof i.nodes !== 'object') return;
               Object.entries(i.nodes as Record<string, number[]>).forEach(([key, targets]) => {
                 targets.forEach((targetId: number) => {
-                  connector.connect(`${i.id}`, key, `${targetId}`, 'in');
+                  connector.connect(String(i.id), key, String(targetId), 'in');
                 });
               });
             });
@@ -335,8 +334,8 @@ export default class PgNodes extends HTMLElement {
     });
   }
 
-  getNodeById(nodeId: string): PgNode {
-    return Array.from(this.$items.children).find((x: any) => String(x.itemId) === nodeId) as PgNode;
+  getNodeById(nodeId: number): PgNode {
+    return Array.from(this.$items.children).find((x: any) => x.itemId === nodeId) as PgNode;
   }
 
   clearSelection() {
@@ -350,20 +349,19 @@ export default class PgNodes extends HTMLElement {
 
   #registerNode(e: any) {
     if (!this.#connector) return;
-    const { node } = e.detail;
-    const nodeId = `${node}`;
+    const nodeId = e.detail.node as number;
     const index = this.#nodePinCounts.get(nodeId) ?? 0;
     this.#nodePinCounts.set(nodeId, index + 1);
   }
 
   #registerNodeOutput(e: any) {
     const { node, key, offset } = e.detail;
-    this.#connector?.setOutputPin(node, key, offset);
+    this.#connector?.setOutputPin(String(node), key, offset);
   }
 
   #shiftOrCtrl: boolean = false;
   #handleSelect(e: any) {
-    const { nodeId } = e.detail;
+    const nodeId = e.detail.nodeId as number;
     if (!this.#shiftOrCtrl) {
       this.#selected.forEach((value) => {
         this.getNodeById(value).deselect();
@@ -375,8 +373,9 @@ export default class PgNodes extends HTMLElement {
   }
 
   #handleChange(e: any) {
-    const nodeId = String((e.target as any).itemId);
     const { x, y, width, height } = e.detail;
+    if (x === undefined) return;
+    const nodeId = (e.target as any).itemId as number;
     const before = this.#nodeStates.get(nodeId) ?? { x, y, width, height };
 
     if (this.#selected.has(nodeId) && this.#selected.size > 1) {
@@ -422,7 +421,7 @@ export default class PgNodes extends HTMLElement {
   }
 
   // Merges consecutive transforms on the same node during a single drag.
-  #pushTransform(nodeId: string, before: NodeState, after: NodeState) {
+  #pushTransform(nodeId: number, before: NodeState, after: NodeState) {
     const last = this.#undo.at(-1);
     if (last?.type === 'transform' && last.nodeId === nodeId) {
       last.after = after;
@@ -478,31 +477,31 @@ export default class PgNodes extends HTMLElement {
       case 'delete': {
         if (direction === 'undo') {
           this.items.splice(item.index, 0, item.item);
-          this.#nodeStates.set(String(item.item.id), {
+          this.#nodeStates.set(item.item.id, {
             x: item.item.x,
             y: item.item.y,
             width: item.item.width ?? 12,
             height: item.item.height ?? 4,
           });
         } else {
-          this.#deleteNode(String(item.item.id));
+          this.#deleteNode(item.item.id);
         }
         break;
       }
     }
   }
 
-  #deleteNode(nodeId: string) {
-    const index = this.items.findIndex((x: any) => String(x.id) === nodeId);
+  #deleteNode(nodeId: number) {
+    const index = this.items.findIndex((x: any) => x.id === nodeId);
     if (index > 0) {
       this.items.splice(index, 1);
-      this.#connector?.removeNode(nodeId);
+      this.#connector?.removeNode(String(nodeId));
       this.#nodeStates.delete(nodeId);
     }
   }
 
-  #deleteNodeWithUndo(nodeId: string) {
-    const index = this.items.findIndex((x: any) => String(x.id) === nodeId);
+  #deleteNodeWithUndo(nodeId: number) {
+    const index = this.items.findIndex((x: any) => x.id === nodeId);
     if (index <= 0) return;
     const node = this.getNodeById(nodeId) as any;
     const item = {
@@ -517,10 +516,10 @@ export default class PgNodes extends HTMLElement {
     this.#redo = [];
   }
 
-  #updatePins(nodeId: string) {
+  #updatePins(nodeId: number) {
     const { x, y, width, height } = this.getNodeById(nodeId);
     this.#connector?.setNode(
-      nodeId,
+      String(nodeId),
       x * this.gridSize,
       y * this.gridSize,
       (width ?? 12) * this.gridSize,
@@ -528,13 +527,13 @@ export default class PgNodes extends HTMLElement {
     );
   }
 
-  debug(nodeId: string | null) {
+  debug(nodeId: number | null) {
     if (this.#debug !== null) {
       this.getNodeById(this.#debug).debug = false;
     }
+    this.#debug = nodeId;
     if (nodeId !== null) {
       this.getNodeById(nodeId).debug = true;
-      this.#debug = nodeId;
     }
   }
 }

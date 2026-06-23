@@ -68,7 +68,7 @@ export default class PgNodeEntry extends HTMLElement {
   #handleSelect(_e: any) {
     this.dispatchEvent(new CustomEvent('select', {
       detail: {
-        nodeId: `${this.itemId}`,
+        nodeId: this.itemId,
       }
     }));
   }

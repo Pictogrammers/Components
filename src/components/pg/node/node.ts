@@ -54,7 +54,7 @@ export default class PgNode extends HTMLElement {
         const top = this.$node.getBoundingClientRect().top;
         this.dispatchEvent(new CustomEvent('registernodeoutput', {
           detail: {
-            node: String(this.itemId),
+            node: this.itemId,
             key: item.key,
             label: item.label,
             offset: $item.getBoundingClientRect().top - top + 31,
@@ -106,7 +106,7 @@ export default class PgNode extends HTMLElement {
   #handleSelect(_e: any) {
     this.dispatchEvent(new CustomEvent('select', {
       detail: {
-        nodeId: `${this.itemId}`,
+        nodeId: this.itemId,
       }
     }));
   }
