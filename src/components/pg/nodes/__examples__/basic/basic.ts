@@ -16,6 +16,8 @@ export default class XPgNodesBasic extends HTMLElement {
 
   @Part() $debug: HTMLButtonElement;
   @Part() $debugNext: HTMLButtonElement;
+  @Part() $play: HTMLButtonElement;
+  @Part() $restart: HTMLButtonElement;
 
   connectedCallback() {
     // Node Editors
@@ -39,9 +41,9 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'then',
         label: 'Then',
       }],
-      handler: ({ state, nodes, key, value }: any) => {
+      handler: ({ state, then, key, value }: any) => {
         state.set(key, value);
-        return nodes;
+        return then;
       },
     }, {
       name: 'equals',
@@ -96,6 +98,32 @@ export default class XPgNodesBasic extends HTMLElement {
         }
       },
     }, {
+      name: 'lessThan',
+      label: 'Less Than',
+      args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+      }, {
+        key: 'value',
+        label: 'Value',
+        editor: 'Text',
+      }],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ state, t, f, key, value }: any) => {
+        if (state.get(key) > value) {
+          return t;
+        } else {
+          return f;
+        }
+      },
+    }, {
       name: 'log',
       label: 'Log',
       args: [{
@@ -107,9 +135,9 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'then',
         label: 'Then',
       }],
-      handler: ({ nodes, message }: any) => {
+      handler: ({ then, message }: any) => {
         console.log(message);
-        return nodes;
+        return then;
       },
     });
     // Items
@@ -172,7 +200,7 @@ export default class XPgNodesBasic extends HTMLElement {
       y: 8,
       node: 'log',
       args: {
-        message: 'Health increased to ${health}',
+        message: "Health increased to ${state.get('health')}",
       },
       nodes: {
         then: [],
@@ -182,17 +210,27 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$script.addEventListener('input', this.#handleInput.bind(this));
     this.$debug.addEventListener('click', this.#handleDebug.bind(this));
     this.$debugNext.addEventListener('click', this.#handleDebugNext.bind(this));
+    this.$play.addEventListener('click', this.#handlePlay.bind(this));
+    this.$restart.addEventListener('click', this.#handleRestart.bind(this));
   }
 
   #handleChange(_e: CustomEvent) {}
 
   #handleInput(_e: CustomEvent) {}
 
-  #handleDebug(e: CustomEvent) {
+  #handleDebug(_e: CustomEvent) {
     this.$script.debug();
   }
 
-  #handleDebugNext(e: CustomEvent) {
+  #handleDebugNext(_e: CustomEvent) {
     this.$script.debugNext();
+  }
+
+  #handlePlay(_e: CustomEvent) {
+    this.$script.play();
+  }
+
+  #handleRestart(_e: CustomEvent) {
+    this.$script.restart();
   }
 }

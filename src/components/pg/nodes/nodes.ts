@@ -57,6 +57,11 @@ export default class PgNodes extends HTMLElement {
 
     connector.on('change', (change) => {
       console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
+      if (change.type === 'connect') {
+        this.items[change.sourceNodeId].nodes[change.sourceKey].push(parseInt(change.targetNodeId, 10));
+      } else {
+
+      }
     });
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -528,27 +533,61 @@ export default class PgNodes extends HTMLElement {
   }
 
   debug(nodeId: number = 0) {
-    this.#debug.push(nodeId);
-    if (nodeId !== -1) {
-      this.getNodeById(nodeId).debug = true;
-    }
+    this.$grid.classList.toggle('debug', true);
+    this.#debug.forEach(id => {
+      const n = this.getNodeById(id);
+      if (n) n.debug = false;
+    });
+    this.#debug = [nodeId];
+    const n = this.getNodeById(nodeId);
+    if (n) n.debug = true;
   }
 
   async debugNext() {
-    // Unhightlight
-    const next = this.#debug.pop();
-    if (next !== undefined) {
-      this.getNodeById(next).debug = false;
+    if (this.#debug.length === 0) return;
+    const currentId = this.#debug.pop()!;
+    const n = this.getNodeById(currentId);
+    if (n) n.debug = false;
+
+    const item = this.items.find((x: any) => x.id === currentId);
+    if (!item) return;
+
+    let nextIds: number[] = [];
+    if (!item.node) {
+      nextIds = item.nodes?.then ?? [];
+    } else {
+      const nodeType = this.nodes.find((x: any) => x.name === item.node);
+      if (nodeType?.handler) {
+        const params: any = { state: this.#state };
+        if (item.args) {
+          Object.keys(item.args).forEach((key) => {
+            // treat strings
+            let fn = new Function('state', `return \`${item.args[key]}\`;`);
+            params[key] = fn(this.#state);
+          });
+        }
+        if (item.nodes) Object.assign(params, item.nodes);
+        const result = await nodeType.handler(params);
+        nextIds = Array.isArray(result) ? result : [];
+      }
     }
-    // Process next
-    const item = this.items.find(x => x.id === next);
-    const node = this.nodes.find(x => x.name === item.node);
-    console.log(item);
-    const nodes = {};
-    const result = await node.handler({
-      state: this.#state,
-      ...nodes,
-    });
+
+    for (const id of nextIds) {
+      this.#debug.push(id);
+      const next = this.getNodeById(id);
+      if (next) next.debug = true;
+    }
+  }
+
+  async play() {
+    while (this.#debug.length > 0) {
+      await this.debugNext();
+    }
+  }
+
+  restart() {
+    this.#state.clear();
+    this.debug();
   }
 
   #state = new Map<string, string>();
