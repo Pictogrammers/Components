@@ -31,8 +31,8 @@
 
 [part=forceScroll] {
   position: absolute;
-  left: 60rem;
-  top: 40rem;
+  left: var(--pg-nodes-max-x, 60rem);
+  top: var(--pg-nodes-max-y, 40rem);
   width: 1rem;
   height: 1rem;
 }

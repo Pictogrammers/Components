@@ -98,8 +98,8 @@ export default class XPgNodesBasic extends HTMLElement {
         }
       },
     }, {
-      name: 'lessThan',
-      label: 'Less Than',
+      name: 'greaterThan',
+      label: 'Greater Than',
       args: [{
         key: 'key',
         label: 'Key',
@@ -138,6 +138,20 @@ export default class XPgNodesBasic extends HTMLElement {
       handler: ({ then, message }: any) => {
         console.log(message);
         return then;
+      },
+    }, {
+      name: 'coin',
+      label: 'Coin Flip',
+      args: [],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ t, f }: any) => {
+        return Math.random() < 0.5 ? t : f;
       },
     });
     // Items

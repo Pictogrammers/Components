@@ -57,10 +57,15 @@ export default class PgNodes extends HTMLElement {
 
     connector.on('change', (change) => {
       console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
+      const targetNodeId = parseInt(change.targetNodeId, 10);
       if (change.type === 'connect') {
-        this.items[change.sourceNodeId].nodes[change.sourceKey].push(parseInt(change.targetNodeId, 10));
+        this.items[change.sourceNodeId].nodes[change.sourceKey].push(targetNodeId);
       } else {
-
+        const index = this.items[change.sourceNodeId].nodes[change.sourceKey].indexOf(targetNodeId);
+        // Check if the item actually exists in the array (-1 means not found)
+        if (index > -1) {
+          this.items[change.sourceNodeId].nodes[change.sourceKey].splice(index, 1);
+        }
       }
     });
 
