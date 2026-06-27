@@ -171,6 +171,7 @@ export default class XPgNodesBasic extends HTMLElement {
           return [];
         }
         console.log('random complete', values);
+        state.delete('random')
         return [];
       },
     }, {
