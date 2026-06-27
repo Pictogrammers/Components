@@ -60,7 +60,7 @@ export default class PgNodes extends HTMLElement {
       console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
       const targetNodeId = parseInt(change.targetNodeId, 10);
       if (change.type === 'connect') {
-        if (!this.items[change.sourceNodeId].nodes.hasOwnProperty(change.sourceKey)) {
+        if (!this.items[change.sourceNodeId].nodes?.hasOwnProperty(change.sourceKey)) {
           this.items[change.sourceNodeId].nodes[change.sourceKey] = [];
         }
         this.items[change.sourceNodeId].nodes[change.sourceKey].push(targetNodeId);
@@ -294,6 +294,7 @@ export default class PgNodes extends HTMLElement {
               $item.fields = nodeType.args.map((arg: any) => ({
                 label: arg.label,
                 value: item.args?.[arg.key] ?? '',
+                itemKey: arg.key, // use itemKey, key is reserved
                 type: arg.editor,
               }));
             }
@@ -314,6 +315,9 @@ export default class PgNodes extends HTMLElement {
         $item.addEventListener('registernodeoutput', this.#registerNodeOutput.bind(this));
         $item.addEventListener('select', this.#handleSelect.bind(this));
         $item.addEventListener('change', this.#handleChange.bind(this));
+        $item.addEventListener('input', (e: any) => {
+          console.log('input', e.detail);
+        });
       },
       connect: ($item: any, item) => {
         const nodeId = item.id as number;
@@ -330,6 +334,7 @@ export default class PgNodes extends HTMLElement {
           ($item.width ?? 12) * 16,
           ($item.height ?? 4) * 16
         );
+        // Performance: only run once for many items
         if (!this.#connectionsScheduled) {
           this.#connectionsScheduled = true;
           queueMicrotask(() => {
@@ -388,53 +393,60 @@ export default class PgNodes extends HTMLElement {
   }
 
   #handleChange(e: any) {
-    const { x, y, width, height } = e.detail;
-    if (x === undefined) return;
-    const nodeId = (e.target as any).itemId as number;
-    const before = this.#nodeStates.get(nodeId) ?? { x, y, width, height };
+    const { type } = e.detail;
+    if (type === 'transform') {
+      const { x, y, width, height } = e.detail;
+      if (x === undefined) return;
+      const nodeId = (e.target as any).itemId as number;
+      const before = this.#nodeStates.get(nodeId) ?? { x, y, width, height };
 
-    if (this.#selected.has(nodeId) && this.#selected.size > 1) {
-      const dx = x - before.x;
-      const dy = y - before.y;
-      const last = this.#undo.at(-1);
-      if (last?.type === 'multi-transform' && last.primaryNodeId === nodeId) {
-        for (const t of last.transforms) {
-          const cur = this.#nodeStates.get(t.nodeId) ?? t.after;
-          const newAfter: NodeState = t.nodeId === nodeId
-            ? { x, y, width, height }
-            : { x: cur.x + dx, y: cur.y + dy, width: cur.width, height: cur.height };
-          t.after = newAfter;
-          if (t.nodeId !== nodeId) {
-            const other = this.getNodeById(t.nodeId) as any;
-            if (other) { other.x = newAfter.x; other.y = newAfter.y; }
+      if (this.#selected.has(nodeId) && this.#selected.size > 1) {
+        const dx = x - before.x;
+        const dy = y - before.y;
+        const last = this.#undo.at(-1);
+        if (last?.type === 'multi-transform' && last.primaryNodeId === nodeId) {
+          for (const t of last.transforms) {
+            const cur = this.#nodeStates.get(t.nodeId) ?? t.after;
+            const newAfter: NodeState = t.nodeId === nodeId
+              ? { x, y, width, height }
+              : { x: cur.x + dx, y: cur.y + dy, width: cur.width, height: cur.height };
+            t.after = newAfter;
+            if (t.nodeId !== nodeId) {
+              const other = this.getNodeById(t.nodeId) as any;
+              if (other) { other.x = newAfter.x; other.y = newAfter.y; }
+            }
+            this.#nodeStates.set(t.nodeId, newAfter);
+            this.#updatePins(t.nodeId);
           }
-          this.#nodeStates.set(t.nodeId, newAfter);
-          this.#updatePins(t.nodeId);
+        } else {
+          const transforms = Array.from(this.#selected).map((id) => {
+            const state = this.#nodeStates.get(id) ?? { x: 0, y: 0, width: 12, height: 4 };
+            const after: NodeState = id === nodeId
+              ? { x, y, width, height }
+              : { x: state.x + dx, y: state.y + dy, width: state.width, height: state.height };
+            if (id !== nodeId) {
+              const other = this.getNodeById(id) as any;
+              if (other) { other.x = after.x; other.y = after.y; }
+            }
+            this.#nodeStates.set(id, after);
+            this.#updatePins(id);
+            return { nodeId: id, before: { ...state }, after };
+          });
+          this.#undo.push({ type: 'multi-transform', primaryNodeId: nodeId, transforms });
+          this.#redo = [];
         }
-      } else {
-        const transforms = Array.from(this.#selected).map((id) => {
-          const state = this.#nodeStates.get(id) ?? { x: 0, y: 0, width: 12, height: 4 };
-          const after: NodeState = id === nodeId
-            ? { x, y, width, height }
-            : { x: state.x + dx, y: state.y + dy, width: state.width, height: state.height };
-          if (id !== nodeId) {
-            const other = this.getNodeById(id) as any;
-            if (other) { other.x = after.x; other.y = after.y; }
-          }
-          this.#nodeStates.set(id, after);
-          this.#updatePins(id);
-          return { nodeId: id, before: { ...state }, after };
-        });
-        this.#undo.push({ type: 'multi-transform', primaryNodeId: nodeId, transforms });
-        this.#redo = [];
+        this.#updateScrollExtent();
+        return;
       }
-      this.#updateScrollExtent();
-      return;
-    }
 
-    this.#pushTransform(nodeId, before, { x, y, width, height });
-    this.#updatePins(nodeId);
-    this.#updateScrollExtent();
+      this.#pushTransform(nodeId, before, { x, y, width, height });
+      this.#updatePins(nodeId);
+      this.#updateScrollExtent();
+    } else if (type === 'arg') {
+      const { id, key, value } = e.detail;
+      const item = this.items.find(x => x.id === id);
+      item.args[key] = value;
+    }
   }
 
   // Merges consecutive transforms on the same node during a single drag.

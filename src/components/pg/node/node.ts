@@ -36,8 +36,28 @@ export default class PgNode extends HTMLElement {
       container: this.$items,
       items: this.fields,
       type: (_item) => PgNodeEditorText,
-      create: ($item: PgNodeEditorText, _item) => {
+      create: ($item: PgNodeEditorText, item) => {
         this.height += $item.height;
+        $item.addEventListener('input', (e: any) => {
+          this.dispatchEvent(new CustomEvent('input', {
+            detail: {
+              type: 'arg',
+              id: this.itemId,
+              key: item.itemKey,
+              value: e.detail.value,
+            }
+          }));
+        });
+        $item.addEventListener('change', (e: any) => {
+          this.dispatchEvent(new CustomEvent('change', {
+            detail: {
+              type: 'arg',
+              id: this.itemId,
+              key: item.itemKey,
+              value: e.detail.value,
+            }
+          }));
+        });
       },
     });
 
@@ -138,7 +158,7 @@ export default class PgNode extends HTMLElement {
       ele.y = y;
       ele.width = width;
       ele.height = height;
-      this.dispatchEvent(new CustomEvent('change', { detail: { x, y, width, height } }));
+      this.dispatchEvent(new CustomEvent('change', { detail: { type: 'transform', x, y, width, height } }));
     });
     ele.addEventListener('select', this.#handleSelect.bind(this));
     this.shadowRoot?.appendChild(ele);
