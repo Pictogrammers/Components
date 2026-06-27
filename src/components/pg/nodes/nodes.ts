@@ -41,6 +41,7 @@ export default class PgNodes extends HTMLElement {
   #nodePinCounts = new Map<number, number>();
   #selected = new Set<number>();
   #debug: number[] = [];
+  #debugPrevious: number = 0;
 
   #undo: UndoItem[] = [];
   #redo: UndoItem[] = [];
@@ -59,6 +60,9 @@ export default class PgNodes extends HTMLElement {
       console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
       const targetNodeId = parseInt(change.targetNodeId, 10);
       if (change.type === 'connect') {
+        if (!this.items[change.sourceNodeId].nodes.hasOwnProperty(change.sourceKey)) {
+          this.items[change.sourceNodeId].nodes[change.sourceKey] = [];
+        }
         this.items[change.sourceNodeId].nodes[change.sourceKey].push(targetNodeId);
       } else {
         const index = this.items[change.sourceNodeId].nodes[change.sourceKey].indexOf(targetNodeId);
@@ -338,6 +342,7 @@ export default class PgNodes extends HTMLElement {
                 });
               });
             });
+            this.#updateScrollExtent();
           });
         }
       },
@@ -423,11 +428,13 @@ export default class PgNodes extends HTMLElement {
         this.#undo.push({ type: 'multi-transform', primaryNodeId: nodeId, transforms });
         this.#redo = [];
       }
+      this.#updateScrollExtent();
       return;
     }
 
     this.#pushTransform(nodeId, before, { x, y, width, height });
     this.#updatePins(nodeId);
+    this.#updateScrollExtent();
   }
 
   // Merges consecutive transforms on the same node during a single drag.
@@ -499,6 +506,7 @@ export default class PgNodes extends HTMLElement {
         break;
       }
     }
+    this.#updateScrollExtent();
   }
 
   #deleteNode(nodeId: number) {
@@ -507,6 +515,7 @@ export default class PgNodes extends HTMLElement {
       this.items.splice(index, 1);
       this.#connector?.removeNode(String(nodeId));
       this.#nodeStates.delete(nodeId);
+      this.#updateScrollExtent();
     }
   }
 
@@ -537,6 +546,17 @@ export default class PgNodes extends HTMLElement {
     );
   }
 
+  #updateScrollExtent() {
+    let maxX = 0;
+    let maxY = 0;
+    Array.from(this.$items.children).forEach((child: any) => {
+      maxX = Math.max(maxX, child.x + (child.width ?? 12));
+      maxY = Math.max(maxY, child.y + (child.height ?? 3));
+    });
+    this.$grid.style.setProperty('--pg-nodes-max-x', `${maxX + 40}rem`);
+    this.$grid.style.setProperty('--pg-nodes-max-y', `${maxY + 40}rem`);
+  }
+
   debug(nodeId: number = 0) {
     this.$grid.classList.toggle('debug', true);
     this.#debug.forEach(id => {
@@ -544,13 +564,14 @@ export default class PgNodes extends HTMLElement {
       if (n) n.debug = false;
     });
     this.#debug = [nodeId];
+    this.#debugPrevious = nodeId;
     const n = this.getNodeById(nodeId);
     if (n) n.debug = true;
   }
 
   async debugNext() {
     if (this.#debug.length === 0) return;
-    const currentId = this.#debug.pop()!;
+    const currentId = this.#debug.shift()!;
     const n = this.getNodeById(currentId);
     if (n) n.debug = false;
 
@@ -572,14 +593,16 @@ export default class PgNodes extends HTMLElement {
           });
         }
         if (item.nodes) Object.assign(params, item.nodes);
+        params.node = this.#debugPrevious;
         const result = await nodeType.handler(params);
         nextIds = Array.isArray(result) ? result : [];
+        this.#debugPrevious = currentId;
       }
     }
-
-    for (const id of nextIds) {
-      this.#debug.push(id);
-      const next = this.getNodeById(id);
+    this.#debug.unshift(...nextIds);
+    const nextId = this.#debug.length ? this.#debug[0] : null;
+    if (nextId) {
+      const next = this.getNodeById(nextId);
       if (next) next.debug = true;
     }
   }

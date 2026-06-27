@@ -153,6 +153,51 @@ export default class XPgNodesBasic extends HTMLElement {
       handler: ({ t, f }: any) => {
         return Math.random() < 0.5 ? t : f;
       },
+    }, {
+      name: 'random',
+      label: 'Random',
+      args: [],
+      nodes: [{
+        key: 'options',
+        label: 'Options',
+      }],
+      handler: ({ state, options }: any) => {
+        if (!state.has('random')) {
+          state.set('random', []);
+          return options;
+        }
+        const values = state.get('random');
+        if (values.length !== options.length) {
+          return [];
+        }
+        console.log('random complete', values);
+        return [];
+      },
+    }, {
+      name: 'randomOption',
+      label: 'Random Option',
+      args: [{
+        key: 'weight',
+        label: 'Weight',
+        editor: 'Number',
+        default: 1,
+      }],
+      nodes: [{
+        key: 'then',
+        label: 'Then',
+      }],
+      handler: ({ state, then, node, weight, options }: any) => {
+        console.log(node, weight, options);
+        if (!state.has('random')) {
+          throw new Error('invalid node');
+        }
+        const values = state.get('random');
+        values.push({
+          weight: weight ?? 0,
+          name: then
+        });
+        return [node];
+      },
     });
     // Items
     this.$script.items.push({

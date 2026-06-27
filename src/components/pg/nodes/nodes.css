@@ -42,8 +42,8 @@
   pointer-events: none;
   top: 0;
   left: 0;
-  width: 60rem;
-  height: 40rem;
+  width: var(--pg-nodes-max-x, 60rem);
+  height: var(--pg-nodes-max-y, 40rem);
 }
 
 [part=svg] path {
