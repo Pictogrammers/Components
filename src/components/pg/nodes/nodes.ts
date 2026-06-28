@@ -59,16 +59,18 @@ export default class PgNodes extends HTMLElement {
     connector.on('change', (change) => {
       console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
       const targetNodeId = parseInt(change.targetNodeId, 10);
+      const sourceNodeId = parseInt(change.sourceNodeId, 10);
+      const currentItem = this.items.find((x) => x.id === sourceNodeId);
       if (change.type === 'connect') {
-        if (!this.items[change.sourceNodeId].nodes?.hasOwnProperty(change.sourceKey)) {
-          this.items[change.sourceNodeId].nodes[change.sourceKey] = [];
+        if (!currentItem.nodes?.hasOwnProperty(change.sourceKey)) {
+          currentItem.nodes[change.sourceKey] = [];
         }
-        this.items[change.sourceNodeId].nodes[change.sourceKey].push(targetNodeId);
+        currentItem.nodes[change.sourceKey].push(targetNodeId);
       } else {
-        const index = this.items[change.sourceNodeId].nodes[change.sourceKey].indexOf(targetNodeId);
+        const index = currentItem.nodes[change.sourceKey].indexOf(targetNodeId);
         // Check if the item actually exists in the array (-1 means not found)
         if (index > -1) {
-          this.items[change.sourceNodeId].nodes[change.sourceKey].splice(index, 1);
+          currentItem.nodes[change.sourceKey].splice(index, 1);
         }
       }
     });
