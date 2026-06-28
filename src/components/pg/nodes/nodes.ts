@@ -249,12 +249,17 @@ export default class PgNodes extends HTMLElement {
           }),
         });
         if (!result) { return; }
+        const args = {};
+        const nodeType = nodes.find(x => x.name === result.value);
+        nodeType.args.forEach(({ key, value }) => {
+          args[key] = value;
+        });
         this.items.push({
-          id: this.#nextNodeId++,
+          id: this.#nextNodeId,
           node: result.value,
           x,
           y,
-          args: {},
+          args,
           nodes: {},
         });
       } else {
@@ -278,7 +283,10 @@ export default class PgNodes extends HTMLElement {
     forEach({
       container: this.$items,
       items: this.items,
-      type: (item) => !item.node ? PgNodeEntry : PgNode,
+      type: (item) => {
+        item.editors = this.editors;
+        return !item.node ? PgNodeEntry : PgNode;
+      },
       create: ($item: any, item) => {
         const nodeId = item.id as number;
         this.#nextNodeId = Math.max(nodeId, this.#nextNodeId) + 1;

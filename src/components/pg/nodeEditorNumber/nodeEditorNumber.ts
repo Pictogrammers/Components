@@ -9,6 +9,9 @@ import style from './nodeEditorNumber.css';
   template,
 })
 export default class PgNodeEditorNumber extends HTMLElement {
+
+  static type = 'Number';
+
   @Prop() label: string = '';
   @Prop() value: number = 0;
   @Prop() name: string = '';
@@ -46,9 +49,5 @@ export default class PgNodeEditorNumber extends HTMLElement {
 
   get height() {
     return 2;
-  }
-
-  get type() {
-    return 'Number';
   }
 }

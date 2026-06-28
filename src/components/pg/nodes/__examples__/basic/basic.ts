@@ -32,10 +32,12 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'key',
         label: 'Key',
         editor: 'Text',
+        value: '',
       }, {
         key: 'value',
         label: 'Value',
         editor: 'Text',
+        value: '',
       }],
       nodes: [{
         key: 'then',
@@ -52,10 +54,12 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'key',
         label: 'Key',
         editor: 'Text',
+        value: '',
       }, {
         key: 'value',
         label: 'Value',
         editor: 'Text',
+        value: '',
       }],
       nodes: [{
         key: 't',
@@ -81,7 +85,8 @@ export default class XPgNodesBasic extends HTMLElement {
       }, {
         key: 'value',
         label: 'Value',
-        editor: 'Text',
+        editor: 'Number',
+        value: 0,
       }],
       nodes: [{
         key: 't',
@@ -104,10 +109,12 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'key',
         label: 'Key',
         editor: 'Text',
+        value: '',
       }, {
         key: 'value',
         label: 'Value',
-        editor: 'Text',
+        editor: 'Number',
+        value: 0,
       }],
       nodes: [{
         key: 't',
@@ -130,6 +137,7 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'message',
         label: 'Message',
         editor: 'Text',
+        value: '',
       }],
       nodes: [{
         key: 'then',
@@ -181,7 +189,7 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'weight',
         label: 'Weight',
         editor: 'Number',
-        default: 1,
+        value: 1,
       }],
       nodes: [{
         key: 'then',
@@ -221,7 +229,7 @@ export default class XPgNodesBasic extends HTMLElement {
       node: 'lessThan',
       args: {
         key: 'health',
-        value: '5',
+        value: 5,
       },
       nodes: {
         t: [2],

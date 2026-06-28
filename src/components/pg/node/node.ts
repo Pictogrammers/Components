@@ -1,7 +1,5 @@
 import { Component, Prop, Part, forEach } from '@pictogrammers/element';
 
-import PgNodeEditorText from '../nodeEditorText/nodeEditorText';
-
 import template from './node.html';
 import style from './node.css';
 import PgNodeResize from '../nodeResize/nodeResize';
@@ -24,6 +22,7 @@ export default class PgNode extends HTMLElement {
   @Prop() fields: any = [];
   @Prop() outputs: any = [];
   @Prop() debug: boolean = false;
+  @Prop() editors: any = [];
 
   @Part() $node: HTMLDivElement;
   @Part() $items: HTMLDivElement;
@@ -35,8 +34,10 @@ export default class PgNode extends HTMLElement {
     forEach({
       container: this.$items,
       items: this.fields,
-      type: (_item) => PgNodeEditorText,
-      create: ($item: PgNodeEditorText, item) => {
+      type: (item) => {
+        return this.editors.find(x => x.type === item.type);
+      },
+      create: ($item: any, item) => {
         this.height += $item.height;
         $item.addEventListener('input', (e: any) => {
           this.dispatchEvent(new CustomEvent('input', {

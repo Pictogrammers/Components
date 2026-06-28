@@ -9,6 +9,9 @@ import style from './nodeEditorText.css';
   template,
 })
 export default class PgNodeEditorText extends HTMLElement {
+
+  static type = 'Text';
+
   @Prop() label: string = '';
   @Prop() value: string = '';
   @Prop() name: string = '';
@@ -46,9 +49,5 @@ export default class PgNodeEditorText extends HTMLElement {
 
   get height() {
     return 2;
-  }
-
-  get type() {
-    return 'Text';
   }
 }

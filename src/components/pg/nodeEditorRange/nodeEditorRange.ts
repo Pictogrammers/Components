@@ -9,6 +9,9 @@ import style from './nodeEditorRange.css';
   template,
 })
 export default class PgNodeEditorRange extends HTMLElement {
+
+  static type = 'Range';
+
   @Prop() label: string = '';
   @Prop() value: number = 0;
   @Prop() name: string = '';
@@ -58,9 +61,5 @@ export default class PgNodeEditorRange extends HTMLElement {
 
   get height() {
     return 2;
-  }
-
-  get type() {
-    return 'Range';
   }
 }
