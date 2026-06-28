@@ -178,9 +178,19 @@ export default class XPgNodesBasic extends HTMLElement {
         if (values.length !== options.length) {
           return [];
         }
-        console.log('random complete', values);
-        state.delete('random')
-        return [];
+        function weightedRandom<T extends { weight: string, then: number[] }>(items: T[]): T {
+          const totalWeight = items.reduce((sum, item) => sum + Number(item.weight), 0);
+          let random = Math.random() * totalWeight;
+
+          for (const item of items) {
+            random -= Number(item.weight);
+            if (random <= 0) return item;
+          }
+
+          return items[items.length - 1]; // fallback
+        }
+        state.delete('random');
+        return weightedRandom(values).then;
       },
     }, {
       name: 'randomOption',
@@ -203,7 +213,7 @@ export default class XPgNodesBasic extends HTMLElement {
         const values = state.get('random');
         values.push({
           weight: weight ?? 0,
-          name: then
+          then,
         });
         return [node];
       },

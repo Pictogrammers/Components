@@ -16,7 +16,15 @@ label {
   color: rgba(255, 255, 255, 0.8);
 }
 
+[part=input]::-webkit-outer-spin-button,
+[part=input]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 [part=input] {
+  -moz-appearance: textfield;
+  appearance: textfield;
   border: 0;
   border-radius: 0.125rem;
   padding-inline-start: 0.25rem;
