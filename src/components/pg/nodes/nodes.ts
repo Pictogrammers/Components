@@ -66,7 +66,7 @@ export default class PgNodes extends HTMLElement {
           currentItem.nodes[change.sourceKey] = [];
         }
         currentItem.nodes[change.sourceKey].push(targetNodeId);
-      } else {
+      } else if (change.type === 'disconnect' && currentItem) {
         const index = currentItem.nodes[change.sourceKey].indexOf(targetNodeId);
         // Check if the item actually exists in the array (-1 means not found)
         if (index > -1) {
