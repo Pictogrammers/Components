@@ -604,7 +604,12 @@ export default class PgNodes extends HTMLElement {
             params[key] = fn(this.#state);
           });
         }
-        if (item.nodes) Object.assign(params, item.nodes);
+        if (item.nodes) {
+          // get the type to know known keys
+          nodeType.nodes.forEach(({ key }) => {
+            params[key] = item.nodes[key] ?? [];
+          });
+        }
         params.node = this.#debugPrevious;
         const result = await nodeType.handler(params);
         nextIds = Array.isArray(result) ? result : [];
