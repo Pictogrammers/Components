@@ -13,6 +13,7 @@ import PgNodeEditorNumber from 'components/pg/nodeEditorNumber/nodeEditorNumber'
 export default class XPgNodesBasic extends HTMLElement {
 
   @Part() $script: PgNodes;
+  @Part() $log: HTMLPreElement;
 
   @Part() $debug: HTMLButtonElement;
   @Part() $debugNext: HTMLButtonElement;
@@ -144,7 +145,7 @@ export default class XPgNodesBasic extends HTMLElement {
         label: 'Then',
       }],
       handler: ({ then, message }: any) => {
-        console.log(message);
+        this.$log.appendChild(document.createTextNode(`${message}\n`));
         return then;
       },
     }, {
