@@ -13,6 +13,7 @@ import PgNodeEditorNumber from 'components/pg/nodeEditorNumber/nodeEditorNumber'
 export default class XPgNodesBasic extends HTMLElement {
 
   @Part() $script: PgNodes;
+  @Part() $state: HTMLPreElement;
   @Part() $log: HTMLPreElement;
 
   @Part() $debug: HTMLButtonElement;
@@ -285,9 +286,10 @@ export default class XPgNodesBasic extends HTMLElement {
         then: [],
       },
     });
+    this.$script.addEventListener('debug', this.#handleDebug.bind(this));
     this.$script.addEventListener('change', this.#handleChange.bind(this));
     this.$script.addEventListener('input', this.#handleInput.bind(this));
-    this.$debug.addEventListener('click', this.#handleDebug.bind(this));
+    this.$debug.addEventListener('click', this.#handleButtonDebug.bind(this));
     this.$debugNext.addEventListener('click', this.#handleDebugNext.bind(this));
     this.$play.addEventListener('click', this.#handlePlay.bind(this));
     this.$restart.addEventListener('click', this.#handleRestart.bind(this));
@@ -297,8 +299,15 @@ export default class XPgNodesBasic extends HTMLElement {
 
   #handleInput(_e: CustomEvent) {}
 
-  #handleDebug(_e: CustomEvent) {
+  #handleButtonDebug(_e: CustomEvent) {
     this.$script.debug();
+  }
+
+  #handleDebug(e: any) {
+    const { state } = e.detail;
+    this.$state.replaceChildren(Array.from(state).map((args: string[]) => {
+      return `${args[0]} = ${args[1]}`;
+    }).join('\n'));
   }
 
   #handleDebugNext(_e: CustomEvent) {

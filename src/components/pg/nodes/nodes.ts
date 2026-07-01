@@ -28,6 +28,8 @@ export default class PgNodes extends HTMLElement {
   @Prop() editors: any = [];
   // Node type registry
   @Prop() nodes: any = [];
+  // Globals
+  @Prop() globals: any = [];
 
   @Part() $grid: HTMLDivElement;
   @Part() $svg: SVGSVGElement;
@@ -624,6 +626,11 @@ export default class PgNodes extends HTMLElement {
         const result = await nodeType.handler(params);
         nextIds = Array.isArray(result) ? result : [];
         this.#debugPrevious = currentId;
+        this.dispatchEvent(new CustomEvent('debug', {
+          detail: {
+            state: this.#state,
+          },
+        }));
       }
     }
     this.#debug.unshift(...nextIds);
@@ -648,5 +655,13 @@ export default class PgNodes extends HTMLElement {
   #state = new Map<string, string>();
   get state() {
     return this.#state;
+  }
+
+  get json() {
+    const normalize = JSON.parse(JSON.stringify(this.items));
+    return normalize.map(x => { delete x.editors; return x; });
+  }
+  set json(value: string) {
+    this.items = JSON.parse(value);
   }
 }
