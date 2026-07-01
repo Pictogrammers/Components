@@ -76,12 +76,10 @@ export default class XPgTreeBasic extends HTMLElement {
       const { actionIndex } = e.detail;
       const action = item.getData().actions[actionIndex];
       const { enabled } = action;
-      if (actionIndex === 0 && enabled) {
-        action.icon = IconEyeOff;
-        action.enabled = false;
-      } else if (actionIndex === 0 && !enabled){
+      if (actionIndex === 0 && action.icon === IconEyeOff) {
         action.icon = IconEye;
-        action.enabled = true;
+      } else if (actionIndex === 0){
+        action.icon = IconEyeOff;
       }
       if (actionIndex === 1 && enabled) {
         action.icon = IconUnlock;
@@ -91,10 +89,8 @@ export default class XPgTreeBasic extends HTMLElement {
         action.enabled = true;
       }
     });
-    this.$tree.addEventListener('move', (e: any) => {
-      this.#selectedItems.forEach((item: any) => {
-        item.move(e.detail.item, e.detail.position);
-      });
+    this.$tree.addEventListener('move', (_e: any) => {
+      // Tree handles all data manipulation internally; this is a notification only
     });
     this.$tree.addEventListener('rename', (e: any) => {
       const { item, label } = e.detail;

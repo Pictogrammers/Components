@@ -43,11 +43,10 @@ export default class PgTree extends HTMLElement {
     });
     this.$items.addEventListener('move', (e: any) => {
       e.stopPropagation();
+      const selectedIdxsList = [...this.#selectedIndexes.values()] as number[][];
+      this.#batchMove(selectedIdxsList, e.detail.indexes, e.detail.position);
       this.dispatchEvent(new CustomEvent('move', {
-        detail: {
-          item: this.#wrap(e.detail.indexes),
-          position: e.detail.position,
-        }
+        detail: { position: e.detail.position }
       }));
     });
     this.$items.addEventListener('rename', (e: any) => {
@@ -152,7 +151,7 @@ export default class PgTree extends HTMLElement {
       const { indexes, callback, ctrlKey } = e.detail;
       const item = this.#getItem(indexes);
       const unproxyItem = getProxyValue(item);
-      if (!ctrlKey && this.#selectedIndexes.size) {
+      if (!ctrlKey && this.#selectedIndexes.size && !this.#selectedIndexes.has(unproxyItem)) {
         this.#selectedIndexes.forEach((x: any) => this.#getItem(x).selected = false);
         this.#selectedIndexes.clear();
       }
@@ -255,6 +254,58 @@ export default class PgTree extends HTMLElement {
     });
   }
 
+  #batchMove(selectedIdxsList: number[][], targetIdxs: number[], position: string) {
+    if (selectedIdxsList.length === 0) return;
+
+    // Ascending order preserves the original relative order of dragged items on insertion
+    const ascending = [...selectedIdxsList].sort((a, b) => {
+      for (let i = 0; i < Math.max(a.length, b.length); i++) {
+        const av = i < a.length ? a[i] : -1;
+        const bv = i < b.length ? b[i] : -1;
+        if (av !== bv) return av - bv;
+      }
+      return 0;
+    });
+
+    // Capture data references before any structural changes
+    const caches = ascending.map(idxs => this.#getItem(idxs));
+
+    if (position === 'on') {
+      // Capture target by reference so it's unaffected by the removals below
+      const targetData = this.#getItem(targetIdxs);
+      // Remove descending so higher sibling indexes don't shift lower ones mid-loop
+      [...ascending].reverse().forEach(idxs => this.#removeItem(idxs));
+      if (!Array.isArray(targetData.items)) targetData.items = [];
+      caches.forEach(cache => targetData.items.push(cache));
+      targetData.expanded = true;
+    } else {
+      // Count how many selected items are in the same parent as the target and
+      // precede it — each one shifts the target index down by one after removal.
+      const targetParent = targetIdxs.slice(0, -1).join(',');
+      let shift = 0;
+      for (const sidxs of ascending) {
+        if (sidxs.slice(0, -1).join(',') === targetParent &&
+            sidxs[sidxs.length - 1] < targetIdxs[targetIdxs.length - 1]) {
+          shift++;
+        }
+      }
+      const adjustedIdx = targetIdxs[targetIdxs.length - 1] - shift;
+      const adjustedParent = targetIdxs.slice(0, -1);
+      // Remove descending to keep earlier indexes stable
+      [...ascending].reverse().forEach(idxs => this.#removeItem(idxs));
+      const insertAt = position === 'after' ? adjustedIdx + 1 : adjustedIdx;
+      if (adjustedParent.length === 0) {
+        this.items.splice(insertAt, 0, ...caches);
+      } else {
+        this.#getItem(adjustedParent).items.splice(insertAt, 0, ...caches);
+      }
+    }
+
+    this.#selectedIndexes.clear();
+    this.#lastSelectedIndexes = null;
+    this.$items.classList.toggle('dragging', false);
+  }
+
   #wrap(indexes: number[]): SelectedTreeItem {
     return {
       indexes,
@@ -269,40 +320,7 @@ export default class PgTree extends HTMLElement {
         return parent.length === 0 ? this : this.#getItem(parent);
       },
       move: (item: SelectedTreeItem, position: string) => {
-        // After removing the dragged item, siblings at higher indexes shift down by one.
-        // Adjust the target index if it's a sibling that comes after the dragged item.
-        const adjustedTarget = [...item.indexes];
-        const draggedParent = indexes.slice(0, indexes.length - 1).join(',');
-        const targetParent = item.indexes.slice(0, item.indexes.length - 1).join(',');
-        if (draggedParent === targetParent &&
-            indexes[indexes.length - 1] < item.indexes[item.indexes.length - 1]) {
-          adjustedTarget[adjustedTarget.length - 1]--;
-        }
-        const adjustedIndex = adjustedTarget[adjustedTarget.length - 1];
-        const adjustedParent = adjustedTarget.slice(0, adjustedTarget.length - 1);
-
-        const cache = this.#getItem(indexes);
-        this.#removeItem(indexes);
-
-        if (position === 'on') {
-          const target = this.#getItem(adjustedTarget);
-          if (!Array.isArray(target.items)) {
-            target.items = [];
-          }
-          target.items.push(cache);
-          target.expanded = true;
-        } else if (adjustedParent.length === 0) {
-          this.items.splice(position === 'after' ? adjustedIndex + 1 : adjustedIndex, 0, cache);
-        } else {
-          this.#getItem(adjustedParent).items.splice(
-            position === 'after' ? adjustedIndex + 1 : adjustedIndex,
-            0,
-            cache
-          );
-        }
-        this.#selectedIndexes.clear();
-        this.#lastSelectedIndexes = null;
-        this.$items.classList.toggle('dragging', false);
+        this.#batchMove([indexes], item.indexes, position);
       }
     };
   }
