@@ -19,6 +19,7 @@ export default class PgTreeItem extends HTMLElement {
   @Prop() label: string = '';
   @Prop() selected: boolean = false;
   @Prop() expanded: boolean = false;
+  @Prop() isFolder: boolean = false;
   @Prop() icon: { path: string } = { path: noIcon };
   @Prop() actions: any[] = [];
   @Prop() items: any[] = [];
@@ -52,18 +53,20 @@ export default class PgTreeItem extends HTMLElement {
     this.$item.addEventListener('contextmenu', this.#handleContextMenu.bind(this));
     this.$input.addEventListener('blur', this.#handleBlur.bind(this));
     this.$input.addEventListener('keydown', this.#handleInputKeyDown.bind(this));
-    // Append Indexes
+    // Bubble indexes up through nested items containers
     this.$items.addEventListener('action', this.#handleAction.bind(this));
     this.$items.addEventListener('move', this.#handleMove.bind(this));
     this.$items.addEventListener('toggle', this.#handleToggle.bind(this));
     this.$items.addEventListener('select', this.#handleSelect.bind(this));
     this.$items.addEventListener('rename', this.#handleRename.bind(this));
+    this.$items.addEventListener('menu', this.#handleMenu.bind(this));
     this.$items.addEventListener('up', this.#handleUp.bind(this));
     this.$items.addEventListener('down', this.#handleDown.bind(this));
     this.$items.addEventListener('itemdragstart', this.#handleItemDragStart.bind(this));
     this.$items.addEventListener('itemdragend', this.#handleItemDragEnd.bind(this));
     this.$items.addEventListener('itemdropenter', this.#handleItemDropEnter.bind(this));
-    // Drop
+    this.$items.addEventListener('expand', this.#handleItemExpand.bind(this));
+    // Drop zones
     this.$dropabove.addEventListener('dragenter', this.#handleDragAboveEnter.bind(this));
     this.$dropabove.addEventListener('dragleave', this.#handleDragAboveLeave.bind(this));
     this.$dropabove.addEventListener('dragover', this.#handleDragOver.bind(this));
@@ -80,9 +83,7 @@ export default class PgTreeItem extends HTMLElement {
     forEach({
       container: this.$actions,
       items: this.actions,
-      type: (item) => {
-        return PgTreeButtonIcon;
-      }
+      type: (item) => item.type || PgTreeButtonIcon
     });
     if (this.expanded) {
       this.#initItems();
@@ -90,7 +91,9 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   disconnectedCallback() {
-    console.log('disconnect', this.index);
+    window.clearTimeout(this.#dragOnTimer);
+    this.#canvas?.remove();
+    this.#canvas = null;
   }
 
   #initItemsOnce = true;
@@ -99,9 +102,7 @@ export default class PgTreeItem extends HTMLElement {
       forEach({
         container: this.$items,
         items: this.items,
-        type: (item) => {
-          return PgTreeItem;
-        }
+        type: () => PgTreeItem
       });
       this.#initItemsOnce = false;
     }
@@ -117,8 +118,8 @@ export default class PgTreeItem extends HTMLElement {
     if (changes.selected) {
       this.$item.classList.toggle('selected', this.selected);
     }
-    if (changes.items) {
-      this.$item.classList.toggle('items', this.items.length !== 0);
+    if (changes.items || changes.isFolder) {
+      this.$item.classList.toggle('items', this.isFolder || this.items.length !== 0);
     }
     if (changes.expanded) {
       if (this.expanded) {
@@ -133,17 +134,12 @@ export default class PgTreeItem extends HTMLElement {
     this.dispatchEvent(new CustomEvent('toggle', {
       bubbles: true,
       composed: true,
-      detail: {
-        indexes: [this.index]
-      }
+      detail: { indexes: [this.index] }
     }));
   }
 
   #handleIconDoubleClick(e: MouseEvent) {
-    const { ctrlKey, shiftKey } = e;
-    if (ctrlKey || shiftKey) {
-      return;
-    }
+    if (e.ctrlKey || e.shiftKey) return;
     this.dispatchEvent(new CustomEvent('select', {
       bubbles: true,
       composed: true,
@@ -170,15 +166,14 @@ export default class PgTreeItem extends HTMLElement {
       this.#ignoreNextClick = false;
       return;
     }
-    const { ctrlKey, shiftKey } = e;
     this.dispatchEvent(new CustomEvent('select', {
       bubbles: true,
       composed: true,
       detail: {
         type: 'label',
         indexes: [this.index],
-        ctrlKey,
-        shiftKey
+        ctrlKey: e.ctrlKey,
+        shiftKey: e.shiftKey
       }
     }));
   }
@@ -187,17 +182,28 @@ export default class PgTreeItem extends HTMLElement {
     if (e.key === 'Enter') {
       this.#enableRename();
       e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      this.dispatchEvent(new CustomEvent('up', {
+        bubbles: true,
+        composed: true,
+        detail: { indexes: [this.index] }
+      }));
+      e.preventDefault();
+    } else if (e.key === 'ArrowDown') {
+      this.dispatchEvent(new CustomEvent('down', {
+        bubbles: true,
+        composed: true,
+        detail: { indexes: [this.index] }
+      }));
+      e.preventDefault();
     }
-    // todo arrow keys
   }
 
   #handlePointerEnter() {
     this.dispatchEvent(new CustomEvent('enter', {
       bubbles: true,
       composed: true,
-      detail: {
-        indexes: [this.index]
-      }
+      detail: { indexes: [this.index] }
     }));
   }
 
@@ -205,13 +211,11 @@ export default class PgTreeItem extends HTMLElement {
     this.dispatchEvent(new CustomEvent('leave', {
       bubbles: true,
       composed: true,
-      detail: {
-        indexes: [this.index]
-      }
+      detail: { indexes: [this.index] }
     }));
   }
 
-  #handleItemAction(e) {
+  #handleItemAction(e: any) {
     e.stopPropagation();
     this.dispatchEvent(new CustomEvent('action', {
       bubbles: true,
@@ -223,40 +227,27 @@ export default class PgTreeItem extends HTMLElement {
     }));
   }
 
-  #handleAction(e) {
-    e.detail.indexes.unshift(this.index);
-  }
+  #handleAction(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleMove(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleToggle(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleRename(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleMenu(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleUp(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleDown(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleSelect(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleItemDropEnter(e: any) { e.detail.indexes.unshift(this.index); }
 
-  #handleMove(e) {
-    e.detail.indexes.unshift(this.index);
-  }
-
-  #handleToggle(e: any) {
-    e.detail.indexes.unshift(this.index);
-  }
-
-  #handleRename(e: any) {
-    e.detail.indexes.unshift(this.index);
-  }
-
-  #handleUp(e: any) {
-    e.detail.indexes.unshift(this.index);
-  }
-
-  #handleDown(e: any) {
-    e.detail.indexes.unshift(this.index);
-  }
-
-  #handleSelect(e: any) {
-    e.detail.indexes.unshift(this.index);
-  }
-
-  #handleItemDropEnter(e: any) {
-    e.detail.indexes.unshift(this.index);
-  }
-
-  #handleContextMenu(e) {
+  #handleContextMenu(e: MouseEvent) {
     e.preventDefault();
+    this.dispatchEvent(new CustomEvent('menu', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        indexes: [this.index],
+        x: e.clientX,
+        y: e.clientY
+      }
+    }));
   }
 
   #enableRename() {
@@ -278,10 +269,7 @@ export default class PgTreeItem extends HTMLElement {
 
   #ignoreNextClick = false;
   #handleDoubleClick(e: MouseEvent) {
-    const { ctrlKey, shiftKey } = e;
-    if (ctrlKey || shiftKey) {
-      return;
-    }
+    if (e.ctrlKey || e.shiftKey) return;
     this.#enableRename();
     e.preventDefault();
   }
@@ -302,7 +290,7 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleIconKeyDown(e: KeyboardEvent) {
-    switch (e.key ) {
+    switch (e.key) {
       case 'ArrowUp':
         this.dispatchEvent(new CustomEvent('up', {
           bubbles: true,
@@ -323,7 +311,7 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleInputKeyDown(e: KeyboardEvent) {
-    switch (e.key ) {
+    switch (e.key) {
       case 'Enter':
         this.#handleBlur();
         break;
@@ -359,8 +347,8 @@ export default class PgTreeItem extends HTMLElement {
     }
   }
 
-  #canvas;
-  #handleDragStart(event) {
+  #canvas: HTMLCanvasElement | null = null;
+  #handleDragStart(event: DragEvent) {
     let dragCount = 0;
     this.dispatchEvent(new CustomEvent('itemdragstart', {
       bubbles: true,
@@ -369,7 +357,7 @@ export default class PgTreeItem extends HTMLElement {
         ctrlKey: event.ctrlKey,
         shiftKey: event.shiftKey,
         indexes: [this.index],
-        callback: (count) => {
+        callback: (count: number) => {
           dragCount = count;
         }
       }
@@ -377,55 +365,57 @@ export default class PgTreeItem extends HTMLElement {
     this.$item.classList.toggle('dragging', true);
     this.$items.classList.toggle('dragging', true);
     // Generate drag image showing selected item count
-    const size = window.devicePixelRatio;
+    const dpr = window.devicePixelRatio;
     const canvas = document.createElement('canvas');
+    // Position off-screen so it doesn't flash before becoming the drag image
+    canvas.style.position = 'absolute';
+    canvas.style.top = '-200px';
+    canvas.style.left = '-200px';
     document.body.append(canvas);
-    // Larger than required!
-    canvas.width = 100 * size;
-    canvas.height = 40 * size;
-    canvas.style.width = `${canvas.width / size}px`;
-    // overlap cursor offset
     const offsetInline = 20;
     const fontSize = 16;
     const paddingBlock = 6;
     const paddingInline = 6;
-    var ctx = canvas.getContext('2d');
+    canvas.width = 100 * dpr;
+    canvas.height = 40 * dpr;
+    canvas.style.width = `${canvas.width / dpr}px`;
+    const ctx = canvas.getContext('2d');
     if (ctx) {
       const text = `${dragCount}`;
-      ctx.font = `bold ${fontSize * size}px Segoe UI`;
+      ctx.font = `bold ${fontSize * dpr}px Segoe UI`;
       const textSize = ctx.measureText(text);
       ctx.fillStyle = '#453C4F';
       ctx.beginPath();
       ctx.roundRect(
-        (offsetInline) * size,
+        offsetInline * dpr,
         0,
-        (textSize.width + (paddingInline * 2)) * size,
-        (fontSize + (paddingBlock * 2)) * size,
-        8 + (size * 2)
+        (textSize.width + paddingInline * 2) * dpr,
+        (fontSize + paddingBlock * 2) * dpr,
+        8 + dpr * 2
       );
       ctx.fill();
       ctx.fillStyle = '#FFF';
       ctx.beginPath();
       ctx.roundRect(
-        (offsetInline + 2) * size,
-        2 * size,
-        ((textSize.width + (paddingInline * 2) - 4) * size),
-        ((fontSize + (paddingBlock * 2) - 4) * size),
+        (offsetInline + 2) * dpr,
+        2 * dpr,
+        (textSize.width + paddingInline * 2 - 4) * dpr,
+        (fontSize + paddingBlock * 2 - 4) * dpr,
         8
       );
       ctx.fill();
       ctx.fillStyle = '#453C4F';
       ctx.fillText(
         text,
-        (offsetInline + paddingInline + 4) * size,
-        (fontSize + paddingBlock - 2) * size
+        (offsetInline + paddingInline + 4) * dpr,
+        (fontSize + paddingBlock - 2) * dpr
       );
     }
-    event.dataTransfer.setDragImage(canvas, 0, 0);
+    event.dataTransfer!.setDragImage(canvas, 0, 0);
     this.#canvas = canvas;
   }
 
-  #handleDragEnd(event) {
+  #handleDragEnd(_event: DragEvent) {
     this.dispatchEvent(new CustomEvent('itemdragend', {
       bubbles: true,
       composed: true,
@@ -433,125 +423,112 @@ export default class PgTreeItem extends HTMLElement {
     }));
     this.$item.classList.toggle('dragging', false);
     this.$items.classList.toggle('dragging', false);
-    this.#canvas.remove();
+    this.#canvas?.remove();
+    this.#canvas = null;
   }
 
-  #handleItemDragStart(e: any) {
-    e.detail.indexes.unshift(this.index);
-  }
+  #handleItemDragStart(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleItemDragEnd(e: any) { e.detail.indexes.unshift(this.index); }
+  #handleItemExpand(e: any) { e.detail.indexes.unshift(this.index); }
 
-  #handleItemDragEnd(e: any) {
-    e.detail.indexes.unshift(this.index);
-  }
-
-  #handleDragAboveEnter(e: any) {
+  #handleDragAboveEnter(e: DragEvent) {
     this.dispatchEvent(new CustomEvent('itemdropenter', {
       bubbles: true,
       composed: true,
       detail: {
         indexes: [this.index],
-        callback: (isValid) => {
+        callback: (isValid: boolean) => {
           if (isValid) {
-            e.dataTransfer.dropEffect = 'move';
+            e.dataTransfer!.dropEffect = 'move';
           }
         }
       }
     }));
-    e.target.classList.toggle('drop', true);
-    e.dataTransfer.setData("text", 'test');
-    e.dataTransfer.effectAllowed = 'move';
+    (e.target as HTMLElement).classList.toggle('drop', true);
   }
 
-  #handleDragAboveLeave(e: any) {
-    console.log('darg leave');
-    e.target.classList.toggle('drop', false);
+  #handleDragAboveLeave(e: DragEvent) {
+    (e.target as HTMLElement).classList.toggle('drop', false);
   }
 
-  #dragOnTimer;
-  #handleDragOnEnter(e: any) {
+  #dragOnTimer: number | undefined;
+  #handleDragOnEnter(e: DragEvent) {
     this.dispatchEvent(new CustomEvent('itemdropenter', {
       bubbles: true,
       composed: true,
       detail: {
         indexes: [this.index],
-        callback: (isValid) => {
+        callback: (isValid: boolean) => {
           if (isValid) {
-            e.dataTransfer.dropEffect = 'move';
+            e.dataTransfer!.dropEffect = 'move';
           }
         }
       }
     }));
-    e.target.classList.toggle('drop', true);
-    this.#dragOnTimer = setTimeout(() => {
-      this.#handleToggleClick();
+    (e.target as HTMLElement).classList.toggle('drop', true);
+    this.#dragOnTimer = window.setTimeout(() => {
+      this.dispatchEvent(new CustomEvent('expand', {
+        bubbles: true,
+        composed: true,
+        detail: { indexes: [this.index] }
+      }));
     }, 1500);
   }
 
-  #handleDragOnLeave(e: any) {
-    clearTimeout(this.#dragOnTimer);
-    console.log('darg leave');
-    e.target.classList.toggle('drop', false);
+  #handleDragOnLeave(e: DragEvent) {
+    window.clearTimeout(this.#dragOnTimer);
+    (e.target as HTMLElement).classList.toggle('drop', false);
   }
 
-  #handleDragBelowEnter(e: any) {
+  #handleDragBelowEnter(e: DragEvent) {
     this.dispatchEvent(new CustomEvent('itemdropenter', {
       bubbles: true,
       composed: true,
       detail: {
         indexes: [this.index],
-        callback: (isValid) => {
+        callback: (isValid: boolean) => {
           if (isValid) {
-            e.dataTransfer.dropEffect = 'move';
+            e.dataTransfer!.dropEffect = 'move';
           }
         }
       }
     }));
-    e.target.classList.toggle('drop', true);
+    (e.target as HTMLElement).classList.toggle('drop', true);
   }
 
-  #handleDragBelowLeave(e: any) {
-    console.log('darg leave');
-    e.target.classList.toggle('drop', false);
+  #handleDragBelowLeave(e: DragEvent) {
+    (e.target as HTMLElement).classList.toggle('drop', false);
   }
 
-  #handleDragOver(e: any) {
+  #handleDragOver(e: DragEvent) {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    e.dataTransfer!.dropEffect = 'move';
   }
 
-  #handleDragAbove(e: any) {
-    e.target.classList.toggle('drop', false);
+  #handleDragAbove(e: DragEvent) {
+    (e.target as HTMLElement).classList.toggle('drop', false);
     this.dispatchEvent(new CustomEvent('move', {
       bubbles: true,
       composed: true,
-      detail: {
-        indexes: [this.index],
-        position: 'before'
-      }
+      detail: { indexes: [this.index], position: 'before' }
     }));
   }
 
-  #handleDropOn(e: any) {
-    e.target.classList.toggle('drop', false);
+  #handleDropOn(e: DragEvent) {
+    (e.target as HTMLElement).classList.toggle('drop', false);
     this.dispatchEvent(new CustomEvent('move', {
       bubbles: true,
       composed: true,
-      detail: {
-        indexes: [this.index],
-        position: 'on'
-      }
+      detail: { indexes: [this.index], position: 'on' }
     }));
   }
 
-  #handleDropBelow(e: any) {
-    e.target.classList.toggle('drop', false);
+  #handleDropBelow(e: DragEvent) {
+    (e.target as HTMLElement).classList.toggle('drop', false);
     this.dispatchEvent(new CustomEvent('move', {
       bubbles: true,
       composed: true,
-      detail: {
-        indexes: [this.index],
-        position: 'after'
-      }
+      detail: { indexes: [this.index], position: 'after' }
     }));
   }
 

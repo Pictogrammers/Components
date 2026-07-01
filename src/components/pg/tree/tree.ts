@@ -10,11 +10,7 @@ export type SelectedTreeItem = {
   remove: () => void;
   getData: () => any;
   getParentData: () => any;
-}
-
-function move(arr, fromIndex, toIndex) {
-  const [element] = arr.splice(fromIndex, 1);
-  arr.splice(toIndex, 0, element);
+  move: (item: SelectedTreeItem, position: string) => void;
 }
 
 @Component({
@@ -28,14 +24,13 @@ export default class PgTree extends HTMLElement {
   @Part() $items: HTMLDivElement;
 
   #selectedIndexes = new Map();
+  #lastSelectedIndexes: number[] | null = null;
 
   connectedCallback() {
     forEach({
       container: this.$items,
       items: this.items,
-      type: (item) => {
-        return PgTreeItem;
-      }
+      type: () => PgTreeItem
     });
     this.$items.addEventListener('action', (e: any) => {
       e.stopPropagation();
@@ -47,66 +42,114 @@ export default class PgTree extends HTMLElement {
       }));
     });
     this.$items.addEventListener('move', (e: any) => {
-      const { indexes, position } = e.detail;
       e.stopPropagation();
       this.dispatchEvent(new CustomEvent('move', {
         detail: {
           item: this.#wrap(e.detail.indexes),
-          position,
+          position: e.detail.position,
         }
       }));
     });
     this.$items.addEventListener('rename', (e: any) => {
-      const { indexes, label } = e.detail;
       e.stopPropagation();
       this.dispatchEvent(new CustomEvent('rename', {
         detail: {
-          item: this.#wrap(indexes),
-          label,
+          item: this.#wrap(e.detail.indexes),
+          label: e.detail.label,
         }
       }));
     });
     this.$items.addEventListener('toggle', (e: any) => {
-      const { indexes } = e.detail;
-      let item = this.#getItem(indexes);
+      const item = this.#getItem(e.detail.indexes);
       item.expanded = !item.expanded;
+    });
+    this.$items.addEventListener('expand', (e: any) => {
+      this.#getItem(e.detail.indexes).expanded = true;
+    });
+    this.$items.addEventListener('menu', (e: any) => {
+      e.stopPropagation();
+      this.dispatchEvent(new CustomEvent('menu', {
+        detail: {
+          item: this.#wrap(e.detail.indexes),
+          x: e.detail.x,
+          y: e.detail.y,
+        }
+      }));
     });
     this.$items.addEventListener('select', (e: any) => {
       e.stopPropagation();
       const { indexes, type, ctrlKey, shiftKey } = e.detail;
       const item = this.#getItem(indexes);
-      const selectedCount = this.#selectedIndexes.size;
       const unproxyItem = getProxyValue(item);
-      if (!ctrlKey && selectedCount && !this.#selectedIndexes.has(unproxyItem)) {
+
+      if (shiftKey && this.#lastSelectedIndexes) {
+        const visible = this.#getVisibleIndexes();
+        const lastPos = visible.findIndex(v => v.join(',') === this.#lastSelectedIndexes!.join(','));
+        const currPos = visible.findIndex(v => v.join(',') === indexes.join(','));
         this.#selectedIndexes.forEach((x: any) => this.#getItem(x).selected = false);
         this.#selectedIndexes.clear();
-      }
-      item.selected = type === 'rename' ? true : !item.selected;
-      if (item.selected) {
-        this.#selectedIndexes.set(unproxyItem, indexes);
+        const start = Math.min(lastPos, currPos);
+        const end = Math.max(lastPos, currPos);
+        for (let i = start; i <= end; i++) {
+          const rangeItem = this.#getItem(visible[i]);
+          rangeItem.selected = true;
+          this.#selectedIndexes.set(getProxyValue(rangeItem), visible[i]);
+        }
       } else {
-        this.#selectedIndexes.delete(unproxyItem);
+        if (!ctrlKey && this.#selectedIndexes.size && !this.#selectedIndexes.has(unproxyItem)) {
+          this.#selectedIndexes.forEach((x: any) => this.#getItem(x).selected = false);
+          this.#selectedIndexes.clear();
+        }
+        item.selected = type === 'rename' ? true : !item.selected;
+        if (item.selected) {
+          this.#selectedIndexes.set(unproxyItem, indexes);
+          this.#lastSelectedIndexes = indexes;
+        } else {
+          this.#selectedIndexes.delete(unproxyItem);
+        }
       }
-      // Dispatch Event
+
       this.dispatchEvent(new CustomEvent('select', {
         detail: {
-          items: [...this.#selectedIndexes.values()].map((indexes: any) => {
-            return this.#wrap(indexes);
-          }),
+          items: [...this.#selectedIndexes.values()].map((idxs: any) => this.#wrap(idxs)),
         }
       }));
     });
+    this.$items.addEventListener('up', (e: any) => {
+      e.stopPropagation();
+      const visible = this.#getVisibleIndexes();
+      const idx = visible.findIndex(v => v.join(',') === e.detail.indexes.join(','));
+      if (idx > 0) {
+        this.#focusItem(visible[idx - 1]);
+      }
+    });
+    this.$items.addEventListener('down', (e: any) => {
+      e.stopPropagation();
+      const visible = this.#getVisibleIndexes();
+      const idx = visible.findIndex(v => v.join(',') === e.detail.indexes.join(','));
+      if (idx < visible.length - 1) {
+        this.#focusItem(visible[idx + 1]);
+      }
+    });
     this.$items.addEventListener('keydown', (e: any) => {
       if (e.key === 'Delete') {
-        this.#selectedIndexes.forEach((indexes: number[]) => {
-          this.#removeItem(indexes);
+        const toRemove = [...this.#selectedIndexes.values()] as number[][];
+        // Remove higher sibling indexes first to avoid index shifts
+        toRemove.sort((a, b) => {
+          for (let i = 0; i < Math.max(a.length, b.length); i++) {
+            const ai = i < a.length ? a[i] : -1;
+            const bi = i < b.length ? b[i] : -1;
+            if (ai !== bi) return bi - ai;
+          }
+          return 0;
         });
+        toRemove.forEach((indexes: number[]) => this.#removeItem(indexes));
         this.#selectedIndexes.clear();
+        this.#lastSelectedIndexes = null;
       }
     });
     this.$items.addEventListener('itemdragstart', (e: any) => {
-      const { indexes, callback, ctrlKey, shiftKey } = e.detail;
-      console.log('drag valid', indexes);
+      const { indexes, callback, ctrlKey } = e.detail;
       const item = this.#getItem(indexes);
       const unproxyItem = getProxyValue(item);
       if (!ctrlKey && this.#selectedIndexes.size) {
@@ -116,23 +159,29 @@ export default class PgTree extends HTMLElement {
       item.selected = true;
       this.#selectedIndexes.set(unproxyItem, indexes);
       let count = 0;
-      this.#selectedIndexes.forEach((indexes) => {
-        const item = this.#getItem(indexes);
-        count = this.#getDragCount(item, count);
+      this.#selectedIndexes.forEach((idxs: any) => {
+        count = this.#getDragCount(this.#getItem(idxs), count);
       });
       callback(count);
       this.$items.classList.toggle('dragging', true);
+      // Sync selection to consumers so #selectedItems reflects the dragged item
+      this.dispatchEvent(new CustomEvent('select', {
+        detail: {
+          items: [...this.#selectedIndexes.values()].map((idxs: any) => this.#wrap(idxs)),
+        }
+      }));
     });
-    this.$items.addEventListener('itemdragend', (e: any) => {
+    this.$items.addEventListener('itemdragend', () => {
       this.$items.classList.toggle('dragging', false);
+      this.#clearDropHighlights(this.$items);
     });
     this.$items.addEventListener('itemdropenter', this.#handleDropEnter.bind(this));
   }
 
-  #getDragCount(item, count) {
-    count += 1
-    if (item.items && item.items.length > 0) {
-      item.items.forEach((itm) => {
+  #getDragCount(item: any, count: number): number {
+    count += 1;
+    if (item.items?.length) {
+      item.items.forEach((itm: any) => {
         count = this.#getDragCount(itm, count);
       });
     }
@@ -142,84 +191,132 @@ export default class PgTree extends HTMLElement {
   #handleDropEnter(e: any) {
     const { indexes, callback } = e.detail;
     const excludes = this.#calculateDragExcludes();
-    console.log('valid???', indexes, excludes);
     const joined = indexes.join(',') as string;
-    const isInvalid = excludes.some(exclude => joined.startsWith(exclude));
-    callback(!isInvalid, (dropEffect) => {
-      e.dataTransfer.effectAllowed = dropEffect;
-    });
+    // Use comma-terminated prefix to prevent "0,1" from matching "0,10"
+    const isInvalid = excludes.some(ex => joined === ex || joined.startsWith(ex + ','));
+    callback(!isInvalid);
   }
 
   #removeItem(indexes: number[]) {
     const deleteIndex = indexes[indexes.length - 1];
-    const tempIndexes = indexes.slice(0, indexes.length - 1);
-    const item = tempIndexes.reduce((item: any, index) => {
-      return item.items[index];
-    }, this);
-    item.items.splice(deleteIndex, 1);
+    const parentIndexes = indexes.slice(0, indexes.length - 1);
+    const parent = parentIndexes.reduce((acc: any, i) => acc.items[i], this);
+    parent.items.splice(deleteIndex, 1);
   }
 
   #getItem(indexes: number[]) {
-    return indexes.reduce((item: any, index) => {
-      return item.items[index];
-    }, this);
+    return indexes.reduce((acc: any, i) => acc.items[i], this);
   }
 
-  /**
-   * Appends helper methods for selected
-   *
-   * @param indexes indexes
-   */
-  #wrap(indexes: number[]) {
+  #getItemElement(indexes: number[]): PgTreeItem | null {
+    let container: HTMLElement = this.$items;
+    let element: PgTreeItem | null = null;
+    for (const i of indexes) {
+      element = container.children[i] as PgTreeItem;
+      if (!element) return null;
+      container = (element as any).$items;
+      if (!container) return null;
+    }
+    return element;
+  }
+
+  #focusItem(indexes: number[]) {
+    const element = this.#getItemElement(indexes);
+    if (element) {
+      (element as any).$labelButton.focus();
+    }
+  }
+
+  #getVisibleIndexes(): number[][] {
+    const result: number[][] = [];
+    const traverse = (items: any[], prefix: number[]) => {
+      items.forEach((item: any, i: number) => {
+        const indexes = [...prefix, i];
+        result.push(indexes);
+        if (item.expanded && item.items?.length) {
+          traverse(item.items, indexes);
+        }
+      });
+    };
+    traverse(this.items, []);
+    return result;
+  }
+
+  #clearDropHighlights(container: HTMLElement) {
+    Array.from(container.children).forEach((child: any) => {
+      if (child.$dropabove) {
+        child.$dropabove.classList.remove('drop');
+        child.$dropon.classList.remove('drop');
+        child.$dropbelow.classList.remove('drop');
+      }
+      if (child.$items) {
+        this.#clearDropHighlights(child.$items);
+      }
+    });
+  }
+
+  #wrap(indexes: number[]): SelectedTreeItem {
     return {
       indexes,
       remove: () => {
         this.#removeItem(indexes);
         this.#selectedIndexes.clear();
+        this.#lastSelectedIndexes = null;
       },
-      getData: () => {
-        return this.#getItem(indexes);
-      },
+      getData: () => this.#getItem(indexes),
       getParentData: () => {
         const parent = indexes.slice(0, indexes.length - 1);
-        if (parent.length === 0) {
-          return this;
-        }
-        return this.#getItem(parent);
+        return parent.length === 0 ? this : this.#getItem(parent);
       },
-      move: (item, position) => {
-        console.log(item, position);
-        const index = item.indexes[item.indexes.length - 1];
-        const parent = item.indexes.slice(0, item.indexes.length - 1);
+      move: (item: SelectedTreeItem, position: string) => {
+        // After removing the dragged item, siblings at higher indexes shift down by one.
+        // Adjust the target index if it's a sibling that comes after the dragged item.
+        const adjustedTarget = [...item.indexes];
+        const draggedParent = indexes.slice(0, indexes.length - 1).join(',');
+        const targetParent = item.indexes.slice(0, item.indexes.length - 1).join(',');
+        if (draggedParent === targetParent &&
+            indexes[indexes.length - 1] < item.indexes[item.indexes.length - 1]) {
+          adjustedTarget[adjustedTarget.length - 1]--;
+        }
+        const adjustedIndex = adjustedTarget[adjustedTarget.length - 1];
+        const adjustedParent = adjustedTarget.slice(0, adjustedTarget.length - 1);
+
         const cache = this.#getItem(indexes);
         this.#removeItem(indexes);
+
         if (position === 'on') {
-          this.#getItem(item.indexes).items.push(cache);
-          this.#getItem(item.indexes).expanded = true;
-        } else if (parent.length === 0) {
-          this.items.splice(position === 'after' ? index + 1 : index, 0, cache);
+          const target = this.#getItem(adjustedTarget);
+          if (!Array.isArray(target.items)) {
+            target.items = [];
+          }
+          target.items.push(cache);
+          target.expanded = true;
+        } else if (adjustedParent.length === 0) {
+          this.items.splice(position === 'after' ? adjustedIndex + 1 : adjustedIndex, 0, cache);
         } else {
-          this.#getItem(parent).items.splice(position === 'after' ? index + 1 : index, 0, cache);
+          this.#getItem(adjustedParent).items.splice(
+            position === 'after' ? adjustedIndex + 1 : adjustedIndex,
+            0,
+            cache
+          );
         }
         this.#selectedIndexes.clear();
+        this.#lastSelectedIndexes = null;
         this.$items.classList.toggle('dragging', false);
       }
-    }
-  }
-
-  render(changes) {
-    if (changes.items) {
-      console.log('yay', this.items.map(x => x));
-    }
+    };
   }
 
   unselect(indexes: number[]) {
-
+    const item = this.#getItem(indexes);
+    const unproxyItem = getProxyValue(item);
+    item.selected = false;
+    this.#selectedIndexes.delete(unproxyItem);
   }
 
-  #calculateDragExcludes() {
+  #calculateDragExcludes(): string[] {
     const exclude: string[] = [];
-    this.#selectedIndexes.forEach((indexes) => {
+    this.#selectedIndexes.forEach((indexes: number[]) => {
       exclude.push(indexes.join(','));
     });
     return exclude;

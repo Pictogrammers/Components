@@ -19,6 +19,7 @@ function createFolder(label, expanded = true, items: any[] = []) {
     },
     label,
     expanded,
+    isFolder: true,
     actions: [{
       type: PgTreeButtonIcon,
       icon:  IconEye,
@@ -115,6 +116,10 @@ export default class XPgTreeBasic extends HTMLElement {
 
     let fileNext: number = 3;
     this.$addItem.addEventListener('click', () => {
+      if (this.#selectedItems.length === 0) {
+        this.$tree.items.push(createItem(`Item ${fileNext++}`));
+        return;
+      }
       this.#selectedItems.forEach((selected: any) => {
         if (selected.getData().items) {
           selected.getData().items.push(createItem(`Item ${fileNext}`));
@@ -127,6 +132,10 @@ export default class XPgTreeBasic extends HTMLElement {
 
     let folderNext = 2;
     this.$addFolder.addEventListener('click', () => {
+      if (this.#selectedItems.length === 0) {
+        this.$tree.items.push(createFolder(`Folder ${folderNext++}`));
+        return;
+      }
       this.#selectedItems.forEach((selected: SelectedTreeItem) => {
         if (selected.getData().items) {
           selected.getData().items.push(createFolder(`Folder ${folderNext}`));

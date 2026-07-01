@@ -15,15 +15,18 @@ export default class PgTreeButtonIcon extends HTMLElement {
 
   @Prop() index: number;
   @Prop() icon: string = noIcon;
+  @Prop() enabled: boolean = false;
+  @Prop() label: string = '';
 
   @Part() $button: HTMLButtonElement;
   @Part() $icon: PgIcon;
 
   connectedCallback() {
-    this.$button.addEventListener('click', this.#handleClick.bind(this))
+    this.$button.addEventListener('click', this.#handleClick.bind(this));
   }
 
-  #handleClick(e) {
+  #handleClick() {
+    if (!this.enabled) return;
     this.dispatchEvent(new CustomEvent('action', {
       bubbles: true,
       composed: true,
@@ -36,6 +39,13 @@ export default class PgTreeButtonIcon extends HTMLElement {
   render(changes) {
     if (changes.icon) {
       this.$icon.path = this.icon;
+    }
+    if (changes.enabled) {
+      this.$button.disabled = !this.enabled;
+    }
+    if (changes.label) {
+      this.$button.title = this.label;
+      this.$button.setAttribute('aria-label', this.label);
     }
   }
 
