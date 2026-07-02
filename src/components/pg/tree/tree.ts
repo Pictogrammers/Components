@@ -49,11 +49,7 @@ export default class PgTree extends HTMLElement {
       this.dispatchEvent(new CustomEvent('move', {
         detail: { position: e.detail.position }
       }));
-      this.dispatchEvent(new CustomEvent('select', {
-        detail: {
-          items: [...this.#selectedIndexes.values()].map((idxs: any) => this.#wrap(idxs)),
-        }
-      }));
+      this.#dispatchSelect();
     });
     this.$items.addEventListener('rename', (e: any) => {
       e.stopPropagation();
@@ -114,11 +110,7 @@ export default class PgTree extends HTMLElement {
         }
       }
 
-      this.dispatchEvent(new CustomEvent('select', {
-        detail: {
-          items: [...this.#selectedIndexes.values()].map((idxs: any) => this.#wrap(idxs)),
-        }
-      }));
+      this.#dispatchSelect();
     });
     this.$items.addEventListener('up', (e: any) => {
       e.stopPropagation();
@@ -141,9 +133,7 @@ export default class PgTree extends HTMLElement {
         this.#selectedIndexes.forEach((idxs: any) => this.#getItem(idxs).selected = false);
         this.#selectedIndexes.clear();
         this.#lastSelectedIndexes = null;
-        this.dispatchEvent(new CustomEvent('select', {
-          detail: { items: [] }
-        }));
+        this.#dispatchSelect();
       } else if (e.key === 'Delete') {
         const toRemove = [...this.#selectedIndexes.values()] as number[][];
         // Remove higher sibling indexes first to avoid index shifts
@@ -158,6 +148,7 @@ export default class PgTree extends HTMLElement {
         toRemove.forEach((indexes: number[]) => this.#removeItem(indexes));
         this.#selectedIndexes.clear();
         this.#lastSelectedIndexes = null;
+        this.#dispatchSelect();
       }
     });
     this.$items.addEventListener('itemdragstart', (e: any) => {
@@ -186,12 +177,7 @@ export default class PgTree extends HTMLElement {
         }
       });
       this.$items.classList.toggle('dragging', true);
-      // Sync selection to consumers so #selectedItems reflects the dragged item
-      this.dispatchEvent(new CustomEvent('select', {
-        detail: {
-          items: [...this.#selectedIndexes.values()].map((idxs: any) => this.#wrap(idxs)),
-        }
-      }));
+      this.#dispatchSelect();
     });
     this.$items.addEventListener('itemdragend', () => {
       this.#draggingElements.forEach(el => el.classList.remove('dragging'));
@@ -351,6 +337,7 @@ export default class PgTree extends HTMLElement {
         this.#removeItem(indexes);
         this.#selectedIndexes.clear();
         this.#lastSelectedIndexes = null;
+        this.#dispatchSelect();
       },
       getData: () => this.#getItem(indexes),
       getParentData: () => {
@@ -359,6 +346,7 @@ export default class PgTree extends HTMLElement {
       },
       move: (item: SelectedTreeItem, position: string) => {
         this.#batchMove([indexes], item.indexes, position);
+        this.#dispatchSelect();
       }
     };
   }
@@ -368,11 +356,21 @@ export default class PgTree extends HTMLElement {
     const unproxyItem = getProxyValue(item);
     item.selected = false;
     this.#selectedIndexes.delete(unproxyItem);
+    this.#dispatchSelect();
   }
 
   unselectAll() {
     this.#selectedIndexes.forEach((idxs: any) => this.#getItem(idxs).selected = false);
     this.#selectedIndexes.clear();
+    this.#dispatchSelect();
+  }
+
+  #dispatchSelect() {
+    this.dispatchEvent(new CustomEvent('select', {
+      detail: {
+        items: [...this.#selectedIndexes.values()].map((idxs: any) => this.#wrap(idxs)),
+      }
+    }));
   }
 
   #calculateDragExcludes(): string[] {
