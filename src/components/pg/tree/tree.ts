@@ -25,6 +25,7 @@ export default class PgTree extends HTMLElement {
 
   #selectedIndexes = new Map();
   #lastSelectedIndexes: number[] | null = null;
+  #draggingElements: Set<HTMLElement> = new Set();
 
   connectedCallback() {
     forEach({
@@ -167,6 +168,16 @@ export default class PgTree extends HTMLElement {
         count = this.#getDragCount(this.#getItem(idxs), count);
       });
       callback(count);
+      this.#draggingElements.clear();
+      this.#selectedIndexes.forEach((idxs: any) => {
+        const el = this.#getItemElement(idxs) as any;
+        if (el) {
+          el.$item.classList.add('dragging');
+          el.$items.classList.add('dragging');
+          this.#draggingElements.add(el.$item);
+          this.#draggingElements.add(el.$items);
+        }
+      });
       this.$items.classList.toggle('dragging', true);
       // Sync selection to consumers so #selectedItems reflects the dragged item
       this.dispatchEvent(new CustomEvent('select', {
@@ -176,6 +187,8 @@ export default class PgTree extends HTMLElement {
       }));
     });
     this.$items.addEventListener('itemdragend', () => {
+      this.#draggingElements.forEach(el => el.classList.remove('dragging'));
+      this.#draggingElements.clear();
       this.$items.classList.toggle('dragging', false);
       this.#clearDropHighlights(this.$items);
     });
