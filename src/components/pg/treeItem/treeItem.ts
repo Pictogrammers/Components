@@ -108,7 +108,7 @@ export default class PgTreeItem extends HTMLElement {
     }
   }
 
-  render(changes) {
+  render(changes: Record<string, boolean>) {
     if (changes.label) {
       this.$label.textContent = this.label;
     }
@@ -316,6 +316,7 @@ export default class PgTreeItem extends HTMLElement {
         this.#handleBlur();
         break;
       case 'Escape':
+        e.stopPropagation();
         this.$labelButton.classList.remove('hide');
         this.$actions.classList.remove('hide');
         this.$input.classList.add('hide');

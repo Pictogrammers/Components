@@ -137,7 +137,14 @@ export default class PgTree extends HTMLElement {
       }
     });
     this.$items.addEventListener('keydown', (e: any) => {
-      if (e.key === 'Delete') {
+      if (e.key === 'Escape') {
+        this.#selectedIndexes.forEach((idxs: any) => this.#getItem(idxs).selected = false);
+        this.#selectedIndexes.clear();
+        this.#lastSelectedIndexes = null;
+        this.dispatchEvent(new CustomEvent('select', {
+          detail: { items: [] }
+        }));
+      } else if (e.key === 'Delete') {
         const toRemove = [...this.#selectedIndexes.values()] as number[][];
         // Remove higher sibling indexes first to avoid index shifts
         toRemove.sort((a, b) => {
@@ -361,6 +368,11 @@ export default class PgTree extends HTMLElement {
     const unproxyItem = getProxyValue(item);
     item.selected = false;
     this.#selectedIndexes.delete(unproxyItem);
+  }
+
+  unselectAll() {
+    this.#selectedIndexes.forEach((idxs: any) => this.#getItem(idxs).selected = false);
+    this.#selectedIndexes.clear();
   }
 
   #calculateDragExcludes(): string[] {
