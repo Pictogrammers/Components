@@ -22,12 +22,57 @@ export default class XPgNodesBasic extends HTMLElement {
   @Part() $restart: HTMLButtonElement;
 
   connectedCallback() {
+    this.$script.globals.push([
+      'trace',
+      (message) => {
+        this.$log.appendChild(document.createTextNode(`${message}\n`));
+      }
+    ]);
     // Node Editors
     this.$script.editors.push(PgNodeEditorText);
     this.$script.editors.push(PgNodeEditorNumber);
     this.$script.editors.push(PgNodeEditorRange);
     // Node type registry
     this.$script.nodes.push({
+      name: 'stateGet',
+      label: 'Get',
+      args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }],
+      nodes: [{
+        key: 'then',
+        label: 'Then',
+      }],
+      handler: ({ state, then, key }: any) => {
+        state.set('$state', key);
+        return then;
+      },
+    }, {
+      name: 'stateAdd',
+      label: 'Add',
+      args: [{
+        key: 'value',
+        label: 'Value',
+        editor: 'Number',
+        value: 0,
+      }],
+      nodes: [{
+        key: 'then',
+        label: 'Then',
+      }],
+      handler: ({ state, then, value }: any) => {
+        if (!state.has('$state')) {
+          throw new Error('Invalid state');
+        }
+        const key = state.get('$state');
+        const current = state.get(key);
+        state.set(key, (current ?? 0) + value);
+        return then;
+      },
+    }, {
       name: 'setState',
       label: 'Set',
       args: [{
