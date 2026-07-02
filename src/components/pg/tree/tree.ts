@@ -48,6 +48,11 @@ export default class PgTree extends HTMLElement {
       this.dispatchEvent(new CustomEvent('move', {
         detail: { position: e.detail.position }
       }));
+      this.dispatchEvent(new CustomEvent('select', {
+        detail: {
+          items: [...this.#selectedIndexes.values()].map((idxs: any) => this.#wrap(idxs)),
+        }
+      }));
     });
     this.$items.addEventListener('rename', (e: any) => {
       e.stopPropagation();
@@ -270,39 +275,52 @@ export default class PgTree extends HTMLElement {
     // Capture data references before any structural changes
     const caches = ascending.map(idxs => this.#getItem(idxs));
 
+    // Count how many selected siblings precede the target — each one shifts its index down after removal
+    const targetParentStr = targetIdxs.slice(0, -1).join(',');
+    let targetShift = 0;
+    for (const sidxs of ascending) {
+      if (sidxs.slice(0, -1).join(',') === targetParentStr &&
+          sidxs[sidxs.length - 1] < targetIdxs[targetIdxs.length - 1]) {
+        targetShift++;
+      }
+    }
+    const adjustedTargetIdxs = [
+      ...targetIdxs.slice(0, -1),
+      targetIdxs[targetIdxs.length - 1] - targetShift
+    ];
+
+    // Remove descending so higher sibling indexes don't shift lower ones mid-loop
+    [...ascending].reverse().forEach(idxs => this.#removeItem(idxs));
+
+    // Rebuild selection map with post-move positions so items stay selected
+    this.#selectedIndexes.clear();
+    this.#lastSelectedIndexes = null;
+
     if (position === 'on') {
-      // Capture target by reference so it's unaffected by the removals below
-      const targetData = this.#getItem(targetIdxs);
-      // Remove descending so higher sibling indexes don't shift lower ones mid-loop
-      [...ascending].reverse().forEach(idxs => this.#removeItem(idxs));
+      const targetData = this.#getItem(adjustedTargetIdxs);
+      const prevLen = Array.isArray(targetData.items) ? targetData.items.length : 0;
       if (!Array.isArray(targetData.items)) targetData.items = [];
-      caches.forEach(cache => targetData.items.push(cache));
+      caches.forEach((cache, i) => {
+        targetData.items.push(cache);
+        const newIdxs = [...adjustedTargetIdxs, prevLen + i];
+        this.#selectedIndexes.set(getProxyValue(this.#getItem(newIdxs)), newIdxs);
+      });
       targetData.expanded = true;
     } else {
-      // Count how many selected items are in the same parent as the target and
-      // precede it — each one shifts the target index down by one after removal.
-      const targetParent = targetIdxs.slice(0, -1).join(',');
-      let shift = 0;
-      for (const sidxs of ascending) {
-        if (sidxs.slice(0, -1).join(',') === targetParent &&
-            sidxs[sidxs.length - 1] < targetIdxs[targetIdxs.length - 1]) {
-          shift++;
-        }
-      }
-      const adjustedIdx = targetIdxs[targetIdxs.length - 1] - shift;
-      const adjustedParent = targetIdxs.slice(0, -1);
-      // Remove descending to keep earlier indexes stable
-      [...ascending].reverse().forEach(idxs => this.#removeItem(idxs));
+      const adjustedParent = adjustedTargetIdxs.slice(0, -1);
+      const adjustedIdx = adjustedTargetIdxs[adjustedTargetIdxs.length - 1];
       const insertAt = position === 'after' ? adjustedIdx + 1 : adjustedIdx;
       if (adjustedParent.length === 0) {
         this.items.splice(insertAt, 0, ...caches);
       } else {
         this.#getItem(adjustedParent).items.splice(insertAt, 0, ...caches);
       }
+      caches.forEach((_, i) => {
+        const newIdxs = [...adjustedParent, insertAt + i];
+        this.#selectedIndexes.set(getProxyValue(this.#getItem(newIdxs)), newIdxs);
+      });
     }
 
-    this.#selectedIndexes.clear();
-    this.#lastSelectedIndexes = null;
     this.$items.classList.toggle('dragging', false);
   }
 
