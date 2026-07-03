@@ -393,6 +393,9 @@ export default class PgNodes extends HTMLElement {
           });
         }
       },
+      disconnect: (_$item: any, item: any) => {
+        this.#connector?.removeNode(String(item.id));
+      },
     });
   }
 
@@ -610,7 +613,6 @@ export default class PgNodes extends HTMLElement {
     const index = this.items.findIndex((x: any) => x.id === nodeId);
     if (index > 0) {
       this.items.splice(index, 1);
-      this.#connector?.removeNode(String(nodeId));
       this.#nodeStates.delete(nodeId);
       this.#updateScrollExtent();
     }
@@ -737,6 +739,11 @@ export default class PgNodes extends HTMLElement {
     );
   }
   set json(value: string) {
+    //this.#connector?.reset();
     this.items = JSON.parse(value);
+  }
+
+  reset() {
+    this.#connector?.reset();
   }
 }

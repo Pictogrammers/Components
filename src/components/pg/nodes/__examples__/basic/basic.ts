@@ -56,6 +56,12 @@ export default class XPgNodesBasic extends HTMLElement {
         label: 'Then',
       }],
       handler: ({ state, then, key }: any) => {
+        if (state.has('$state.next')) {
+          const next = state.has('$state.next');
+          state.delete('$state.next');
+          state.delete('$state');
+          return next;
+        }
         state.set('$state', key);
         return then;
       },
@@ -85,11 +91,6 @@ export default class XPgNodesBasic extends HTMLElement {
       name: 'stateSet',
       label: 'Set',
       args: [{
-        key: 'key',
-        label: 'Key',
-        editor: 'Text',
-        value: '',
-      }, {
         key: 'value',
         label: 'Value',
         editor: 'Text',
@@ -99,7 +100,11 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'then',
         label: 'Then',
       }],
-      handler: ({ state, then, key, value }: any) => {
+      handler: ({ state, then, value }: any) => {
+        if (!state.has('$state')) {
+          throw new Error('Missing get before set');
+        }
+        const key = state.get('$state');
         state.set(key, value);
         return then;
       },
@@ -107,11 +112,6 @@ export default class XPgNodesBasic extends HTMLElement {
       name: 'equals',
       label: 'State Equals',
       args: [{
-        key: 'key',
-        label: 'Key',
-        editor: 'Text',
-        value: '',
-      }, {
         key: 'value',
         label: 'Value',
         editor: 'Text',
@@ -124,7 +124,8 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'f',
         label: 'False',
       }],
-      handler: ({ state, t, f, key, value }: any) => {
+      handler: ({ state, t, f, value }: any) => {
+        const key = state.get('$state');
         if (state.get(key) === value) {
           return t;
         } else {
@@ -134,11 +135,8 @@ export default class XPgNodesBasic extends HTMLElement {
     }, {
       name: 'lessThan',
       label: 'Less Than',
+      width: 6,
       args: [{
-        key: 'key',
-        label: 'Key',
-        editor: 'Text',
-      }, {
         key: 'value',
         label: 'Value',
         editor: 'Number',
@@ -152,7 +150,7 @@ export default class XPgNodesBasic extends HTMLElement {
         label: 'False',
       }],
       handler: ({ state, t, f, key, value }: any) => {
-        if (state.get(key) < value) {
+        if (parseFloat(state.get(key)) < value) {
           return t;
         } else {
           return f;
@@ -262,7 +260,6 @@ export default class XPgNodesBasic extends HTMLElement {
         label: 'Then',
       }],
       handler: ({ state, then, node, weight, options }: any) => {
-        console.log(node, weight, options);
         if (!state.has('random')) {
           throw new Error('invalid node');
         }
@@ -308,7 +305,6 @@ export default class XPgNodesBasic extends HTMLElement {
       y: 2,
       node: 'stateSet',
       args: {
-        key: 'health',
         value: '10',
       },
       nodes: {
@@ -321,7 +317,6 @@ export default class XPgNodesBasic extends HTMLElement {
       y: 10,
       node: 'stateSet',
       args: {
-        key: 'health',
         value: '20',
       },
       nodes: {
