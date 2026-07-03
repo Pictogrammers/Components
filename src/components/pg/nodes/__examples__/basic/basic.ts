@@ -82,7 +82,7 @@ export default class XPgNodesBasic extends HTMLElement {
         return then;
       },
     }, {
-      name: 'setState',
+      name: 'stateSet',
       label: 'Set',
       args: [{
         key: 'key',
@@ -306,7 +306,7 @@ export default class XPgNodesBasic extends HTMLElement {
       id: 2,
       x: 30,
       y: 2,
-      node: 'setState',
+      node: 'stateSet',
       args: {
         key: 'health',
         value: '10',
@@ -319,7 +319,7 @@ export default class XPgNodesBasic extends HTMLElement {
       id: 3,
       x: 30,
       y: 10,
-      node: 'setState',
+      node: 'stateSet',
       args: {
         key: 'health',
         value: '20',
@@ -405,15 +405,22 @@ export default class XPgNodesBasic extends HTMLElement {
     });
     if (index === -1) {
       list?.push(this.$script.json);
-      this.store.set('list', list);
     } else {
-      // update item
+      list[index] = this.$script.json;
     }
+    this.store.set('list', list);
     // update list
-    this.$files.options.push({
-      label: newDescription,
-      value: this.$script.json,
-    });
+    if (index === -1) {
+      this.$files.options.push({
+        label: newDescription,
+        value: this.$script.json,
+      });
+    } else {
+      this.$files.options.splice(index, 1, {
+        label: newDescription,
+        value: this.$script.json,
+      });
+    }
     // select
     this.$files.value = this.$script.json;
   }

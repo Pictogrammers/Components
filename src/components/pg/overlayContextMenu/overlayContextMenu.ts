@@ -57,11 +57,14 @@ export default class PgOverlayContextMenu extends PgOverlay {
     // ToDo: update to CSS Variables
     this.$overlay.style.setProperty('--pg-overlay-menu-_x', `${x}px`);
     this.$overlay.style.setProperty('--pg-overlay-menu-_y', `${y}px`);
-    // Focus
-    this.$menu.focus(0);
     // Should return focus
     this.#handleDown = this.#down.bind(this);
     document.addEventListener('pointerdown', this.#handleDown);
+    // Rendering children is after parent's connectedCallback
+    queueMicrotask(() => {
+      // Focus
+      this.$menu.focus(0);
+    });
   }
 
   #ignore = false;
