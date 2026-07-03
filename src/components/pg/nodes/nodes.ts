@@ -739,8 +739,12 @@ export default class PgNodes extends HTMLElement {
     );
   }
   set json(value: string) {
-    //this.#connector?.reset();
     this.items = JSON.parse(value);
+    let nextNodeId = 0;
+    this.items.forEach((item) => {
+      nextNodeId = Math.max(nextNodeId, item.id);
+    });
+    this.#nextNodeId = nextNodeId + 1;
   }
 
   reset() {

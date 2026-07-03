@@ -20,6 +20,7 @@ export default class XPgNodesBasic extends HTMLElement {
   @Part() $files: PgInputSelect;
   @Part() $save: HTMLButtonElement;
   @Part() $open: HTMLButtonElement;
+  @Part() $new: HTMLButtonElement;
 
   @Part() $debug: HTMLButtonElement;
   @Part() $debugNext: HTMLButtonElement;
@@ -344,6 +345,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$restart.addEventListener('click', this.#handleRestart.bind(this));
     this.$save.addEventListener('click', this.#handleSave.bind(this));
     this.$open.addEventListener('click', this.#handleOpen.bind(this));
+    this.$new.addEventListener('click', this.#handleNew.bind(this));
     this.#initFiles();
   }
 
@@ -425,6 +427,6 @@ export default class XPgNodesBasic extends HTMLElement {
   }
 
   #handleNew(e: CustomEvent) {
-
+    this.$script.json = '[{"id":0,"x":2,"y":2,"width":12,"height":4,"args":{"description":"New script"},"nodes":{"then":[]}}]'
   }
 }
