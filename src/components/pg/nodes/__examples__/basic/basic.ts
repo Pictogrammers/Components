@@ -1,10 +1,11 @@
-import { Component, Part } from '@pictogrammers/element';
+import { Component, Part, Local } from '@pictogrammers/element';
 import PgNodes from '../../nodes';
 
 import template from './basic.html';
 import PgNodeEditorText from 'components/pg/nodeEditorText/nodeEditorText';
 import PgNodeEditorRange from 'components/pg/nodeEditorRange/nodeEditorRange';
 import PgNodeEditorNumber from 'components/pg/nodeEditorNumber/nodeEditorNumber';
+import PgInputSelect from 'components/pg/inputSelect/inputSelect';
 
 @Component({
   selector: 'x-pg-nodes-basic',
@@ -16,10 +17,18 @@ export default class XPgNodesBasic extends HTMLElement {
   @Part() $state: HTMLPreElement;
   @Part() $log: HTMLPreElement;
 
+  @Part() $files: PgInputSelect;
+  @Part() $save: HTMLButtonElement;
+  @Part() $open: HTMLButtonElement;
+
   @Part() $debug: HTMLButtonElement;
   @Part() $debugNext: HTMLButtonElement;
   @Part() $play: HTMLButtonElement;
   @Part() $restart: HTMLButtonElement;
+
+  @Local('nodes.basic') store = new Map<string, any>([
+    ['list', []]
+  ]);
 
   connectedCallback() {
     this.$script.globals.push([
@@ -338,6 +347,9 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$debugNext.addEventListener('click', this.#handleDebugNext.bind(this));
     this.$play.addEventListener('click', this.#handlePlay.bind(this));
     this.$restart.addEventListener('click', this.#handleRestart.bind(this));
+    this.$save.addEventListener('click', this.#handleSave.bind(this));
+    this.$open.addEventListener('click', this.#handleOpen.bind(this));
+    this.#initFiles();
   }
 
   #handleChange(_e: CustomEvent) {}
@@ -365,5 +377,52 @@ export default class XPgNodesBasic extends HTMLElement {
 
   #handleRestart(_e: CustomEvent) {
     this.$script.restart();
+  }
+
+  #initFiles() {
+    const list = this.store.get('list');
+    list.forEach((value) => {
+      const items = JSON.parse(value);
+      const { description } = items[0].args;
+      this.$files.options.push({
+        label: description,
+        value: value,
+      });
+    });
+    if (list.length > 0) {
+      this.$files.value = list[0];
+    }
+  }
+
+  #handleSave(e: CustomEvent) {
+    const list = this.store.get('list');
+    const { description: newDescription } = this.$script.items[0].args;
+    // Search for index
+    const index = list.findIndex((value) => {
+      const items = JSON.parse(value);
+      const { description } = items[0].args;
+      return newDescription === description;
+    });
+    if (index === -1) {
+      list?.push(this.$script.json);
+      this.store.set('list', list);
+    } else {
+      // update item
+    }
+    // update list
+    this.$files.options.push({
+      label: newDescription,
+      value: this.$script.json,
+    });
+    // select
+    this.$files.value = this.$script.json;
+  }
+
+  #handleOpen(e: CustomEvent) {
+    this.$script.json = this.$files.value;
+  }
+
+  #handleNew(e: CustomEvent) {
+
   }
 }

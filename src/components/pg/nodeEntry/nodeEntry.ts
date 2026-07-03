@@ -28,10 +28,24 @@ export default class PgNodeEntry extends HTMLElement {
     this.height = this.getMinHeight();
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
     this.$input.addEventListener('input', () => {
-      this.dispatchEvent(new CustomEvent('input', { detail: { key: 'description', value: this.$input.value } }));
+      this.dispatchEvent(new CustomEvent('input', {
+        detail: {
+          id: 0,
+          type: 'arg',
+          key: 'description',
+          value: this.$input.value,
+        }
+      }));
     });
     this.$input.addEventListener('change', () => {
-      this.dispatchEvent(new CustomEvent('change', { detail: { key: 'description', value: this.$input.value } }));
+      this.dispatchEvent(new CustomEvent('change', {
+        detail: {
+          id: 0,
+          type: 'arg',
+          key: 'description',
+          value: this.$input.value,
+        }
+      }));
     });
   }
 

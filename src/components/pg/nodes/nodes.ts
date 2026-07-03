@@ -49,6 +49,8 @@ export default class PgNodes extends HTMLElement {
   #redo: UndoItem[] = [];
   #nodeStates = new Map<number, NodeState>();
 
+  #clipboard: Array<{ item: any; state: NodeState }> | null = null;
+
   #dragOrigin: { x: number; y: number } | null = null;
   #isDragging: boolean = false;
   #wasSelectionDrag: boolean = false;
@@ -81,6 +83,18 @@ export default class PgNodes extends HTMLElement {
       if (e.ctrlKey && e.key === 'z') {
         e.preventDefault();
         e.shiftKey ? this.#applyRedo() : this.#applyUndo();
+        return;
+      }
+
+      if (e.ctrlKey && e.key === 'c') {
+        e.preventDefault();
+        this.#copySelected();
+        return;
+      }
+
+      if (e.ctrlKey && e.key === 'v') {
+        e.preventDefault();
+        this.#pasteClipboard();
         return;
       }
 
@@ -244,15 +258,23 @@ export default class PgNodes extends HTMLElement {
       const ele = e.target as HTMLDivElement;
       if (ele.part.contains('grid')) {
         const { nodes } = this;
+        const nodeMenuItems = nodes.map((nodeType: any) => {
+          return { label: nodeType.label, value: nodeType.name, type: PgMenuItem };
+        });
+        if (this.#clipboard && this.#clipboard.length > 0) {
+          nodeMenuItems.unshift({ label: 'Paste', value: '__paste__', type: PgMenuItem });
+        }
         const result = await PgOverlayContextMenu.open({
           source: this.$items,
           x: e.clientX,
           y: e.clientY,
-          items: nodes.map((nodeType: any) => {
-            return { label: nodeType.label, value: nodeType.name, type: PgMenuItem };
-          }),
+          items: nodeMenuItems,
         });
         if (!result) { return; }
+        if (result.value === '__paste__') {
+          this.#pasteClipboard();
+          return;
+        }
         const args = {};
         const nodeType = nodes.find(x => x.name === result.value);
         nodeType.args.forEach(({ key, value }) => {
@@ -267,19 +289,27 @@ export default class PgNodes extends HTMLElement {
           nodes: {},
         });
       } else {
-        this.clearSelection();
         const nodeId = (ele as any).itemId as number;
-        this.getNodeById(nodeId).select();
-        this.#selected.add(nodeId);
+        if (!this.#selected.has(nodeId)) {
+          this.clearSelection();
+          this.getNodeById(nodeId).select();
+          this.#selected.add(nodeId);
+        }
         const result = await PgOverlayContextMenu.open({
           source: this.$items,
           x: e.clientX,
           y: e.clientY,
-          items: [{ label: 'Delete Node', value: 'deleteNode', type: PgMenuItem }],
+          items: [
+            { label: 'Copy', value: 'copyNode', type: PgMenuItem },
+            { label: 'Delete Node', value: 'deleteNode', type: PgMenuItem },
+          ],
         });
-        if (result?.value === 'deleteNode') {
-          this.#deleteNodeWithUndo(nodeId);
+        if (result?.value === 'copyNode') {
+          this.#copySelected();
+        } else if (result?.value === 'deleteNode') {
+          const toDelete = Array.from(this.#selected);
           this.#selected.clear();
+          toDelete.forEach((id) => this.#deleteNodeWithUndo(id));
         }
       }
     });
@@ -459,6 +489,49 @@ export default class PgNodes extends HTMLElement {
       const item = this.items.find(x => x.id === id);
       item.args[key] = value;
     }
+  }
+
+  #copySelected() {
+    if (this.#selected.size === 0) return;
+    this.#clipboard = Array.from(this.#selected).map((id) => {
+      const item = this.items.find((x: any) => x.id === id);
+      const state = this.#nodeStates.get(id) ?? { x: item.x, y: item.y, width: item.width ?? 12, height: item.height ?? 4 };
+      return { item: JSON.parse(JSON.stringify(item)), state: { ...state } };
+    });
+  }
+
+  #pasteClipboard() {
+    if (!this.#clipboard || this.#clipboard.length === 0) return;
+
+    const copiedIds = new Set(this.#clipboard.map(({ item }) => item.id));
+    const idMap = new Map<number, number>();
+    this.#clipboard.forEach(({ item }) => {
+      idMap.set(item.id, this.#nextNodeId++);
+    });
+
+    this.clearSelection();
+
+    const newItems = this.#clipboard.map(({ item, state }) => {
+      const newId = idMap.get(item.id)!;
+      const newNodes: Record<string, number[]> = {};
+      if (item.nodes && typeof item.nodes === 'object') {
+        Object.entries(item.nodes as Record<string, number[]>).forEach(([key, targets]) => {
+          const remapped = (targets as number[])
+            .filter((t) => copiedIds.has(t))
+            .map((t) => idMap.get(t)!);
+          if (remapped.length > 0) newNodes[key] = remapped;
+        });
+      }
+      return { ...JSON.parse(JSON.stringify(item)), id: newId, x: state.x + 2, y: state.y + 2, nodes: newNodes };
+    });
+
+    newItems.forEach((item) => this.items.push(item));
+
+    newItems.forEach((item) => {
+      this.#selected.add(item.id);
+      const node = this.getNodeById(item.id);
+      if (node) (node as any).select();
+    });
   }
 
   // Merges consecutive transforms on the same node during a single drag.
@@ -659,7 +732,9 @@ export default class PgNodes extends HTMLElement {
 
   get json() {
     const normalize = JSON.parse(JSON.stringify(this.items));
-    return normalize.map(x => { delete x.editors; return x; });
+    return JSON.stringify(
+      normalize.map(x => { delete x.editors; return x; })
+    );
   }
   set json(value: string) {
     this.items = JSON.parse(value);

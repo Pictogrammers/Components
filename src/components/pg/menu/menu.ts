@@ -77,6 +77,9 @@ export default class PgMenu extends HTMLElement {
   }
 
   focus(index) {
+    if (this.items.length === 0) {
+      throw new Error('Must contain at least 1 item to focus')
+    }
     if (index === -1) {
       this.#focus(0, 1, this.items.length - 1);
     } else {

@@ -24,7 +24,7 @@
     "remarkable": "^2.0.1"
   },
   "devDependencies": {
-    "@pictogrammers/element": "0.0.78",
+    "@pictogrammers/element": "0.0.79",
     "@pictogrammers/element-esbuild": "^0.0.20",
     "@pictogrammers/element-jest": "^0.1.10",
     "@pictogrammers/fnt": "^1.2.0",

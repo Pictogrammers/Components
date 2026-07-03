@@ -40,6 +40,10 @@ export default class PgInputSelect extends HTMLElement {
 
   #menuOpen = false;
   async #handleClick() {
+    if (this.options.length === 0) {
+      // No options
+      return;
+    }
     if (this.#menuOpen) { return; }
     this.#menuOpen = true;
     const result = await PgOverlaySelectMenu.open({
