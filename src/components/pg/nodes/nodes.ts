@@ -285,6 +285,8 @@ export default class PgNodes extends HTMLElement {
           node: result.value,
           x,
           y,
+          ...(nodeType.width !== undefined && { width: nodeType.width }),
+          ...(nodeType.height !== undefined && { height: nodeType.height }),
           args,
           nodes: {},
         });

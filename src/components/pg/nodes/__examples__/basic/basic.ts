@@ -85,8 +85,8 @@ export default class XPgNodesBasic extends HTMLElement {
           throw new Error('Invalid state');
         }
         const key = state.get('$state');
-        const current = state.get(key);
-        state.set(key, (current ?? 0) + value);
+        const current = parseFloat(state.get(key) ?? 0);
+        state.set(key, current + value);
         return then;
       },
     }, {
