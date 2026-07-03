@@ -46,6 +46,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$script.nodes.push({
       name: 'stateGet',
       label: 'Get',
+      width: 8,
       args: [{
         key: 'key',
         label: 'Key',
@@ -346,6 +347,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$save.addEventListener('click', this.#handleSave.bind(this));
     this.$open.addEventListener('click', this.#handleOpen.bind(this));
     this.$new.addEventListener('click', this.#handleNew.bind(this));
+    this.$files.addEventListener('change', this.#handleFilesChange.bind(this));
     this.#initFiles();
   }
 
@@ -428,5 +430,9 @@ export default class XPgNodesBasic extends HTMLElement {
 
   #handleNew(e: CustomEvent) {
     this.$script.json = '[{"id":0,"x":2,"y":2,"width":12,"height":4,"args":{"description":"New script"},"nodes":{"then":[]}}]'
+  }
+
+  #handleFilesChange(e: CustomEvent) {
+    this.$files.value = e.detail.value;
   }
 }
