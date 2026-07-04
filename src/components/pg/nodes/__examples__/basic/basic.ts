@@ -282,17 +282,18 @@ export default class XPgNodesBasic extends HTMLElement {
     }, {
       name: 'random',
       label: 'Random',
+      width: 6,
       args: [],
       nodes: [{
         key: 'options',
         label: 'Options',
       }],
       handler: ({ state, options }: any) => {
-        if (!state.has('random')) {
-          state.set('random', []);
+        if (!state.has('$random')) {
+          state.set('$random', []);
           return options;
         }
-        const values = state.get('random');
+        const values = state.get('$random');
         if (values.length !== options.length) {
           return [];
         }
@@ -307,12 +308,13 @@ export default class XPgNodesBasic extends HTMLElement {
 
           return items[items.length - 1]; // fallback
         }
-        state.delete('random');
+        state.delete('$random');
         return weightedRandom(values).then;
       },
     }, {
       name: 'randomOption',
       label: 'Random Option',
+      width: 8,
       args: [{
         key: 'weight',
         label: 'Weight',
@@ -324,10 +326,10 @@ export default class XPgNodesBasic extends HTMLElement {
         label: 'Then',
       }],
       handler: ({ state, then, node, weight, options }: any) => {
-        if (!state.has('random')) {
+        if (!state.has('$random')) {
           throw new Error('invalid node');
         }
-        const values = state.get('random');
+        const values = state.get('$random');
         values.push({
           weight: weight ?? 0,
           then,
