@@ -67,3 +67,23 @@
 [part=selection].active {
   display: block;
 }
+
+[part=dragPreview] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[part=dragPreview].active {
+  display: block;
+}
+
+[part=dragPreview] div {
+  position: absolute;
+  border: 1px solid #248BE5;
+  background: rgba(36, 139, 229, 0.15);
+  box-sizing: border-box;
+}

@@ -161,6 +161,23 @@ export default class PgNode extends HTMLElement {
       ele.height = height;
       this.dispatchEvent(new CustomEvent('change', { detail: { type: 'transform', x, y, width, height } }));
     });
+    ele.addEventListener('dragstart', () => {
+      this.dispatchEvent(new CustomEvent('nodedragstart', { detail: { nodeId: this.itemId } }));
+    });
+    ele.addEventListener('dragmove', (e: any) => {
+      this.dispatchEvent(new CustomEvent('nodedragmove', { detail: e.detail }));
+    });
+    ele.addEventListener('dragend', (e: any) => {
+      const { dx, dy, complete } = e.detail;
+      this.dispatchEvent(new CustomEvent('nodedragend', { detail: { nodeId: this.itemId } }));
+      // Only commit when the node actually landed on a new grid position.
+      if (!complete || (dx === 0 && dy === 0)) return;
+      this.x += dx;
+      this.y += dy;
+      this.dispatchEvent(new CustomEvent('change', {
+        detail: { type: 'transform', x: this.x, y: this.y, width: this.width, height: this.height, final: true },
+      }));
+    });
     ele.addEventListener('select', this.#handleSelect.bind(this));
     this.shadowRoot?.appendChild(ele);
     this.#resizeElement = ele;

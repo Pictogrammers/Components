@@ -36,6 +36,7 @@ export default class PgNodes extends HTMLElement {
   @Part() $items: HTMLDivElement;
   @Part() $forceScroll: HTMLDivElement;
   @Part() $selection: HTMLDivElement;
+  @Part() $dragPreview: HTMLDivElement;
 
   #nextNodeId: number = 0;
   #connector: NodeConnector | null = null;
@@ -98,54 +99,30 @@ export default class PgNodes extends HTMLElement {
         return;
       }
 
-      if (this.#selected.size > 0) {
-        this.#selected.forEach((id) => {
-          const node = this.getNodeById(id) as any;
-          switch (e.key) {
-            case 'ArrowUp': {
-              e.preventDefault();
-              const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width, height: node.height };
-              node.y -= 1;
-              this.#pushTransform(id, before, { x: node.x, y: node.y, width: node.width, height: node.height });
-              this.#updatePins(id);
-              break;
-            }
-            case 'ArrowDown': {
-              e.preventDefault();
-              const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width, height: node.height };
-              node.y += 1;
-              this.#pushTransform(id, before, { x: node.x, y: node.y, width: node.width, height: node.height });
-              this.#updatePins(id);
-              break;
-            }
-            case 'ArrowLeft': {
-              e.preventDefault();
-              const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width, height: node.height };
-              node.x -= 1;
-              this.#pushTransform(id, before, { x: node.x, y: node.y, width: node.width, height: node.height });
-              this.#updatePins(id);
-              break;
-            }
-            case 'ArrowRight': {
-              e.preventDefault();
-              const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width, height: node.height };
-              node.x += 1;
-              this.#pushTransform(id, before, { x: node.x, y: node.y, width: node.width, height: node.height });
-              this.#updatePins(id);
-              break;
-            }
-            case 'Delete':
-              this.#deleteNodeWithUndo(id);
-              break;
-            case 'Escape':
-              this.clearSelection();
-              break;
-          }
-        });
-        if (e.key === 'Delete') {
-          this.#selected.clear();
-        }
+      if (this.#selected.size === 0) return;
+
+      if (e.key === 'Delete') {
+        const toDelete = Array.from(this.#selected);
+        this.#selected.clear();
+        toDelete.forEach((id) => this.#deleteNodeWithUndo(id));
+        return;
       }
+      if (e.key === 'Escape') {
+        this.clearSelection();
+        return;
+      }
+
+      let dx = 0;
+      let dy = 0;
+      switch (e.key) {
+        case 'ArrowUp': dy = -1; break;
+        case 'ArrowDown': dy = 1; break;
+        case 'ArrowLeft': dx = -1; break;
+        case 'ArrowRight': dx = 1; break;
+        default: return;
+      }
+      e.preventDefault();
+      this.#moveSelectedBy(dx, dy);
     });
 
     this.$grid.addEventListener('click', (e: any) => {
@@ -362,6 +339,9 @@ export default class PgNodes extends HTMLElement {
         $item.addEventListener('registernodeoutput', this.#registerNodeOutput.bind(this));
         $item.addEventListener('select', this.#handleSelect.bind(this));
         $item.addEventListener('change', this.#handleChange.bind(this));
+        $item.addEventListener('nodedragstart', this.#handleNodeDragStart.bind(this));
+        $item.addEventListener('nodedragmove', this.#handleNodeDragMove.bind(this));
+        $item.addEventListener('nodedragend', this.#handleNodeDragEnd.bind(this));
         $item.addEventListener('input', (e: any) => {
           console.log('input', e.detail);
         });
@@ -445,7 +425,7 @@ export default class PgNodes extends HTMLElement {
   #handleChange(e: any) {
     const { type } = e.detail;
     if (type === 'transform') {
-      const { x, y, width, height } = e.detail;
+      const { x, y, width, height, final } = e.detail;
       if (x === undefined) return;
       const nodeId = (e.target as any).itemId as number;
       const before = this.#nodeStates.get(nodeId) ?? { x, y, width, height };
@@ -454,7 +434,8 @@ export default class PgNodes extends HTMLElement {
         const dx = x - before.x;
         const dy = y - before.y;
         const last = this.#undo.at(-1);
-        if (last?.type === 'multi-transform' && last.primaryNodeId === nodeId) {
+        // A final transform is a completed drag: always its own undo entry.
+        if (!final && last?.type === 'multi-transform' && last.primaryNodeId === nodeId) {
           for (const t of last.transforms) {
             const cur = this.#nodeStates.get(t.nodeId) ?? t.after;
             const newAfter: NodeState = t.nodeId === nodeId
@@ -509,7 +490,7 @@ export default class PgNodes extends HTMLElement {
         return;
       }
 
-      this.#pushTransform(nodeId, before, { x, y, width, height });
+      this.#pushTransform(nodeId, before, { x, y, width, height }, !final);
       this.#updatePins(nodeId);
       this.#updateScrollExtent();
       const item = this.items.find((i: any) => i.id === nodeId);
@@ -527,6 +508,96 @@ export default class PgNodes extends HTMLElement {
       const item = this.items.find(x => x.id === id);
       item.args[key] = value;
     }
+  }
+
+  // Drag previews: while a node header is dragged the nodes themselves stay
+  // put (no pin/path redraws) and light blue rectangles track the snapped
+  // drop position. The rectangles live in one container so every move is a
+  // single transform update.
+  #handleNodeDragStart(e: any) {
+    const nodeId = e.detail.nodeId as number;
+    // Dragging an unselected node makes it the selection, like clicking it.
+    if (!this.#selected.has(nodeId)) {
+      this.clearSelection();
+      this.#selected.add(nodeId);
+      this.getNodeById(nodeId)?.select();
+    }
+    this.$dragPreview.replaceChildren();
+    Array.from(this.$items.children).forEach((child: any) => {
+      if (!this.#selected.has(child.itemId)) return;
+      const rect = document.createElement('div');
+      rect.style.left = `${child.x}rem`;
+      rect.style.top = `${child.y}rem`;
+      rect.style.width = `${child.width ?? 12}rem`;
+      rect.style.height = `${child.height ?? 3}rem`;
+      this.$dragPreview.appendChild(rect);
+    });
+    this.$dragPreview.style.transform = 'translate(0, 0)';
+    this.$dragPreview.classList.add('active');
+  }
+
+  #handleNodeDragMove(e: any) {
+    const { dx, dy } = e.detail;
+    this.$dragPreview.style.transform = `translate(${dx}rem, ${dy}rem)`;
+  }
+
+  #handleNodeDragEnd() {
+    this.$dragPreview.classList.remove('active');
+    this.$dragPreview.replaceChildren();
+  }
+
+  // Moves all selected nodes by a grid delta in one pass, recording a single
+  // undo entry and batching the connector updates.
+  #moveSelectedBy(dx: number, dy: number) {
+    const byId = new Map<number, any>();
+    Array.from(this.$items.children).forEach((child: any) => byId.set(child.itemId, child));
+
+    const transforms = Array.from(this.#selected).map((id) => {
+      const node = byId.get(id);
+      const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width ?? 12, height: node.height ?? 3 };
+      const after: NodeState = { x: before.x + dx, y: before.y + dy, width: before.width, height: before.height };
+      node.x = after.x;
+      node.y = after.y;
+      this.#nodeStates.set(id, after);
+      this.#schedulePinUpdate(id);
+      const item = this.items.find((i: any) => i.id === id);
+      if (item) { item.x = after.x; item.y = after.y; }
+      return { nodeId: id, before, after };
+    });
+
+    if (transforms.length === 1) {
+      const { nodeId, before, after } = transforms[0];
+      this.#pushTransform(nodeId, before, after);
+      return;
+    }
+
+    // Merge held arrow keys on the same selection into one undo entry.
+    const last = this.#undo.at(-1);
+    const afterById = new Map(transforms.map((t) => [t.nodeId, t.after]));
+    if (last?.type === 'multi-transform'
+      && last.transforms.length === transforms.length
+      && last.transforms.every((t) => afterById.has(t.nodeId))) {
+      last.transforms.forEach((t) => { t.after = afterById.get(t.nodeId)!; });
+    } else {
+      this.#undo.push({ type: 'multi-transform', primaryNodeId: transforms[0].nodeId, transforms });
+    }
+    this.#redo = [];
+  }
+
+  // Every connector.setNode triggers a full path redraw, so coalesce updates
+  // from key repeats into at most one batch per animation frame.
+  #pinUpdateIds = new Set<number>();
+  #pinUpdateScheduled = false;
+  #schedulePinUpdate(nodeId: number) {
+    this.#pinUpdateIds.add(nodeId);
+    if (this.#pinUpdateScheduled) return;
+    this.#pinUpdateScheduled = true;
+    requestAnimationFrame(() => {
+      this.#pinUpdateScheduled = false;
+      const ids = Array.from(this.#pinUpdateIds);
+      this.#pinUpdateIds.clear();
+      ids.forEach((id) => this.#updatePins(id));
+    });
   }
 
   #copySelected() {
@@ -572,10 +643,11 @@ export default class PgNodes extends HTMLElement {
     });
   }
 
-  // Merges consecutive transforms on the same node during a single drag.
-  #pushTransform(nodeId: number, before: NodeState, after: NodeState) {
+  // Merges consecutive transforms on the same node (resize snaps, held arrow
+  // keys); pass merge = false to keep a completed drag as its own undo entry.
+  #pushTransform(nodeId: number, before: NodeState, after: NodeState, merge: boolean = true) {
     const last = this.#undo.at(-1);
-    if (last?.type === 'transform' && last.nodeId === nodeId) {
+    if (merge && last?.type === 'transform' && last.nodeId === nodeId) {
       last.after = after;
     } else {
       this.#undo.push({ type: 'transform', nodeId, before, after });
@@ -670,7 +742,9 @@ export default class PgNodes extends HTMLElement {
   }
 
   #updatePins(nodeId: number) {
-    const { x, y, width, height } = this.getNodeById(nodeId);
+    const node = this.getNodeById(nodeId);
+    if (!node) return;
+    const { x, y, width, height } = node;
     this.#connector?.setNode(
       String(nodeId),
       x * this.gridSize,

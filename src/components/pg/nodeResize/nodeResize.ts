@@ -105,37 +105,28 @@ export default class PgNodeResize extends HTMLElement {
     addHandle(this.$south,      0,  1);
     addHandle(this.$southEast,  1,  1);
 
-    // Header: translate the whole node — no resize, both x and y move together
+    // Header: translate the whole node — no resize, both x and y move together.
+    // The node is not moved while dragging; drag events let the host draw
+    // snapped previews and commit the final position on release.
+    let didDrag = false;
     drag({
       source: this.$header,
       gridSize: this.gridSize,
-      start,
-      move: (dx, dy) => {
-        const gs = this.gridSize;
-        const snapDx = Math.floor((dx + gs / 2) / gs);
-        const snapDy = Math.floor((dy + gs / 2) / gs);
-        this.style.setProperty('--node-resize-delta-x',      `${dx - snapDx * gs}px`);
-        this.style.setProperty('--node-resize-delta-y',      `${dy - snapDy * gs}px`);
-        this.style.setProperty('--node-resize-delta-width',  '0px');
-        this.style.setProperty('--node-resize-delta-height', '0px');
+      start: () => {
+        didDrag = false;
+        this.dispatchEvent(new CustomEvent('dragstart'));
       },
       snap: (dx, dy) => {
-        this.emit(startX + dx, startY + dy, startWidth, startHeight);
+        didDrag = true;
+        this.dispatchEvent(new CustomEvent('dragmove', { detail: { dx, dy } }));
       },
       end: (dx, dy, complete) => {
-        if (complete) {
-          this.emit(startX + dx, startY + dy, startWidth, startHeight);
-        } else {
-          this.emit(startX, startY, startWidth, startHeight);
-        }
-        this.classList.toggle('preview', false);
-        this.style.setProperty('--node-resize-delta-x',      '0px');
-        this.style.setProperty('--node-resize-delta-y',      '0px');
-        this.style.setProperty('--node-resize-delta-width',  '0px');
-        this.style.setProperty('--node-resize-delta-height', '0px');
+        this.dispatchEvent(new CustomEvent('dragend', { detail: { dx, dy, complete } }));
       },
     });
     this.$header.addEventListener('click', () => {
+      // The click after a drag must not change the selection.
+      if (didDrag) return;
       this.dispatchEvent(new CustomEvent('select'));
     });
   }
