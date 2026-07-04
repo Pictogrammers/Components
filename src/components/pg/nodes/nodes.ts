@@ -39,6 +39,7 @@ export default class PgNodes extends HTMLElement {
   @Part() $dragPreview: HTMLDivElement;
 
   #nextNodeId: number = 0;
+  #focusNext: boolean = false;
   #connector: NodeConnector | null = null;
   #connectionsScheduled: boolean = false;
   #nodePinCounts = new Map<number, number>();
@@ -257,6 +258,7 @@ export default class PgNodes extends HTMLElement {
         nodeType.args.forEach(({ key, value }) => {
           args[key] = value;
         });
+        this.#focusNext = true;
         this.items.push({
           id: this.#nextNodeId,
           node: result.value,
@@ -376,6 +378,10 @@ export default class PgNodes extends HTMLElement {
             });
             this.#updateScrollExtent();
           });
+        }
+        if (this.#focusNext) {
+          $item.focus();
+          this.#focusNext = false;
         }
       },
       disconnect: (_$item: any, item: any) => {

@@ -208,4 +208,10 @@ export default class PgNode extends HTMLElement {
   getMinWidth() {
     return 6;
   }
+
+  focus() {
+    if (this.$items.children.length) {
+      (this.$items.children[0] as any).focus();
+    }
+  }
 }

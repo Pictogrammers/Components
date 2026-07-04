@@ -50,4 +50,8 @@ export default class PgNodeEditorText extends HTMLElement {
   get height() {
     return 2;
   }
+
+  focus() {
+    this.$input.focus();
+  }
 }
