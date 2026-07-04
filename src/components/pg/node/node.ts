@@ -189,6 +189,6 @@ export default class PgNode extends HTMLElement {
   }
 
   getMinWidth() {
-    return 10;
+    return 6;
   }
 }

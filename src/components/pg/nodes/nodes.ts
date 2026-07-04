@@ -334,6 +334,9 @@ export default class PgNodes extends HTMLElement {
           const nodeType = this.nodes.find((n: any) => n.name === item.node);
           if (nodeType) {
             $item.label = nodeType.label;
+            if (!item.width) {
+              $item.width = nodeType.width ?? $item.getMinWidth();
+            }
             if (nodeType.args) {
               $item.fields = nodeType.args.map((arg: any) => ({
                 label: arg.label,
@@ -464,6 +467,8 @@ export default class PgNodes extends HTMLElement {
             }
             this.#nodeStates.set(t.nodeId, newAfter);
             this.#updatePins(t.nodeId);
+            const tItem = this.items.find((i: any) => i.id === t.nodeId);
+            if (tItem) { tItem.x = newAfter.x; tItem.y = newAfter.y; }
           }
         } else {
           const transforms = Array.from(this.#selected).map((id) => {
@@ -477,10 +482,28 @@ export default class PgNodes extends HTMLElement {
             }
             this.#nodeStates.set(id, after);
             this.#updatePins(id);
+            const tItem = this.items.find((i: any) => i.id === id);
+            if (tItem) { tItem.x = after.x; tItem.y = after.y; }
             return { nodeId: id, before: { ...state }, after };
           });
           this.#undo.push({ type: 'multi-transform', primaryNodeId: nodeId, transforms });
           this.#redo = [];
+        }
+        const primaryItem = this.items.find((i: any) => i.id === nodeId);
+        if (primaryItem) {
+          const primaryNode = this.getNodeById(nodeId) as any;
+          if (primaryNode) {
+            if (width === primaryNode.getMinWidth()) {
+              delete primaryItem.width;
+            } else {
+              primaryItem.width = width;
+            }
+            if (height === primaryNode.getMinHeight()) {
+              delete primaryItem.height;
+            } else {
+              primaryItem.height = height;
+            }
+          }
         }
         this.#updateScrollExtent();
         return;
@@ -489,6 +512,16 @@ export default class PgNodes extends HTMLElement {
       this.#pushTransform(nodeId, before, { x, y, width, height });
       this.#updatePins(nodeId);
       this.#updateScrollExtent();
+      const item = this.items.find((i: any) => i.id === nodeId);
+      if (item) {
+        item.x = x;
+        item.y = y;
+        const node = this.getNodeById(nodeId) as any;
+        if (node) {
+          if (width === node.getMinWidth()) { delete item.width; } else { item.width = width; }
+          if (height === node.getMinHeight()) { delete item.height; } else { item.height = height; }
+        }
+      }
     } else if (type === 'arg') {
       const { id, key, value } = e.detail;
       const item = this.items.find(x => x.id === id);
@@ -688,9 +721,12 @@ export default class PgNodes extends HTMLElement {
         const params: any = { state: this.#state };
         if (item.args) {
           Object.keys(item.args).forEach((key) => {
-            // treat strings
-            let fn = new Function('state', `return \`${item.args[key]}\`;`);
-            params[key] = fn(this.#state);
+            if (typeof item.args[key] === 'string') {
+              let fn = new Function('state', `return \`${item.args[key]}\`;`);
+              params[key] = fn(this.#state);
+            } else {
+              params[key] = item.args[key];
+            }
           });
         }
         if (item.nodes) {
@@ -701,7 +737,7 @@ export default class PgNodes extends HTMLElement {
         }
         params.node = this.#debugPrevious;
         const result = await nodeType.handler(params);
-        nextIds = Array.isArray(result) ? result : [];
+        nextIds = Array.isArray(result) ? result : [result];
         this.#debugPrevious = currentId;
         this.dispatchEvent(new CustomEvent('debug', {
           detail: {
