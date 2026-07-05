@@ -280,6 +280,52 @@ export default class XPgNodesBasic extends HTMLElement {
         return Math.random() < 0.5 ? t : f;
       },
     }, {
+      name: 'isTrue',
+      label: 'Is True',
+      width: 4,
+      args: [],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ state, t, f }: any) => {
+        if (!state.has('$state')) {
+          throw new Error('Missing get before isTrue');
+        }
+        const key = state.get('$state');
+        if (state.has(key) && state.get(key) === true) {
+          return t;
+        } else {
+          return f;
+        }
+      },
+    }, {
+      name: 'isFalse',
+      label: 'Is False',
+      width: 4,
+      args: [],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ state, t, f }: any) => {
+        if (!state.has('$state')) {
+          throw new Error('Missing get before isFalse');
+        }
+        const key = state.get('$state');
+        if (state.has(key) && state.get(key) === true) {
+          return t;
+        } else {
+          return f;
+        }
+      },
+    }, {
       name: 'random',
       label: 'Random',
       width: 6,
@@ -330,6 +376,68 @@ export default class XPgNodesBasic extends HTMLElement {
           throw new Error('invalid node');
         }
         const values = state.get('$random');
+        values.push({
+          weight: weight ?? 0,
+          then,
+        });
+        return [node];
+      },
+    }, {
+      name: 'dialog',
+      label: 'Dialog',
+      width: 12,
+      args: [{
+        key: 'message',
+        label: 'Message',
+        editor: 'Text',
+        value: 'Hello',
+      }],
+      nodes: [{
+        key: 'options',
+        label: 'Options',
+      }],
+      handler: ({ state, options }: any) => {
+        if (!state.has('$dialog')) {
+          state.set('$dialog', []);
+          return options;
+        }
+        const values = state.get('$dialog');
+        if (values.length !== options.length) {
+          return [];
+        }
+        function weightedRandom<T extends { weight: string, then: number[] }>(items: T[]): T {
+          const totalWeight = items.reduce((sum, item) => sum + Number(item.weight), 0);
+          let random = Math.random() * totalWeight;
+
+          for (const item of items) {
+            random -= Number(item.weight);
+            if (random <= 0) return item;
+          }
+
+          return items[items.length - 1]; // fallback
+        }
+        state.delete('$dialog');
+        return weightedRandom(values).then;
+      },
+    }, {
+      name: 'dialogOption',
+      label: 'Dialog Option',
+      width: 12,
+      args: [{
+        key: 'message',
+        label: 'Message',
+        editor: 'Text',
+        value: 'Reply',
+      }],
+      nodes: [{
+        key: 'then',
+        label: 'Then',
+      }],
+      handler: ({ state, then, node, weight, options }: any) => {
+        if (!state.has('$dialog')) {
+          throw new Error('invalid node');
+        }
+        const values = state.get('$dialog');
         values.push({
           weight: weight ?? 0,
           then,
