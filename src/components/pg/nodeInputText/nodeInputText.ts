@@ -12,8 +12,10 @@ export default class PgNodeInputText extends HTMLElement {
 
   @Prop() value: string = '';
   @Prop() name: string = '';
+  @Prop() removable: boolean = false;
 
   @Part() $input: HTMLInputElement;
+  @Part() $remove: HTMLButtonElement;
 
   connectedCallback() {
     this.$input.addEventListener('change', (e: any) => {
@@ -32,11 +34,17 @@ export default class PgNodeInputText extends HTMLElement {
         }
       }));
     });
+    this.$remove.addEventListener('click', (e: any) => {
+      this.dispatchEvent(new CustomEvent('remove'));
+    });
   }
 
   render(changes: any) {
     if (changes.value) {
       this.$input.value = this.value;
+    }
+    if (changes.removable) {
+      this.$remove.classList.toggle('hide', false);
     }
   }
 

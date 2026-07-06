@@ -45,6 +45,7 @@ export default class PgNodeEditorTextArray extends HTMLElement {
       type: () => PgNodeInputText,
       create: ($item: PgNodeInputText, item: any) => {
         $item.value = item.value;
+        $item.removable = true;
         $item.addEventListener('change', (e: any) => {
           e.stopPropagation();
           const index = Array.from(this.$inputs.children).indexOf($item);
