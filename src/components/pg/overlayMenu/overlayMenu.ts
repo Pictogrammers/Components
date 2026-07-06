@@ -19,6 +19,7 @@ export default class PgOverlayMenu extends PgOverlay {
   @Prop() default: any = null;
   @Prop() items: any[] = [];
   @Prop() value: any = null;
+  @Prop() preventFocus: boolean = false;
 
   render(changes) {
 
@@ -46,7 +47,9 @@ export default class PgOverlayMenu extends PgOverlay {
       ? 0
       : this.items.findIndex(x => x.value === value);
     // Focus
-    this.$menu.focus(index);
+    if (this.preventFocus) {
+      this.$menu.focus(index);
+    }
   }
 
   #toggle(e: ToggleEvent) {

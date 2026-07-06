@@ -1,0 +1,39 @@
+:host {
+  display: contents;
+}
+
+[part=container] {
+  font-family: var(--pg-font-family, system-ui);
+  background: var(--pg-input-combobox-background, #FFFFFF);
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--pg-input-combobox-border-color, #453C4F);
+  border-radius: 0.25rem;
+  width: 100%;
+  font-size: 1rem;
+  cursor: text;
+}
+
+[part=container]:focus-within {
+  box-shadow: 0 0 0 3px rgba(79, 143, 249, 0.5);
+}
+
+[part=input] {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: var(--pg-input-combobox-padding, 0.25rem 0.75rem);
+  font-size: var(--pg-input-combobox-font-size, 1rem);
+  font-family: inherit;
+  min-width: 0;
+}
+
+[part=chevron] {
+  pointer-events: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-self: center;
+  flex-shrink: 0;
+  margin-right: 0.125rem;
+}
