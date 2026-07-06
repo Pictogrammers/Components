@@ -15,36 +15,3 @@ label {
   padding-inline: 0.25rem;
   color: rgba(255, 255, 255, 0.8);
 }
-
-[part=input] {
-  border: 0;
-  border-radius: 0.125rem;
-  padding-inline-start: 0.25rem;
-  padding-inline-end: 0.25rem;
-  padding-block-start: 0;
-  padding-block-end: 0;
-  font-family: var(--pg-input-text-font-family, var(--pg-font-family));
-  font-size: 0.875rem;
-  outline: none;
-  field-sizing: content;
-  min-width: calc(
-    100%
-    - var(--pg-input-text-padding-inline-start, var(--pg-input-text-padding-inline, 0.5rem))
-    - var(--pg-input-text-padding-inline-end, var(--pg-input-text-padding-inline, 0.5rem))
-    - 2px
-  );
-  background-color: #2B2B2B;
-  color: #FFF;
-  outline: 1px solid #444;
-}
-
-[part=input]:read-only {
-  border-color: transparent;
-}
-
-[part=input]:active {
-  outline-color: rgb(79, 143, 249, 0.75);
-}
-[part=input]:focus {
-  outline-color: rgb(79, 143, 249, 0.75);
-}

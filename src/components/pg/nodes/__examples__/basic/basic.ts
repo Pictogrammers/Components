@@ -6,6 +6,7 @@ import PgNodeEditorText from 'components/pg/nodeEditorText/nodeEditorText';
 import PgNodeEditorRange from 'components/pg/nodeEditorRange/nodeEditorRange';
 import PgNodeEditorNumber from 'components/pg/nodeEditorNumber/nodeEditorNumber';
 import PgInputSelect from 'components/pg/inputSelect/inputSelect';
+import PgNodeEditorTextArray from 'components/pg/nodeEditorTextArray/nodeEditorTextArray';
 
 @Component({
   selector: 'x-pg-nodes-basic',
@@ -42,6 +43,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$script.editors.push(PgNodeEditorText);
     this.$script.editors.push(PgNodeEditorNumber);
     this.$script.editors.push(PgNodeEditorRange);
+    this.$script.editors.push(PgNodeEditorTextArray);
     // Node type registry
     this.$script.nodes.push({
       name: 'stateGet',
@@ -277,6 +279,26 @@ export default class XPgNodesBasic extends HTMLElement {
         label: 'False',
       }],
       handler: ({ t, f }: any) => {
+        return Math.random() < 0.5 ? t : f;
+      },
+    }, {
+      name: 'some',
+      label: 'Some',
+      width: 8,
+      args: [{
+        key: 'keys',
+        label: 'Keys',
+        editor: 'TextArray',
+        value: [''],
+      }],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ keys, t, f }: any) => {
         return Math.random() < 0.5 ? t : f;
       },
     }, {

@@ -1,0 +1,48 @@
+:host {
+  display: block;
+  font-family: var(--pg-font-family, system-ui);
+}
+
+div.wrapper {
+  display: flex;
+  flex-direction: column;
+  padding-inline: 0.25rem;
+}
+
+div.labelAdd {
+  display: flex;
+  flex-direction: row;
+}
+
+[part=label] {
+  flex: 1;
+  font-size: 0.625rem;
+  line-height: 0.875rem;
+  padding-inline: 0.25rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[part=inputs] {
+  display: flex;
+  flex-direction: column;
+}
+
+[part=add] {
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  line-height: 0.625rem;
+  font-size: 0.875rem;
+  text-align: center;
+  outline: 1px solid #444;
+  border-top-left-radius: 0.125rem;
+  border-top-right-radius: 0.125rem;
+  padding-block: 0;
+  padding-inline: 0.25rem;
+}
+
+[part=add]:hover {
+  color: rgba(255, 255, 255, 0.8);
+  outline: 1px solid #666;
+}

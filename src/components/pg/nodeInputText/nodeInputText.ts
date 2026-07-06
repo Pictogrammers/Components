@@ -1,31 +1,26 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import PgNodeInputText from '../nodeInputText/nodeInputText';
-import template from './nodeEditorText.html';
-import style from './nodeEditorText.css';
+import template from './nodeInputText.html';
+import style from './nodeInputText.css';
 
 @Component({
-  selector: 'pg-node-editor-text',
+  selector: 'pg-node-input-text',
   style,
   template,
 })
-export default class PgNodeEditorText extends HTMLElement {
+export default class PgNodeInputText extends HTMLElement {
 
-  static type = 'Text';
-
-  @Prop() label: string = '';
   @Prop() value: string = '';
   @Prop() name: string = '';
 
-  @Part() $label: HTMLSpanElement;
-  @Part() $input: PgNodeInputText;
+  @Part() $input: HTMLInputElement;
 
   connectedCallback() {
     this.$input.addEventListener('change', (e: any) => {
       e.stopPropagation();
       this.dispatchEvent(new CustomEvent('change', {
         detail: {
-          value: e.detail.value,
+          value: this.$input.value,
         }
       }));
     });
@@ -33,23 +28,16 @@ export default class PgNodeEditorText extends HTMLElement {
       e.stopPropagation();
       this.dispatchEvent(new CustomEvent('input', {
         detail: {
-          value: e.detail.value,
+          value: this.$input.value,
         }
       }));
     });
   }
 
   render(changes: any) {
-    if (changes.label) {
-      this.$label.textContent = this.label;
-    }
     if (changes.value) {
       this.$input.value = this.value;
     }
-  }
-
-  get height() {
-    return 2;
   }
 
   focus() {
