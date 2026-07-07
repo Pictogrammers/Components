@@ -52,7 +52,7 @@ export default class PgInputSelect extends HTMLElement {
       value: this.options.find(x => x.value === this.value) ?? null,
       items: this.options,
     });
-    if (result !== undefined) {
+    if (result && result.value !== null) {
       this.dispatchEvent(new CustomEvent('change', {
         detail: {
           value: result.value,
