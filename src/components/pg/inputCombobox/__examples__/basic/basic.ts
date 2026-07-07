@@ -14,13 +14,13 @@ export default class XPgInputComboboxBasic extends HTMLElement {
 
   connectedCallback() {
     this.$input.options = [
-      { label: 'Apple', value: 'apple' },
-      { label: 'Banana', value: 'banana' },
-      { label: 'Cherry', value: 'cherry' },
-      { label: 'Date', value: 'date' },
-      { label: 'Elderberry', value: 'elderberry' },
-      { label: 'Fig', value: 'fig' },
-      { label: 'Grape', value: 'grape' },
+      { label: 'Dipper Pines', value: 'Dipper Pines' },
+      { label: 'Mabel Pines', value: 'Mabel Pines' },
+      { label: 'Stanley "Grunkle Stan" Pines', value: 'Stanley Pines' },
+      { label: 'Soos Ramirez', value: 'Soos Ramirez' },
+      { label: 'Wendy Corduroy', value: 'Wendy Corduroy' },
+      { label: 'Bill Cipher', value: 'Bill Cipher' },
+      { label: 'Stanford Pines', value: 'Stanford Pines' },
     ];
     this.$input.addEventListener('change', this.#handleChange.bind(this));
   }

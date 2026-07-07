@@ -82,6 +82,11 @@ export default class PgInputCombobox extends HTMLElement {
     const result = await promise;
     this.#menuOpen = false;
     this.#activeOverlay = null;
+    // Restore focus regardless of how the overlay closed. source.focus() targets
+    // $container (not focusable), so focus otherwise ends up on document.body.
+    this.#pointerOnInput = true; // suppress #handleFocus from reopening the menu
+    this.$input.focus();
+    this.#pointerOnInput = false;
 
     if (result !== undefined) {
       const { item } = result;

@@ -28,6 +28,7 @@ export default class PgOverlayMenu extends PgOverlay {
   connectedCallback() {
     this.$menu.items = this.items;
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
+    this.$menu.addEventListener('close', this.#handleMenuClose.bind(this));
     this.$overlay.popover = 'auto';
     if (this.source !== null) {
       // @ts-ignore
@@ -69,6 +70,11 @@ export default class PgOverlayMenu extends PgOverlay {
       indexes,
       item
     });
+    this.source?.focus();
+  }
+
+  #handleMenuClose() {
+    this.close();
     this.source?.focus();
   }
 }
