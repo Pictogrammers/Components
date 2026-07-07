@@ -338,9 +338,11 @@ export default class PgInputPixelEditor extends HTMLElement {
   #setSelectionPreview(pixels: Pixel[]) {
     // Undo previous selection
     this.#previousPreview.forEach(({x, y}) => {
+      if (x < 0 || x >= this.width || y < 0 || y >= this.height) { return; }
       this.#selectionPreview[y][x] = 0;
     });
     pixels.forEach(({ x, y }) => {
+      if (x < 0 || x >= this.width || y < 0 || y >= this.height) { return; }
       this.#previousPreview = pixels;
       this.#selectionPreview[y][x] = 1;
     });
@@ -351,6 +353,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   #clearSelectionPreview() {
     this.$selectionPathPreview.classList.toggle('hide', true);
     this.#previousPreview.forEach(({x, y}) => {
+      if (x < 0 || x >= this.width || y < 0 || y >= this.height) { return; }
       this.#selectionPreview[y][x] = 0;
     });
   }
@@ -375,6 +378,7 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   #setSelectionPixel(x: number, y: number) {
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) { return; }
     this.#selectionPixels.set(`${x},${y}`, [x, y]);
     this.#selection[y][x] = 1;
   }
@@ -800,8 +804,10 @@ export default class PgInputPixelEditor extends HTMLElement {
     const totalSize = this.size + this.gridSize;
     let newX = Math.floor((event.clientX - rect.left) / totalSize);
     let newY = Math.floor((event.clientY - rect.top) / totalSize);
-    //if (newX >= this.width) { newX = this.width - 1; }
-    //if (newY >= this.height) { newY = this.height - 1; }
+    if (newX >= this.width) { newX = this.width - 1; }
+    if (newY >= this.height) { newY = this.height - 1; }
+    if (newX < 0) { newX = 0; }
+    if (newY < 0) { newY = 0; }
     //if (this.#startX === -1 && this.#startY === -1) {
     //  return;
     //}
