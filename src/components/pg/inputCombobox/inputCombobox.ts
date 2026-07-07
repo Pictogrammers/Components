@@ -48,7 +48,7 @@ export default class PgInputCombobox extends HTMLElement {
     return items.map(item => ({
       label: item.label,
       value: item.value,
-      type: PgMenuItem
+      type: PgMenuItem,
     }));
   }
 
@@ -69,7 +69,7 @@ export default class PgInputCombobox extends HTMLElement {
     const promise = PgOverlayMenu.open({
       source: this.$container,
       items: menuItems,
-      preventFocus: false,
+      preventFocus: true,
     });
     const newEl = Array.from(document.querySelectorAll('pg-overlay-menu')).find(
       el => !prevMenus.has(el as PgOverlayMenu)

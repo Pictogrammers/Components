@@ -47,7 +47,7 @@ export default class PgOverlayMenu extends PgOverlay {
       ? 0
       : this.items.findIndex(x => x.value === value);
     // Focus
-    if (this.preventFocus) {
+    if (!this.preventFocus) {
       this.$menu.focus(index);
     }
   }
