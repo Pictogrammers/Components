@@ -26,7 +26,9 @@ export default class PgInputCombobox extends HTMLElement {
 
   connectedCallback() {
     this.$container.addEventListener('mousedown', this.#handleMousedown.bind(this));
+    this.$input.addEventListener('pointerdown', this.#handlePointerdown.bind(this));
     this.$input.addEventListener('focus', this.#handleFocus.bind(this));
+    this.$input.addEventListener('click', this.#handleClick.bind(this));
     this.$input.addEventListener('input', this.#handleInput.bind(this));
     this.$input.addEventListener('keydown', this.#handleKeydown.bind(this));
   }
@@ -43,6 +45,7 @@ export default class PgInputCombobox extends HTMLElement {
 
   #menuOpen = false;
   #activeOverlay: PgOverlayMenu | null = null;
+  #pointerOnInput = false;
 
   #toMenuItems(items: InputComboboxItem[]) {
     return items.map(item => ({
@@ -98,8 +101,26 @@ export default class PgInputCombobox extends HTMLElement {
     }
   }
 
+  #handlePointerdown() {
+    // pointerdown fires before focus, so we know focus is pointer-driven
+    this.#pointerOnInput = true;
+  }
+
   #handleFocus() {
+    if (this.#pointerOnInput) {
+      // Pointer click: wait for the click event to open so popover="auto"
+      // light-dismiss doesn't see it as an outside-click on the same gesture
+      return;
+    }
+    // Keyboard focus (Tab / programmatic): open immediately, no click coming
     this.#openMenu();
+  }
+
+  #handleClick() {
+    this.#pointerOnInput = false;
+    if (!this.#menuOpen) {
+      this.#openMenu();
+    }
   }
 
   #handleInput() {
