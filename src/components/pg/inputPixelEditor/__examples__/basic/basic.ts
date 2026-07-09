@@ -253,7 +253,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
           }
         })
       );
-      this.$input.addLayer();
+      this.$input.addLayer({ name: 'layer 1', type: 'pixel' });
     });
     this.$addLayerReference.addEventListener('click', () => {
       this.$layers.data.push(
@@ -268,7 +268,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
           }
         })
       );
-      this.$input.addLayer();
+      this.$input.addLayer({ name: 'layer 1', type: 'pixel' });
     });
     // Colors
     this.$colors.columns = [{

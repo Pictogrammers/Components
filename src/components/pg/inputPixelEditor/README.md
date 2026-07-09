@@ -16,13 +16,14 @@ import PgInputPixelEditor, {
 
 ## Attributes
 
-| Attributes  | Tested   | Description |
-| ----------- | -------- | ----------- |
-| `name`      |          | Unique name in `pg-form` |
-| `width`     |          | Pixel width. Default `10` |
-| `height`    |          | Pixel height. Default `10` |
-| `size`      |          | Pixel size, minimum value `4`. Default `10` |
-| `gridSize`  |          | Grid spacing between cells. Default `1` |
+| Attributes    | Tested   | Description |
+| ------------- | -------- | ----------- |
+| `width`       |          | Pixel width. Default `10` |
+| `height`      |          | Pixel height. Default `10` |
+| `size`        |          | Pixel size, minimum value `4`. Default `10` |
+| `gridSize`    |          | Grid spacing between cells. Default `1` |
+| `transparent` |          | Show checkerboard background. Default `false` |
+| `placeholder` |          | Placeholder text |
 
 ## Events
 
@@ -46,59 +47,61 @@ See usage for each method below.
 | Method     | Tested   | Description |
 | ---------- | -------- | ----------- |
 | `getJson(options)` | -        | Get JSON file. |
-| `getData()` | -           | Get layer data. |
-| `setData()` | -           | Set layer data. |
 | `setJson(json)` | -        | Set JSON file. |
+| `getData()` | -           | Get layer data as paths by color. |
+| `setData(data)` | -           | Set layer data from paths. |
 | `reset()` | -  | Reset canvas and data. |
 | `getExport()` | -  | 2d array of pixel color indexes. Already calculated. |
-| `getExport(id)` | -  | 2d array of pixel color indexes by export size. Minimal perf. |
-| `getExportCanvas()` | -  | Get new prepopulated HTML canvas, ideal for advanced export screens. |
+| `getExportCanvas(options)` | -  | Get new prepopulated HTML canvas, ideal for advanced export screens. |
 | `await getExportPng(options, meta)` | -  | Get png image with optional metadata. |
+| `await getSelectionPng(options, meta)` | -  | Get png of the current selection bounding box. |
 | `undo()` | -           | Undo. |
-| `hasUndo()` | -     | Has undo |
-| `hasRedo()` | -     | Has redo |
+| `hasUndo()` | -     | Has undo. |
+| `hasRedo()` | -     | Has redo. |
 | `redo()` | -           | Redo. |
 | `getHistory()` | -  | History list. |
-| `inputModeSelectRectangle()` | -  | Input Mode Select Rectangle |
-| `inputModeSelectEllipse()` | -  | Input Mode Select Ellipse |
-| `inputModeSelectLasso()` | -  | Input Mode Lasso |
-| `inputModeSelectMagicWand()` | -  | Input Mode Magic Wand |
-| `inputModePixel()` | -  | Input Mode Pixel |
-| `inputModeStamp(stamp)` | -  | Input Mode Stamp |
-| `inputModeLine()` | -  | Input Mode Line |
-| `inputModeRectangle()` | -  | Input Mode Rectangle |
-| `inputModeRectangleOutline()` | -  | Input Mode Rectangle Outline |
-| `inputModeEllipse()` | -  | Input Mode Ellipse |
-| `inputModeEllipseOutline()` | -  | Input Mode Ellipse Outline |
-| `selectLayer(index)` | -    | Select layer. |
-| `getLayers()` | -    | Get layer array. |
+| `clearHistory()` | -  | Clear undo/redo history. |
+| `inputModeCursor()` | -  | Input Mode Cursor — click to select layer. |
+| `inputModeSelectRectangle()` | -  | Input Mode Select Rectangle. |
+| `inputModeSelectEllipse()` | -  | Input Mode Select Ellipse. |
+| `inputModeSelectLasso()` | -  | Input Mode Lasso. |
+| `inputModeSelectMagicWand()` | -  | Input Mode Magic Wand. |
+| `inputModePixel()` | -  | Input Mode Pixel. |
+| `inputModeStamp(stamp)` | -  | Input Mode Stamp. |
+| `inputModeLine()` | -  | Input Mode Line. |
+| `inputModeRectangle()` | -  | Input Mode Rectangle. |
+| `inputModeRectangleOutline()` | -  | Input Mode Rectangle Outline. |
+| `inputModeEllipse()` | -  | Input Mode Ellipse. |
+| `inputModeEllipseOutline()` | -  | Input Mode Ellipse Outline. |
+| `selectLayers(indexes)` | -    | Select one or more layers by index array. |
+| `getLayers()` | -    | Get layer index array. |
 | `addLayer(option)` | -        | Add layer. `name`, `type` required. |
-| `removeLayer(index)` | -      | Remove layer. |
-| `flattenLayers(layerIndexes)` | -      | Flatten layers. |
-| `getColor()` | -     | Get selected color |
-| `getColors()` | -    | Get colors. |
-| `getLayerColorIndexes()` | -  | Get selected layer colors. |
-| `selectColor(index)` | -    | Select color. |
-| `setColor(index, r, g, b, a)` | -  | Set Color. |
-| `addColor(r, g, b, a)` | -    | Add color. |
-| `removeColor(index)` | -    | Remove color. |
-| `moveColor(startIndex, endIndex)` | -    | Move index. |
-| `rotateClockwise()` | -    | Rotate. |
-| `rotateCounterclockwise()` | -    | Rotate. |
-| `move(x, y[, layer])` | -  | Move. |
-| `getSelection()` | -  | Get selection pixels. |
-| `clearSelection()` | -  | Clear selection. |
-| `moveSelection(x, y)` | -    | Move selection. |
-| `flipHorizontal()` | -  | Flip horizontal selection. |
-| `flipVertical()` | -  | Flip vertical selection. |
-| `invert()` | -  | Invert layer. |
-| `outline()` | -  | Outline layer with selected color. |
-| `glow()` | -  | Glow layer with selected color. |
-| `drawPixels([[x, y, color], ...])` | -  | Draw pixels. Color optional. |
-| `drawRectangle(x, y, width, height, isOutline)` | -  | Draw rectangle |
-| `drawEllipse(x, y, width, height, isOutline)` | -  | Draw ellipse. |
-| `drawLine()` | -  | Draw line. |
-| `flush()` | -  | Flush changes to history. |
+| `removeLayer(index)` | -      | Remove layer by index. |
+| `flattenLayers(layerIndexes)` | -      | Flatten layers (not yet implemented). |
+| `getColor(index)` | -     | Get color by index. |
+| `getColors()` | -    | Get all colors. |
+| `getLayerColorIndexes(layerIndex?)` | -  | Get unique color indexes on selected (or given) layer. |
+| `getLayerPaths()` | -  | Get SVG path strings per color per layer. |
+| `selectColor(index)` | -    | Set the active draw color. |
+| `setColor(index, r, g, b, a)` | -  | Update a color by index. |
+| `addColor(r, g, b, a)` | -    | Append a color. |
+| `removeColor(index)` | -    | Remove a color by index. |
+| `moveColor(startIndex, endIndex)` | -    | Move a color (not yet implemented). |
+| `rotateClockwise()` | -    | Rotate active layer 90° clockwise. |
+| `rotateCounterclockwise()` | -    | Rotate active layer 90° counter-clockwise. |
+| `move(x, y)` | -  | Translate active layer by x/y pixels. |
+| `flipHorizontal()` | -  | Flip active layer horizontally. |
+| `flipVertical()` | -  | Flip active layer vertically. |
+| `invert()` | -  | Invert active layer (2-color only). |
+| `outline(include?)` | -  | Draw outline around active layer with selected color. |
+| `glow(include?)` | -  | Draw glow (outer outline) with selected color. |
+| `applyGuides()` | -  | Draw guide lines onto the base layer. |
+| `drawGrid(grid, layer?)` | -  | Draw a full 2d color-index grid onto a layer. |
+| `drawPixel(x, y, color, layer?)` | -  | Draw a single pixel. |
+| `hasSelection()` | -  | Returns true when pixels are selected. |
+| `getSelection()` | -  | Get selection pixels (not yet implemented). |
+| `clearSelection()` | -  | Deselect all pixels. |
+| `moveSelection(x, y)` | -    | Translate selection and its pixels by x/y. |
 
 ### `getJson(options)` Method
 
@@ -107,8 +110,8 @@ The `getJson` method allows getting the JSON representation of the current edito
 ```typescript
 @Part() $editor: PgInputPixelEditor;
 
-handleSave() {
-  const json = await this.$editor.save({
+async handleSave() {
+  const json = await this.$editor.getJson({
     // Include history
     history: true,
   });
@@ -118,16 +121,13 @@ handleSave() {
 
 ### `setJson(json)` Method
 
-The open method allows loading json for previously created images.
+The `setJson` method loads a previously saved JSON file into the editor.
 
 ```typescript
 @Part() $editor: PgInputPixelEditor;
 
-handleOpen() {
-  const error = await this.$editor.open(json);
-  if (error) {
-    throw new Error(error.message);
-  }
+async handleOpen(json) {
+  await this.$editor.setJson(json);
 }
 ```
 
@@ -360,7 +360,7 @@ To create a repeating 10 pixel grid with an offset `5` and limit `10`. The use c
 
 Exports by default include the entire canvas, but can be resized to a specific pixel size or grid. The `x`, `y`, `width`, and `height` are optional.
 
-Use `getExport(id)` with a `id` value to get the data grid. This is ideal for export previews.
+Use `getExport()` to get the cached 2d color-index grid. Use `getExportCanvas(options)` with `x`, `y`, `width`, `height` to crop to a region — ideal for export previews.
 
 ```json
 {
@@ -388,7 +388,7 @@ Use `getExport(id)` with a `id` value to get the data grid. This is ideal for ex
 
 The history list contains every change made to the canvas. All feature insert an entry into history. Pens and pattern tools will group as to cut down history entries.
 
-Note: Calling the `draw*()` commands programatically will group into a single history item. To create multiple entries call `flush()`.
+Note: Calling the `draw*()` commands programmatically will group into a single history item.
 
 - Undo a change
 - Redo an undo

@@ -341,13 +341,13 @@ export default class PgInputPixelEditor extends HTMLElement {
       if (x < 0 || x >= this.width || y < 0 || y >= this.height) { return; }
       this.#selectionPreview[y][x] = 0;
     });
+    this.#previousPreview = pixels;
     pixels.forEach(({ x, y }) => {
       if (x < 0 || x >= this.width || y < 0 || y >= this.height) { return; }
-      this.#previousPreview = pixels;
       this.#selectionPreview[y][x] = 1;
     });
     this.$selectionPathPreview.classList.toggle('hide', false);
-    this.$selectionPathPreview.setAttribute('d', bitmaskToPath(this.#selectionPreview, { scale: this.size }));
+    this.$selectionPathPreview.setAttribute('d', bitmaskToPath(this.#selectionPreview, { scale: this.size })[0]);
   }
 
   #clearSelectionPreview() {
@@ -654,7 +654,6 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   async handleKeyDown(event: KeyboardEvent) {
-    console.log(event.shiftKey, event.ctrlKey, event.altKey, event.key);
     this.#isShift = true;
     switch (event.key) {
       case ' ':
@@ -819,20 +818,18 @@ export default class PgInputPixelEditor extends HTMLElement {
             this.clearSelection();
           }
           const color = this.#data[this.#layer[0]][newY][newX];
-          console.log(color);
           const pixels = getFloodFill(this.#data[this.#layer[0]], newX, newY, [color]);
           pixels.forEach(([x, y]) => {
             this.#setSelectionPixel(x, y);
           });
           this.$selectionPathPreview.classList.toggle('hide', true);
           this.$selectionPath.classList.toggle('hide', false);
-          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
+          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size })[0]);
           break;
         case InputMode.Pixel:
           // Same as current color
           if (this.#startColor === this.#color) {
             this.#setPixel(newX, newY, 0);
-            this.#data[this.#layer[0]][newY][newX] = 0;
           }
           break;
         case InputMode.Stamp:
@@ -856,7 +853,7 @@ export default class PgInputPixelEditor extends HTMLElement {
           });
           this.$selectionPathPreview.classList.toggle('hide', true);
           this.$selectionPath.classList.toggle('hide', false);
-          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
+          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size })[0]);
           break;
         case InputMode.SelectEllipse:
           this.#clearSelectionPreview();
@@ -868,7 +865,7 @@ export default class PgInputPixelEditor extends HTMLElement {
           });
           this.$selectionPathPreview.classList.toggle('hide', true);
           this.$selectionPath.classList.toggle('hide', false);
-          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
+          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size })[0]);
           break;
         case InputMode.SelectLasso:
 
@@ -958,6 +955,9 @@ export default class PgInputPixelEditor extends HTMLElement {
       switch (this.#inputMode) {
         case InputMode.SelectRectangle:
           this.#setSelectionPreview(getRectanglePixels(startX, startY, lastX, lastY));
+          break;
+        case InputMode.SelectEllipse:
+          this.#setSelectionPreview(getEllipsePixels(startX, startY, lastX, lastY));
           break;
         case InputMode.Pixel:
           for (var point of points) {
@@ -1106,7 +1106,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     const cloned = cloneGrid(this.#data[this.#layer[0]]);
     const h = cloned.length - 1;
     iterateGrid(this.#data[this.#layer[0]], (x, y) => {
-      cloned[this.#layer[0]][y][x] = this.#data[h - y][x];
+      cloned[y][x] = this.#data[this.#layer[0]][h - y][x];
     });
     this.#data[this.#layer[0]] = cloned;
   }
@@ -1613,8 +1613,8 @@ export default class PgInputPixelEditor extends HTMLElement {
       ...options,
       x: minX,
       y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
+      width: maxX - minX + 1,
+      height: maxY - minY + 1,
     }, meta);
   }
 
@@ -1629,6 +1629,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#selectionPixels.forEach(([currentX, currentY]) => {
       const newX = currentX + x;
       const newY = currentY + y;
+      if (newX < 0 || newX >= this.width || newY < 0 || newY >= this.height) { return; }
       this.#layer.forEach((layer) => {
         const color = this.#data[layer][currentY][currentX];
         const newColor = this.#data[layer][newY][newX];
@@ -1642,7 +1643,6 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
     const clearSelection = diffLeftMapPixels(this.#selectionPixels, newSelection);
     // Move pixels
-    console.log(changes);
     changes.forEach(([layer, newX, newY, color]) => {
       this.#data[layer][newY][newX] = color;
       this.#setPixel(newX, newY, color, [layer]);
@@ -1667,7 +1667,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     });
 
     // Update render
-    this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size }));
+    this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size })[0]);
   }
 }
 
