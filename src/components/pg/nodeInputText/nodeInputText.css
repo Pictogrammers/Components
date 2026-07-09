@@ -4,7 +4,10 @@
 
 [part=input] {
   border: 0;
-  border-radius: 0.125rem;
+  border-top-left-radius: var(--pg-node-input-text-border-top-left-radius, 0.125rem);
+  border-top-right-radius: var(--pg-node-input-text-border-top-right-radius, 0.125rem);
+  border-bottom-left-radius: var(--pg-node-input-text-border-bottom-left-radius, 0.125rem);
+  border-bottom-right-radius: var(--pg-node-input-text-border-bottom-right-radius, 0.125rem);
   padding-inline-start: 0.25rem;
   padding-inline-end: 0.25rem;
   padding-block-start: 0;
@@ -34,6 +37,7 @@
 
 [part=input]:focus {
   outline-color: rgb(79, 143, 249, 0.75);
+  z-index: 1;
 }
 
 .hide {
@@ -45,7 +49,10 @@
   border: 0;
   color: rgba(255, 255, 255, 0.5);
   margin-left: -1rem;
-  padding: 0 0.125rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  z-index: 2;
 }
 [part=remove]:hover {
   color: rgba(255, 255, 255, 0.8);

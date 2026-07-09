@@ -27,6 +27,26 @@ div.labelAdd {
   flex-direction: column;
 }
 
+[part=inputs] > *:first-child:not(:only-child) {
+  --pg-node-input-text-border-top-right-radius: 0;
+  --pg-node-input-text-border-bottom-left-radius: 0;
+  --pg-node-input-text-border-bottom-right-radius: 0;
+}
+[part=inputs] > *:not(:last-child):not(:first-child):not(:only-child) {
+  --pg-node-input-text-border-top-left-radius: 0;
+  --pg-node-input-text-border-top-right-radius: 0;
+  --pg-node-input-text-border-bottom-left-radius: 0;
+  --pg-node-input-text-border-bottom-right-radius: 0;
+}
+[part=inputs] > *:last-child:not(:only-child) {
+  --pg-node-input-text-border-top-left-radius: 0;
+  --pg-node-input-text-border-top-right-radius: 0;
+}
+
+[part=inputs] > *:only-child {
+  --pg-node-input-text-border-top-right-radius: 0;
+}
+
 [part=add] {
   border: 0;
   background: none;
@@ -39,7 +59,7 @@ div.labelAdd {
   border-top-left-radius: 0.125rem;
   border-top-right-radius: 0.125rem;
   padding-block: 0;
-  padding-inline: 0.25rem;
+  padding-inline: 0.125rem;
 }
 
 [part=add]:hover {
