@@ -9,6 +9,7 @@ import getEllipseOutlinePixels from './utils/getEllipseOutlinePixels';
 import { WHITE, Pixel } from './utils/constants';
 import getLinePixels from './utils/getLinePixels';
 import getRectanglePixels from './utils/getRectanglePixels';
+import getLassoPixels from './utils/getLassoPixels';
 import getRectangleOutlinePixels from './utils/getRectangleOutlinePixels';
 import fillGrid from './utils/fillGrid';
 import iterateGrid from './utils/interateGrid';
@@ -147,6 +148,9 @@ export default class PgInputPixelEditor extends HTMLElement {
   #startColor: number = -1;
   #startX: number = -1;
   #startY: number = -1;
+  #lassoPath: [number, number][] = [];
+  #lassoOutlinePixels: Set<string> = new Set();
+  #lassoOutlineList: { x: number; y: number }[] = [];
   #x: number = -1;
   #y: number = -1;
   #layer: number[] = [0];
@@ -784,6 +788,11 @@ export default class PgInputPixelEditor extends HTMLElement {
           }
         }));
         break;
+      case InputMode.SelectLasso:
+        this.#lassoPath = [[newX, newY]];
+        this.#lassoOutlinePixels = new Set();
+        this.#lassoOutlineList = [];
+        break;
       case InputMode.Pixel:
         this.#setPixel(newX, newY, color);
         break;
@@ -878,7 +887,16 @@ export default class PgInputPixelEditor extends HTMLElement {
           this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size })[0]);
           break;
         case InputMode.SelectLasso:
-
+          this.#clearSelectionPreview();
+          if (!event.shiftKey) {
+            this.clearSelection();
+          }
+          getLassoPixels(this.#lassoPath).forEach(({ x, y }) => {
+            this.#setSelectionPixel(x, y);
+          });
+          this.$selectionPathPreview.classList.toggle('hide', true);
+          this.$selectionPath.classList.toggle('hide', false);
+          this.$selectionPath.setAttribute('d', bitmaskToPath(this.#selection, { scale: this.size })[0]);
           break;
         case InputMode.Line:
           getLinePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
@@ -969,6 +987,25 @@ export default class PgInputPixelEditor extends HTMLElement {
         case InputMode.SelectEllipse:
           this.#setSelectionPreview(getEllipsePixels(startX, startY, lastX, lastY));
           break;
+        case InputMode.SelectLasso: {
+          const [sx, sy] = this.#lassoPath[0];
+          for (const [px, py] of points) {
+            const [prevX, prevY] = this.#lassoPath.at(-1)!;
+            for (const { x: lx, y: ly } of getLinePixels(prevX, prevY, px, py)) {
+              const key = `${lx},${ly}`;
+              if (!this.#lassoOutlinePixels.has(key)) {
+                this.#lassoOutlinePixels.add(key);
+                this.#lassoOutlineList.push({ x: lx, y: ly });
+              }
+            }
+            this.#lassoPath.push([px, py]);
+          }
+          const [cx, cy] = this.#lassoPath.at(-1)!;
+          const closing = getLinePixels(cx, cy, sx, sy)
+            .filter(({ x: lx, y: ly }) => !this.#lassoOutlinePixels.has(`${lx},${ly}`));
+          this.#setSelectionPreview([...this.#lassoOutlineList, ...closing]);
+          break;
+        }
         case InputMode.Pixel:
           for (var point of points) {
             this.#setPixel(point[0], point[1], color);
