@@ -31,6 +31,8 @@ export default class PgNodeEditorTextArray extends HTMLElement {
 
   @Prop() #inputs: any[] = [];
 
+  #focusNext = false;
+
   connectedCallback() {
     // Map this.value to list
     this.value.forEach((value) => {
@@ -64,10 +66,39 @@ export default class PgNodeEditorTextArray extends HTMLElement {
             detail: { value: newValue },
           }));
         });
+        $item.addEventListener('inputprevious', (e: any) => {
+          const { index, selectionIndex } = e.detail;
+          const $items = Array.from(this.$inputs.children);
+          if ($items.length > 1) {
+            if (index === 0) {
+              ($items[$items.length - 1] as any).focus();
+            } else {
+              ($items[index - 1] as any).focus();
+            }
+          }
+        });
+        $item.addEventListener('inputnext', (e: any) => {
+          const { index, selectionIndex } = e.detail;
+          const $items = Array.from(this.$inputs.children);
+          if ($items.length > 1) {
+            if (index === $items.length - 1) {
+              ($items[0] as any).focus();
+            } else {
+              ($items[index + 1] as any).focus();
+            }
+          }
+        });
+      },
+      connect: ($item) => {
+        if (this.#focusNext) {
+          $item.focus();
+          this.#focusNext = false;
+        }
       },
     });
 
     this.$add.addEventListener('click', () => {
+      this.#focusNext = true;
       this.#inputs.push({
         key: uuid(),
         value: '',

@@ -40,20 +40,35 @@
   z-index: 1;
 }
 
+[part=input]:hover + button,
+[part=input]:focus + button {
+  display: flex;
+}
+
 .hide {
   display: none;
 }
 
+[part=input]:has(+ button:active) {
+  outline-color: #cd2626;
+  border-radius: 0.125rem;
+}
+
+[part=input] + [part=remove]:active {
+  color: #cd2626;
+}
+
 [part=remove] {
+  display: none;
   background: transparent;
   border: 0;
   color: rgba(255, 255, 255, 0.5);
   margin-left: -1rem;
   padding: 0;
-  display: flex;
   align-items: center;
   z-index: 2;
 }
 [part=remove]:hover {
   color: rgba(255, 255, 255, 0.8);
+  display: flex;
 }

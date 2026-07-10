@@ -10,6 +10,7 @@ import style from './nodeInputText.css';
 })
 export default class PgNodeInputText extends HTMLElement {
 
+  @Prop() index: number;
   @Prop() value: string = '';
   @Prop() name: string = '';
   @Prop() removable: boolean = false;
@@ -30,12 +31,37 @@ export default class PgNodeInputText extends HTMLElement {
       e.stopPropagation();
       this.dispatchEvent(new CustomEvent('input', {
         detail: {
-          value: this.$input.value,
+          index: this.index,
         }
       }));
     });
+    this.$input.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp') {
+        this.dispatchEvent(new CustomEvent('inputprevious', {
+          detail: {
+            index: this.index,
+            selectionStart: this.$input.selectionDirection
+              ? this.$input.selectionStart
+              : this.$input.selectionEnd,
+          }
+        }));
+      } else if (e.key === 'ArrowDown') {
+        this.dispatchEvent(new CustomEvent('inputnext', {
+          detail: {
+            index: this.index,
+            selectionIndex: this.$input.selectionDirection
+              ? this.$input.selectionStart
+              : this.$input.selectionEnd,
+          }
+        }));
+      }
+    });
     this.$remove.addEventListener('click', (e: any) => {
-      this.dispatchEvent(new CustomEvent('remove'));
+      this.dispatchEvent(new CustomEvent('remove', {
+        detail: {
+          index: this.index,
+        }
+      }));
     });
   }
 
