@@ -96,6 +96,16 @@ interface Export {
   height?: number
 }
 
+interface AddLayerOptions {
+  name: string
+  type: Layer['type']
+  exclude?: boolean
+  locked?: boolean
+  hidden?: boolean
+  opacity?: number
+  data?: any[]
+}
+
 interface GridItem {
   value: number
   color: number
@@ -1385,7 +1395,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#layer = indexes;
   }
 
-  addLayer({ name, type, ...optional }) {
+  addLayer({ name, type, ...optional }: AddLayerOptions) {
     this.#data.push(fillGrid(this.width, this.height));
     this.#layers.push({
       name,
