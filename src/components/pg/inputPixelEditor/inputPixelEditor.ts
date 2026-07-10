@@ -1385,7 +1385,7 @@ export default class PgInputPixelEditor extends HTMLElement {
     return this.#colors;
   }
 
-  addColor(r, g, b, a) {
+  addColor(r: number, g: number, b: number, a: number) {
     this.#colors.push([r, g, b, a]);
   }
 

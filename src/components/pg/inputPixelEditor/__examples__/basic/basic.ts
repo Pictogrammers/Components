@@ -346,9 +346,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
     });
     this.$addColor.addEventListener('click', () => {
       this.$colors.data.push(createTableItem({
-        r: 5,
-        g: 5,
-        b: 5,
+        r: 0,
+        g: 0,
+        b: 0,
         a: 1,
         selected: false,
         select: {
@@ -361,6 +361,7 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
           icon: IconTrash
         }
       }));
+      this.$input.addColor(0, 0, 0, 1);
     });
   }
 
