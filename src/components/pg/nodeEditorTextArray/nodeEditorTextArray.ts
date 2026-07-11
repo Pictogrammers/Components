@@ -100,8 +100,6 @@ export default class PgNodeEditorTextArray extends HTMLElement {
         });
         $item.addEventListener('enter', (e: any) => {
           const { index } = e.detail;
-          console.log('enter', index);
-          console.log(this.#inputs);
           const emptyItem = this.#inputs.findIndex(x => x.value === '');
           if (emptyItem !== -1) {
             (this.$inputs.children[emptyItem] as any).focus();
@@ -115,7 +113,9 @@ export default class PgNodeEditorTextArray extends HTMLElement {
         });
         $item.addEventListener('remove', (e: any) => {
           const { index } = e.detail;
-          console.log('remove', index);
+          if (this.#inputs.length > 1) {
+            this.#inputs.splice(index, 1);
+          }
         });
       },
       connect: ($item) => {
@@ -143,12 +143,6 @@ export default class PgNodeEditorTextArray extends HTMLElement {
     if (changes.label) {
       this.$label.textContent = this.label;
     }
-    /*
-    if (changes.value) {
-      Array.from(this.$inputs.children).forEach(($ele: any, i: number) => {
-        $ele.value = this.value[i] ?? '';
-      });
-    }*/
   }
 
   get height() {

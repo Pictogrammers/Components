@@ -52,6 +52,7 @@
 [part=input]:has(+ button:not(.hide):active) {
   outline-color: #cd2626;
   border-radius: 0.125rem;
+  z-index: 1;
 }
 
 [part=input] + [part=remove]:not(.hide):active {

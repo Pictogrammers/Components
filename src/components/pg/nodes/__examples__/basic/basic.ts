@@ -107,6 +107,7 @@ export default class XPgNodesBasic extends HTMLElement {
         }
         const key = state.get('$state');
         state.set(key, value);
+        state.delete('$state');
         return then;
       },
     }, {
@@ -284,7 +285,7 @@ export default class XPgNodesBasic extends HTMLElement {
     }, {
       name: 'some',
       label: 'Some',
-      width: 8,
+      width: 10,
       args: [{
         key: 'keys',
         label: 'Keys',
@@ -298,8 +299,28 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'f',
         label: 'False',
       }],
-      handler: ({ keys, t, f }: any) => {
-        return Math.random() < 0.5 ? t : f;
+      handler: ({ state, keys, t, f }: any) => {
+        return keys.some((key) => state.has(key)) ? t : f;
+      },
+    }, {
+      name: 'every',
+      label: 'Every',
+      width: 10,
+      args: [{
+        key: 'keys',
+        label: 'Keys',
+        editor: 'TextArray',
+        value: [''],
+      }],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ state, keys, t, f }: any) => {
+        return keys.every((key) => state.has(key)) ? t : f;
       },
     }, {
       name: 'isTrue',
