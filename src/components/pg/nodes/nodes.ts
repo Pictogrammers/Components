@@ -62,6 +62,10 @@ export default class PgNodes extends HTMLElement {
     connector.bridgeColor = '#0a0c14';
     this.#connector = connector;
 
+    connector.on('create', (event) => {
+      const { x, y, sourceY, sourceNodeId, sourceKey } = event;
+      console.log(x, y, sourceY, sourceNodeId, sourceKey);
+    });
     connector.on('change', (change) => {
       console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
       const targetNodeId = parseInt(change.targetNodeId, 10);

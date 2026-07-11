@@ -37,19 +37,21 @@ export default class PgNodeInputText extends HTMLElement {
     });
     this.$input.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'ArrowUp') {
+        e.preventDefault();
         this.dispatchEvent(new CustomEvent('inputprevious', {
           detail: {
             index: this.index,
-            selectionStart: this.$input.selectionDirection
+            selectionIndex: this.$input.selectionDirection === 'forward'
               ? this.$input.selectionStart
               : this.$input.selectionEnd,
           }
         }));
       } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
         this.dispatchEvent(new CustomEvent('inputnext', {
           detail: {
             index: this.index,
-            selectionIndex: this.$input.selectionDirection
+            selectionIndex: this.$input.selectionDirection === 'forward'
               ? this.$input.selectionStart
               : this.$input.selectionEnd,
           }
@@ -76,5 +78,19 @@ export default class PgNodeInputText extends HTMLElement {
 
   focus() {
     this.$input.focus();
+  }
+
+  get selectionStart(){
+    return this.$input.selectionStart || 0;
+  }
+  set selectionStart(value: number) {
+    this.$input.selectionStart = value;
+  }
+
+  get selectionEnd(){
+    return this.$input.selectionEnd || 0;
+  }
+  set selectionEnd(value: number) {
+    this.$input.selectionEnd = value;
   }
 }

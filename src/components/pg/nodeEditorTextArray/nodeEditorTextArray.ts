@@ -71,8 +71,12 @@ export default class PgNodeEditorTextArray extends HTMLElement {
           const $items = Array.from(this.$inputs.children);
           if ($items.length > 1) {
             if (index === 0) {
+              ($items[$items.length - 1] as any).selectionStart = selectionIndex;
+              ($items[$items.length - 1] as any).selectionEnd = selectionIndex;
               ($items[$items.length - 1] as any).focus();
             } else {
+              ($items[index - 1] as any).selectionStart = selectionIndex;
+              ($items[index - 1] as any).selectionEnd = selectionIndex;
               ($items[index - 1] as any).focus();
             }
           }
@@ -82,8 +86,12 @@ export default class PgNodeEditorTextArray extends HTMLElement {
           const $items = Array.from(this.$inputs.children);
           if ($items.length > 1) {
             if (index === $items.length - 1) {
+              ($items[0] as any).selectionStart = selectionIndex;
+              ($items[0] as any).selectionEnd = selectionIndex;
               ($items[0] as any).focus();
             } else {
+              ($items[index + 1] as any).selectionStart = selectionIndex;
+              ($items[index + 1] as any).selectionEnd = selectionIndex;
               ($items[index + 1] as any).focus();
             }
           }
