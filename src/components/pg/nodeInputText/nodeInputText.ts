@@ -58,6 +58,13 @@ export default class PgNodeInputText extends HTMLElement {
               : this.$input.selectionEnd,
           }
         }));
+      } else if (e.key === 'Enter' && this.$input.value !== '') {
+        e.preventDefault();
+        this.dispatchEvent(new CustomEvent('enter', {
+          detail: {
+            index: this.index,
+          }
+        }));
       }
     });
     this.$remove.addEventListener('click', (e: any) => {

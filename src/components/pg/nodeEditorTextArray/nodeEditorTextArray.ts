@@ -50,23 +50,23 @@ export default class PgNodeEditorTextArray extends HTMLElement {
         $item.removable = true;
         $item.addEventListener('change', (e: any) => {
           e.stopPropagation();
-          const index = Array.from(this.$inputs.children).indexOf($item);
-          const newValue = [...this.value];
-          newValue[index] = e.detail.value;
+          const { index, value } = e.detail;
+          this.#inputs[index].value = value;
           this.dispatchEvent(new CustomEvent('change', {
-            detail: { value: newValue },
+            detail: {
+              value: this.#inputs.map(x => x.value),
+            },
           }));
-          this.value = newValue;
         });
         $item.addEventListener('input', (e: any) => {
           e.stopPropagation();
-          const { index } = e.detail;
-          const newValue = [...this.value];
-          newValue[index] = e.detail.value;
+          const { index, value } = e.detail;
+          this.#inputs[index].value = value;
           this.dispatchEvent(new CustomEvent('input', {
-            detail: { value: newValue },
+            detail: {
+              value: this.#inputs.map(x => x.value),
+            },
           }));
-          this.value = newValue;
         });
         $item.addEventListener('inputprevious', (e: any) => {
           const { index, selectionIndex } = e.detail;
@@ -97,6 +97,25 @@ export default class PgNodeEditorTextArray extends HTMLElement {
               ($items[index + 1] as any).focus();
             }
           }
+        });
+        $item.addEventListener('enter', (e: any) => {
+          const { index } = e.detail;
+          console.log('enter', index);
+          console.log(this.#inputs);
+          const emptyItem = this.#inputs.findIndex(x => x.value === '');
+          if (emptyItem !== -1) {
+            (this.$inputs.children[emptyItem] as any).focus();
+            return;
+          }
+          this.#focusNext = true;
+          this.#inputs.splice(index + 1, 0, {
+            key: uuid(),
+            value: '',
+          });
+        });
+        $item.addEventListener('remove', (e: any) => {
+          const { index } = e.detail;
+          console.log('remove', index);
         });
       },
       connect: ($item) => {
