@@ -251,6 +251,7 @@ export default class PgNodes extends HTMLElement {
           x: e.clientX,
           y: e.clientY,
           items: nodeMenuItems,
+          filter: true,
         });
         if (!result) { return; }
         if (result.value === '__paste__') {

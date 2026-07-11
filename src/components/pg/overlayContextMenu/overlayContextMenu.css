@@ -18,12 +18,12 @@
 
 [part="filter"] {
   display: none;
+  --pg-input-border-radius: 0.5rem;
 }
 
 [part="overlay"].filter [part="filter"] {
   display: block;
   margin-bottom: 0.25rem;
-  border-radius: 0.125rem;
-  background-color: var(--pg-menu-background-color, #FFFFFF);
+  border-radius: 0.5rem;
   box-shadow: var(--pg-menu-box-shadow, none);
 }

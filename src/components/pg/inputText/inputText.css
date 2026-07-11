@@ -5,7 +5,7 @@
 
 [part=input] {
   border: 1px solid var(--pg-input-text-border-color, #453C4F);
-  border-radius: 0.125rem;
+  border-radius: var(--pg-input-border-radius, 0.125rem);
   padding-inline-start: var(--pg-input-text-padding-inline-start, var(--pg-input-text-padding-inline, 0.5rem));
   padding-inline-end: var(--pg-input-text-padding-inline-end, var(--pg-input-text-padding-inline, 0.5rem));
   padding-block-start: var(--pg-input-text-padding-block-start, var(--pg-input-text-padding-block, 0.25rem));
@@ -26,7 +26,7 @@
     - var(--pg-input-text-padding-inline-end, var(--pg-input-text-padding-inline, 0.5rem))
     - 2px
   );
-  background-color: transparent;
+  background-color: #FFF;
 }
 
 [part=input]:read-only {
