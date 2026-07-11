@@ -81,7 +81,7 @@ export default class PgNodeInputText extends HTMLElement {
       this.$input.value = this.value;
     }
     if (changes.removable) {
-      this.$remove.classList.toggle('hide', false);
+      this.$remove.classList.toggle('hide', !this.removable);
     }
   }
 

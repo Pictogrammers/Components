@@ -115,6 +115,12 @@ export default class PgNodeEditorTextArray extends HTMLElement {
           const { index } = e.detail;
           if (this.#inputs.length > 1) {
             this.#inputs.splice(index, 1);
+            // Emit updated array
+            this.dispatchEvent(new CustomEvent('change', {
+              detail: {
+                value: this.#inputs.map(x => x.value),
+              },
+            }));
           }
         });
       },
