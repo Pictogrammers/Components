@@ -21,16 +21,18 @@ import PgInputPixelEditor, {
 | `width`       |          | Pixel width. Default `10` |
 | `height`      |          | Pixel height. Default `10` |
 | `size`        |          | Pixel size, minimum value `4`. Default `10` |
-| `gridSize`    |          | Grid spacing between cells. Default `1` |
+| `gridSize`    |          | Grid spacing between cells. Default `1` (changing after init does not currently re-render) |
 | `transparent` |          | Show checkerboard background. Default `false` |
-| `placeholder` |          | Placeholder text |
+| `placeholder` |          | Placeholder text (not yet implemented) |
 
 ## Events
 
-| Events      | Tested   | Description |
-| ----------- | -------- | ----------- |
-| `change`    |          | `{ detail: { value }` |
-| `reference` |          | `{ detail: { id, callback } }` |
+| Events        | Tested   | Description |
+| ------------- | -------- | ----------- |
+| `change`      |          | `{ detail: { export } }` — debounced, fires 1 second after the last edit |
+| `selectlayer` |          | `{ detail: { color, index } }` — fired in cursor input mode |
+| `debug`       |          | `{ detail: { x, y, width, height, canvas, context, baseLayer, editLayer, noEditLayer, previewLayer } }` — internal layers for debugging previews |
+| `reference`   |          | `{ detail: { id, callback } }` (not yet implemented) |
 
 ```typescript
 this.$input.addEventListener('reference', (e: any) => {
@@ -51,14 +53,19 @@ See usage for each method below.
 | `getData()` | -           | Get layer data as paths by color. |
 | `setData(data)` | -           | Set layer data from paths. |
 | `reset()` | -  | Reset canvas and data. |
+| `clear()` | -  | Clear all pixel data (deprecated, will be removed). |
+| `applyTemplate(grid)` | -  | Replace all data with a single-layer 2d color-index grid. |
 | `getExport()` | -  | 2d array of pixel color indexes. Already calculated. |
+| `getExportPath()` | -  | SVG path string(s) for the export grid. |
+| `getExportLayerIndexes()` | -  | Indexes of layers flagged for export. |
 | `getExportCanvas(options)` | -  | Get new prepopulated HTML canvas, ideal for advanced export screens. |
 | `await getExportPng(options, meta)` | -  | Get png image with optional metadata. |
-| `await getSelectionPng(options, meta)` | -  | Get png of the current selection bounding box. |
-| `undo()` | -           | Undo. |
+| `await getSelectionPng(options, meta)` | -  | Get png of the current selection bounding box. Requires an active selection. |
+| `await copyPngToClipboard(blob, data)` | -  | Copy a png blob and JSON data to the clipboard. |
+| `undo()` | -           | Undo (partial — history is not yet recorded). |
 | `hasUndo()` | -     | Has undo. |
 | `hasRedo()` | -     | Has redo. |
-| `redo()` | -           | Redo. |
+| `redo()` | -           | Redo (not yet implemented). |
 | `getHistory()` | -  | History list. |
 | `clearHistory()` | -  | Clear undo/redo history. |
 | `inputModeCursor()` | -  | Input Mode Cursor — click to select layer. |
@@ -67,7 +74,8 @@ See usage for each method below.
 | `inputModeSelectLasso()` | -  | Input Mode Lasso. |
 | `inputModeSelectMagicWand()` | -  | Input Mode Magic Wand. |
 | `inputModePixel()` | -  | Input Mode Pixel. |
-| `inputModeStamp(stamp)` | -  | Input Mode Stamp. |
+| `inputModePixelSize(size)` | -  | Set pixel brush size (not yet implemented). |
+| `inputModeStamp(stamp)` | -  | Input Mode Stamp. Accepts a `[x, y][]` offset array; a hover preview is shown. |
 | `inputModeLine()` | -  | Input Mode Line. |
 | `inputModeRectangle()` | -  | Input Mode Rectangle. |
 | `inputModeRectangleOutline()` | -  | Input Mode Rectangle Outline. |
@@ -80,6 +88,8 @@ See usage for each method below.
 | `flattenLayers(layerIndexes)` | -      | Flatten layers (not yet implemented). |
 | `getColor(index)` | -     | Get color by index. |
 | `getColors()` | -    | Get all colors. |
+| `getColorAt(x, y)` | -    | Get the export color index at a coordinate. |
+| `getLayerAt(x, y)` | -    | Get the top-most layer index with a color at a coordinate, or `null`. |
 | `getLayerColorIndexes(layerIndex?)` | -  | Get unique color indexes on selected (or given) layer. |
 | `getLayerPaths()` | -  | Get SVG path strings per color per layer. |
 | `selectColor(index)` | -    | Set the active draw color. |
@@ -87,6 +97,7 @@ See usage for each method below.
 | `addColor(r, g, b, a)` | -    | Append a color. |
 | `removeColor(index)` | -    | Remove a color by index. |
 | `moveColor(startIndex, endIndex)` | -    | Move a color (not yet implemented). |
+| `mergeColor(fromIndex, toIndex)` | -    | Merge one color into another (not yet implemented). |
 | `rotateClockwise()` | -    | Rotate active layer 90° clockwise. |
 | `rotateCounterclockwise()` | -    | Rotate active layer 90° counter-clockwise. |
 | `move(x, y)` | -  | Translate active layer by x/y pixels. |
@@ -96,6 +107,7 @@ See usage for each method below.
 | `outline(include?)` | -  | Draw outline around active layer with selected color. |
 | `glow(include?)` | -  | Draw glow (outer outline) with selected color. |
 | `applyGuides()` | -  | Draw guide lines onto the base layer. |
+| `clearGuides()` | -  | Clear guide lines (not yet implemented). |
 | `drawGrid(grid, layer?)` | -  | Draw a full 2d color-index grid onto a layer. |
 | `drawPixel(x, y, color, layer?)` | -  | Draw a single pixel. |
 | `hasSelection()` | -  | Returns true when pixels are selected. |
@@ -135,6 +147,14 @@ async handleOpen(json) {
 
 ### `change`
 
+Debounced — fires 1 second after the last edit. The detail contains the cached export grid.
+
+```typescript
+this.$input.addEventListener('change', (e: any) => {
+  const { export: grid } = e.detail;
+});
+```
+
 ### `selectLayer`
 
 Using `InputMode.Cursor` individual pixels can be clicked on to select the layer. Note, selecting a layer does not automatically select it. The event must be handled.
@@ -142,9 +162,24 @@ Using `InputMode.Cursor` individual pixels can be clicked on to select the layer
 ```typescript
 this.$input.addEventListener('selectlayer', (e: any) => {
   const { color, index } = e.detail;
-  this.selectLayers([index]);
+  this.$input.selectLayers([index]);
 })
 ```
+
+## Keyboard Shortcuts
+
+The wrapper is focusable (`tabindex="0"`); shortcuts apply while the editor has focus.
+
+| Keys | Description |
+| ---- | ----------- |
+| `Escape` | Clear the current selection. |
+| `Delete` | Delete the pixels in the current selection. |
+| `Arrow Keys` | Move the current selection by 1 pixel. |
+| `Shift + Arrow Keys` | Move the current selection by 10 pixels. |
+| `Ctrl + C` | Copy the selection (or the full export when nothing is selected) to the clipboard as a PNG. |
+| `Ctrl + V` | Paste clipboard PNG / easel JSON (work in progress — currently logs metadata only). |
+| `Ctrl + Z` | Undo. |
+| `Ctrl + Shift + Z` / `Ctrl + Y` | Redo. |
 
 ## JSON Format
 
