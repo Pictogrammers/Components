@@ -61,6 +61,23 @@ export default class PgNode extends HTMLElement {
               value: e.detail.value,
             }
           }));
+          // todo: cache height by key and only trigger when height changes
+          // as this is currently bad for performance.
+          if (Array.isArray(e.detail.value)) {
+            const $outputs = this.$outputs.children;
+            this.outputs.forEach((output, outputIndex) => {
+              const $output = $outputs[outputIndex];
+              const top = this.$node.getBoundingClientRect().top;
+              this.dispatchEvent(new CustomEvent('registernodeoutput', {
+                detail: {
+                  node: this.itemId,
+                  key: output.key,
+                  label: output.label,
+                  offset: $output.getBoundingClientRect().top - top + 9,
+                },
+              }));
+            });
+          }
         });
       },
     });
