@@ -836,11 +836,11 @@ export default class PgInputPixelEditor extends HTMLElement {
     const isDragSelect = this.#inputMode === InputMode.SelectRectangle
       || this.#inputMode === InputMode.SelectEllipse
       || this.#inputMode === InputMode.SelectLasso;
-    // Select tools moving less than 5px act as a click to deselect,
+    // Select tools moving less than 3px act as a click to deselect,
     // shift keeps the current selection
     if (isDragSelect
-      && Math.abs(event.clientX - this.#startClientX) < 5
-      && Math.abs(event.clientY - this.#startClientY) < 5) {
+      && Math.abs(event.clientX - this.#startClientX) < 3
+      && Math.abs(event.clientY - this.#startClientY) < 3) {
       this.#clearSelectionPreview();
       if (!event.shiftKey) {
         this.clearSelection();
