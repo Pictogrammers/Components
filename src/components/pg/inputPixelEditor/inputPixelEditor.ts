@@ -148,6 +148,8 @@ export default class PgInputPixelEditor extends HTMLElement {
   #startColor: number = -1;
   #startX: number = -1;
   #startY: number = -1;
+  #startClientX: number = -1;
+  #startClientY: number = -1;
   #lassoPath: [number, number][] = [];
   #lassoOutlinePixels: Set<string> = new Set();
   #lassoOutlineList: { x: number; y: number }[] = [];
@@ -774,6 +776,8 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#startColor = this.#data[this.#layer[0]][newY][newX];
     this.#startX = newX;
     this.#startY = newY;
+    this.#startClientX = event.clientX;
+    this.#startClientY = event.clientY;
     this.#x = newX;
     this.#y = newY;
     const color = event.buttons === 32 ? 0 : this.#color;
@@ -829,8 +833,19 @@ export default class PgInputPixelEditor extends HTMLElement {
     //if (this.#startX === -1 && this.#startY === -1) {
     //  return;
     //}
-    // Single Tap
-    if (newX === this.#startX && newY === this.#startY) {
+    const isDragSelect = this.#inputMode === InputMode.SelectRectangle
+      || this.#inputMode === InputMode.SelectEllipse
+      || this.#inputMode === InputMode.SelectLasso;
+    // Select tools moving less than 5px act as a click to deselect,
+    // shift keeps the current selection
+    if (isDragSelect
+      && Math.abs(event.clientX - this.#startClientX) < 5
+      && Math.abs(event.clientY - this.#startClientY) < 5) {
+      this.#clearSelectionPreview();
+      if (!event.shiftKey) {
+        this.clearSelection();
+      }
+    } else if (newX === this.#startX && newY === this.#startY) {
       switch (this.#inputMode) {
         case InputMode.SelectMagicWand:
           if (!event.shiftKey) {

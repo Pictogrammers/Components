@@ -69,9 +69,9 @@ See usage for each method below.
 | `getHistory()` | -  | History list. |
 | `clearHistory()` | -  | Clear undo/redo history. |
 | `inputModeCursor()` | -  | Input Mode Cursor — click to select layer. |
-| `inputModeSelectRectangle()` | -  | Input Mode Select Rectangle. |
-| `inputModeSelectEllipse()` | -  | Input Mode Select Ellipse. |
-| `inputModeSelectLasso()` | -  | Input Mode Lasso. |
+| `inputModeSelectRectangle()` | -  | Input Mode Select Rectangle. Drags under 5px deselect (`Shift` keeps the selection). |
+| `inputModeSelectEllipse()` | -  | Input Mode Select Ellipse. Drags under 5px deselect (`Shift` keeps the selection). |
+| `inputModeSelectLasso()` | -  | Input Mode Lasso. Drags under 5px deselect (`Shift` keeps the selection). |
 | `inputModeSelectMagicWand()` | -  | Input Mode Magic Wand. |
 | `inputModePixel()` | -  | Input Mode Pixel. |
 | `inputModePixelSize(size)` | -  | Set pixel brush size (not yet implemented). |
