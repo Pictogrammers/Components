@@ -23,6 +23,7 @@ export default class PgNodeInputText extends HTMLElement {
       e.stopPropagation();
       this.dispatchEvent(new CustomEvent('change', {
         detail: {
+          index: this.index,
           value: this.$input.value,
         }
       }));
@@ -32,6 +33,7 @@ export default class PgNodeInputText extends HTMLElement {
       this.dispatchEvent(new CustomEvent('input', {
         detail: {
           index: this.index,
+          value: this.$input.value,
         }
       }));
     });

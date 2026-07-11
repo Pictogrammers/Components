@@ -56,15 +56,17 @@ export default class PgNodeEditorTextArray extends HTMLElement {
           this.dispatchEvent(new CustomEvent('change', {
             detail: { value: newValue },
           }));
+          this.value = newValue;
         });
         $item.addEventListener('input', (e: any) => {
           e.stopPropagation();
-          const index = Array.from(this.$inputs.children).indexOf($item);
+          const { index } = e.detail;
           const newValue = [...this.value];
           newValue[index] = e.detail.value;
           this.dispatchEvent(new CustomEvent('input', {
             detail: { value: newValue },
           }));
+          this.value = newValue;
         });
         $item.addEventListener('inputprevious', (e: any) => {
           const { index, selectionIndex } = e.detail;
