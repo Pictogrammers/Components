@@ -11,8 +11,11 @@ import style from './nodes.css';
 
 type NodeState = { x: number; y: number; width: number; height: number };
 type UndoTransform = { type: 'transform'; nodeId: number; before: NodeState; after: NodeState };
-type UndoMultiTransform = { type: 'multi-transform'; primaryNodeId: number; transforms: Array<{ nodeId: number; before: NodeState; after: NodeState }> };
-type UndoDelete = { type: 'delete'; item: any; index: number };
+type UndoMultiTransform = { type: 'multi-transform'; transforms: Array<{ nodeId: number; before: NodeState; after: NodeState }> };
+// incoming = connections from surviving nodes into a deleted node; recorded so
+// undo can restore them (the connector strips them from the model on removal).
+type DeleteEntry = { item: any; index: number; incoming: Array<{ id: number; key: string; index: number }> };
+type UndoDelete = { type: 'delete'; entries: DeleteEntry[] };
 type UndoItem = UndoTransform | UndoMultiTransform | UndoDelete;
 
 @Component({
@@ -42,7 +45,6 @@ export default class PgNodes extends HTMLElement {
   #focusNext: boolean = false;
   #connector: NodeConnector | null = null;
   #connectionsScheduled: boolean = false;
-  #nodePinCounts = new Map<number, number>();
   #selected = new Set<number>();
   #debug: number[] = [];
   #debugPrevious: number = 0;
@@ -52,82 +54,51 @@ export default class PgNodes extends HTMLElement {
   #nodeStates = new Map<number, NodeState>();
 
   #clipboard: Array<{ item: any; state: NodeState }> | null = null;
+  #pasteCount: number = 0;
 
   #dragOrigin: { x: number; y: number } | null = null;
   #isDragging: boolean = false;
   #wasSelectionDrag: boolean = false;
+  #nodeDragging: boolean = false;
+
+  // connectedCallback runs again if the element is reparented; listeners on
+  // document must follow the connected state while everything else (connector,
+  // shadow DOM listeners, forEach) must only ever be set up once.
+  #initialized: boolean = false;
+  #keydownListener = (e: KeyboardEvent) => this.#handleKeyDown(e);
 
   connectedCallback() {
+    document.addEventListener('keydown', this.#keydownListener);
+    if (this.#initialized) return;
+    this.#initialized = true;
+
     const connector = new NodeConnector(this.$svg);
     connector.bridgeColor = '#0a0c14';
     this.#connector = connector;
 
-    connector.on('create', (event) => {
-      const { x, y, sourceY, sourceNodeId, sourceKey } = event;
-      console.log(x, y, sourceY, sourceNodeId, sourceKey);
-    });
+    connector.on('create', this.#handleConnectorCreate.bind(this));
     connector.on('change', (change) => {
-      console.log(change.type, change.sourceNodeId, change.sourceKey, change.targetNodeId, change.targetKey);
-      const targetNodeId = parseInt(change.targetNodeId, 10);
       const sourceNodeId = parseInt(change.sourceNodeId, 10);
-      const currentItem = this.items.find((x) => x.id === sourceNodeId);
+      const targetNodeId = parseInt(change.targetNodeId, 10);
+      const currentItem = this.items.find((x: any) => x.id === sourceNodeId);
+      if (!currentItem) return;
       if (change.type === 'connect') {
-        if (!currentItem.nodes?.hasOwnProperty(change.sourceKey)) {
-          currentItem.nodes[change.sourceKey] = [];
+        const nodes = currentItem.nodes ?? (currentItem.nodes = {});
+        const targets = Array.isArray(nodes[change.sourceKey])
+          ? nodes[change.sourceKey]
+          : (nodes[change.sourceKey] = []);
+        if (!targets.includes(targetNodeId)) {
+          targets.push(targetNodeId);
         }
-        currentItem.nodes[change.sourceKey].push(targetNodeId);
-      } else if (change.type === 'disconnect' && currentItem) {
-        const index = currentItem.nodes[change.sourceKey].indexOf(targetNodeId);
+      } else if (change.type === 'disconnect') {
+        const targets = currentItem.nodes?.[change.sourceKey];
+        if (!Array.isArray(targets)) return;
+        const index = targets.indexOf(targetNodeId);
         // Check if the item actually exists in the array (-1 means not found)
         if (index > -1) {
-          currentItem.nodes[change.sourceKey].splice(index, 1);
+          targets.splice(index, 1);
         }
       }
-    });
-
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'z') {
-        e.preventDefault();
-        e.shiftKey ? this.#applyRedo() : this.#applyUndo();
-        return;
-      }
-
-      if (e.ctrlKey && e.key === 'c') {
-        e.preventDefault();
-        this.#copySelected();
-        return;
-      }
-
-      if (e.ctrlKey && e.key === 'v') {
-        e.preventDefault();
-        this.#pasteClipboard();
-        return;
-      }
-
-      if (this.#selected.size === 0) return;
-
-      if (e.key === 'Delete') {
-        const toDelete = Array.from(this.#selected);
-        this.#selected.clear();
-        toDelete.forEach((id) => this.#deleteNodeWithUndo(id));
-        return;
-      }
-      if (e.key === 'Escape') {
-        this.clearSelection();
-        return;
-      }
-
-      let dx = 0;
-      let dy = 0;
-      switch (e.key) {
-        case 'ArrowUp': dy = -1; break;
-        case 'ArrowDown': dy = 1; break;
-        case 'ArrowLeft': dx = -1; break;
-        case 'ArrowRight': dx = 1; break;
-        default: return;
-      }
-      e.preventDefault();
-      this.#moveSelectedBy(dx, dy);
     });
 
     this.$grid.addEventListener('click', (e: any) => {
@@ -155,6 +126,7 @@ export default class PgNodes extends HTMLElement {
       const cancelDrag = () => {
         document.removeEventListener('pointermove', onMove);
         document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onCancel);
         document.removeEventListener('keydown', onKeyDown);
         this.$grid.classList.remove('selecting');
         this.$selection.classList.remove('active');
@@ -162,8 +134,13 @@ export default class PgNodes extends HTMLElement {
         this.#isDragging = false;
       };
 
+      const onCancel = () => {
+        if (this.#isDragging) this.#suppressNextGridClick();
+        cancelDrag();
+      };
+
       const onKeyDown = (ev: KeyboardEvent) => {
-        if (ev.key === 'Escape') cancelDrag();
+        if (ev.key === 'Escape') onCancel();
       };
 
       const onMove = (ev: PointerEvent) => {
@@ -187,6 +164,7 @@ export default class PgNodes extends HTMLElement {
       const onUp = (ev: PointerEvent) => {
         document.removeEventListener('pointermove', onMove);
         document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onCancel);
         document.removeEventListener('keydown', onKeyDown);
         this.$grid.classList.remove('selecting');
         this.$selection.classList.remove('active');
@@ -200,7 +178,7 @@ export default class PgNodes extends HTMLElement {
         const origin = this.#dragOrigin;
         this.#dragOrigin = null;
         this.#isDragging = false;
-        this.#wasSelectionDrag = true;
+        this.#suppressNextGridClick();
 
         const r = this.$grid.getBoundingClientRect();
         const curX = ev.clientX - r.left + this.$grid.scrollLeft;
@@ -229,20 +207,18 @@ export default class PgNodes extends HTMLElement {
 
       document.addEventListener('pointermove', onMove);
       document.addEventListener('pointerup', onUp);
+      document.addEventListener('pointercancel', onCancel);
       document.addEventListener('keydown', onKeyDown);
     });
 
     this.$grid.addEventListener('contextmenu', async (e: MouseEvent) => {
       e.preventDefault();
-      const rect = this.$grid.getBoundingClientRect();
-      const x = Math.floor((e.clientX - rect.left + this.$grid.scrollLeft) / this.gridSize);
-      const y = Math.floor((e.clientY - rect.top + this.$grid.scrollTop) / this.gridSize);
       const ele = e.target as HTMLDivElement;
-      if (ele.part.contains('grid')) {
-        const { nodes } = this;
-        const nodeMenuItems = nodes.map((nodeType: any) => {
-          return { label: nodeType.label, value: nodeType.name, type: PgMenuItem };
-        });
+      if (ele.part?.contains('grid')) {
+        const rect = this.$grid.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left + this.$grid.scrollLeft) / this.gridSize);
+        const y = Math.floor((e.clientY - rect.top + this.$grid.scrollTop) / this.gridSize);
+        const nodeMenuItems = this.#nodeTypeMenuItems();
         if (this.#clipboard && this.#clipboard.length > 0) {
           nodeMenuItems.unshift({ label: 'Paste', value: '__paste__', type: PgMenuItem });
         }
@@ -258,27 +234,18 @@ export default class PgNodes extends HTMLElement {
           this.#pasteClipboard();
           return;
         }
-        const args = {};
-        const nodeType = nodes.find(x => x.name === result.value);
-        nodeType.args.forEach(({ key, value }) => {
-          args[key] = value;
-        });
-        this.#focusNext = true;
-        this.items.push({
-          id: this.#nextNodeId,
-          node: result.value,
-          x,
-          y,
-          ...(nodeType.width !== undefined && { width: nodeType.width }),
-          ...(nodeType.height !== undefined && { height: nodeType.height }),
-          args,
-          nodes: {},
-        });
+        this.#createNode(result.value, x, y);
       } else {
-        const nodeId = (ele as any).itemId as number;
+        // Right-clicks land on connector paths and pin circles too; only
+        // elements created by the forEach carry an itemId.
+        const nodeId = (ele as any).itemId;
+        if (typeof nodeId !== 'number') return;
+        const item = this.items.find((i: any) => i.id === nodeId);
+        // The entry node cannot be copied or deleted.
+        if (item && !item.node) return;
         if (!this.#selected.has(nodeId)) {
           this.clearSelection();
-          this.getNodeById(nodeId).select();
+          this.getNodeById(nodeId)?.select();
           this.#selected.add(nodeId);
         }
         const result = await PgOverlayContextMenu.open({
@@ -294,8 +261,8 @@ export default class PgNodes extends HTMLElement {
           this.#copySelected();
         } else if (result?.value === 'deleteNode') {
           const toDelete = Array.from(this.#selected);
-          this.#selected.clear();
-          toDelete.forEach((id) => this.#deleteNodeWithUndo(id));
+          this.clearSelection();
+          this.#deleteNodesWithUndo(toDelete);
         }
       }
     });
@@ -310,11 +277,17 @@ export default class PgNodes extends HTMLElement {
       create: ($item: any, item) => {
         const nodeId = item.id as number;
         this.#nextNodeId = Math.max(nodeId, this.#nextNodeId) + 1;
-        connector.setNode(String(nodeId), item.x * 16, item.y * 16, (item.width ?? 12) * 16, (item.height ?? 4) * 16);
+        connector.setNode(
+          String(nodeId),
+          item.x * this.gridSize,
+          item.y * this.gridSize,
+          (item.width ?? 12) * this.gridSize,
+          (item.height ?? 4) * this.gridSize
+        );
 
         if (item.node) {
           // Regular node: set input pin and look up output slots from type registry
-          connector.setInputPin(String(nodeId), 'in', 16);
+          connector.setInputPin(String(nodeId), 'in', this.gridSize);
           const nodeType = this.nodes.find((n: any) => n.name === item.node);
           if (nodeType) {
             $item.label = nodeType.label;
@@ -332,17 +305,16 @@ export default class PgNodes extends HTMLElement {
             if (nodeType.nodes) {
               $item.outputs = nodeType.nodes;
               nodeType.nodes.forEach((slot: any, i: number) => {
-                connector.setOutputPin(String(nodeId), slot.key, 16 + i * 16);
+                connector.setOutputPin(String(nodeId), slot.key, this.gridSize + i * this.gridSize);
               });
             }
           }
         } else {
           // Entry node (id 0): always has a single 'then' output
-          connector.setOutputPin(String(nodeId), 'then', 16);
+          connector.setOutputPin(String(nodeId), 'then', this.gridSize);
           $item.fields = [{ key: 'description', value: item.args?.description ?? '' }];
         }
 
-        $item.addEventListener('registernode', this.#registerNode.bind(this));
         $item.addEventListener('registernodeoutput', this.#registerNodeOutput.bind(this));
         $item.addEventListener('select', this.#handleSelect.bind(this));
         $item.addEventListener('change', this.#handleChange.bind(this));
@@ -350,7 +322,11 @@ export default class PgNodes extends HTMLElement {
         $item.addEventListener('nodedragmove', this.#handleNodeDragMove.bind(this));
         $item.addEventListener('nodedragend', this.#handleNodeDragEnd.bind(this));
         $item.addEventListener('input', (e: any) => {
-          console.log('input', e.detail);
+          // Re-dispatch editor input events (they don't compose past this
+          // shadow root); native composed input events already reach the host.
+          if (e.detail) {
+            this.dispatchEvent(new CustomEvent('input', { detail: e.detail }));
+          }
         });
       },
       connect: ($item: any, item) => {
@@ -363,10 +339,10 @@ export default class PgNodes extends HTMLElement {
         });
         connector.setNode(
           String(nodeId),
-          $item.x * 16,
-          $item.y * 16,
-          ($item.width ?? 12) * 16,
-          ($item.height ?? 4) * 16
+          $item.x * this.gridSize,
+          $item.y * this.gridSize,
+          ($item.width ?? 12) * this.gridSize,
+          ($item.height ?? 4) * this.gridSize
         );
         // Performance: only run once for many items
         if (!this.#connectionsScheduled) {
@@ -376,6 +352,7 @@ export default class PgNodes extends HTMLElement {
             this.items.forEach((i: any) => {
               if (!i.nodes || typeof i.nodes !== 'object') return;
               Object.entries(i.nodes as Record<string, number[]>).forEach(([key, targets]) => {
+                if (!Array.isArray(targets)) return;
                 targets.forEach((targetId: number) => {
                   connector.connect(String(i.id), key, String(targetId), 'in');
                 });
@@ -391,8 +368,17 @@ export default class PgNodes extends HTMLElement {
       },
       disconnect: (_$item: any, item: any) => {
         this.#connector?.removeNode(String(item.id));
+        // Items can also disappear through array reassignment (e.g. the json
+        // setter or items.filter), so interaction state is pruned here.
+        this.#nodeStates.delete(item.id);
+        this.#selected.delete(item.id);
+        this.#pinUpdateIds.delete(item.id);
       },
     });
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('keydown', this.#keydownListener);
   }
 
   getNodeById(nodeId: number): PgNode {
@@ -401,18 +387,152 @@ export default class PgNodes extends HTMLElement {
 
   clearSelection() {
     this.#selected.forEach((value) => {
-      this.getNodeById(value).deselect();
+      this.getNodeById(value)?.deselect();
     });
     this.#selected.clear();
   }
 
   render(_changes: any) {}
 
-  #registerNode(e: any) {
-    if (!this.#connector) return;
-    const nodeId = e.detail.node as number;
-    const index = this.#nodePinCounts.get(nodeId) ?? 0;
-    this.#nodePinCounts.set(nodeId, index + 1);
+  #handleKeyDown(e: KeyboardEvent) {
+    // Never hijack keys while the user is typing in a field (the editors live
+    // in nested shadow roots, so composedPath is needed to see the real target).
+    const target = e.composedPath()[0];
+    if (target instanceof HTMLElement
+      && (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName))) {
+      return;
+    }
+
+    const key = e.key.toLowerCase();
+    const mod = e.ctrlKey || e.metaKey;
+
+    if (mod && key === 'z') {
+      e.preventDefault();
+      e.shiftKey ? this.#applyRedo() : this.#applyUndo();
+      return;
+    }
+
+    if (mod && key === 'y') {
+      e.preventDefault();
+      this.#applyRedo();
+      return;
+    }
+
+    if (mod && key === 'c') {
+      // Without a node selection let the browser copy whatever is selected.
+      if (this.#selected.size === 0) return;
+      e.preventDefault();
+      this.#copySelected();
+      return;
+    }
+
+    if (mod && key === 'v') {
+      if (!this.#clipboard || this.#clipboard.length === 0) return;
+      e.preventDefault();
+      this.#pasteClipboard();
+      return;
+    }
+
+    if (this.#selected.size === 0) return;
+
+    if (e.key === 'Delete') {
+      const toDelete = Array.from(this.#selected);
+      this.clearSelection();
+      this.#deleteNodesWithUndo(toDelete);
+      return;
+    }
+    if (e.key === 'Escape') {
+      // Active drags handle Escape themselves (cancel); keep the selection.
+      if (this.#nodeDragging || this.#dragOrigin) return;
+      this.clearSelection();
+      return;
+    }
+
+    if (mod || e.altKey) return;
+    let dx = 0;
+    let dy = 0;
+    switch (e.key) {
+      case 'ArrowUp': dy = -1; break;
+      case 'ArrowDown': dy = 1; break;
+      case 'ArrowLeft': dx = -1; break;
+      case 'ArrowRight': dx = 1; break;
+      default: return;
+    }
+    e.preventDefault();
+    this.#moveSelectedBy(dx, dy);
+  }
+
+  // Swallow only the click generated by this pointerup; if none follows
+  // (pointer released off-grid) the flag must not eat a later real click.
+  #suppressNextGridClick() {
+    this.#wasSelectionDrag = true;
+    setTimeout(() => { this.#wasSelectionDrag = false; }, 0);
+  }
+
+  #nodeTypeMenuItems(): any[] {
+    return this.nodes.map((nodeType: any) => {
+      return { label: nodeType.label, value: nodeType.name, type: PgMenuItem };
+    });
+  }
+
+  #createNode(name: string, x: number, y: number): any | null {
+    const nodeType = this.nodes.find((n: any) => n.name === name);
+    if (!nodeType) return null;
+    const args: any = {};
+    (nodeType.args ?? []).forEach(({ key, value }: any) => {
+      args[key] = value;
+    });
+    const item = {
+      id: this.#nextNodeId,
+      node: name,
+      x: Math.max(x, 0),
+      y: Math.max(y, 0),
+      ...(nodeType.width !== undefined && { width: nodeType.width }),
+      ...(nodeType.height !== undefined && { height: nodeType.height }),
+      args,
+      nodes: {},
+    };
+    this.#focusNext = true;
+    this.items.push(item);
+    return item;
+  }
+
+  // Dragging from an output pin into empty space offers to create the target
+  // node there and connects it to the dragged pin.
+  async #handleConnectorCreate(event: any) {
+    const { x, y, sourceY, sourceNodeId, sourceKey } = event;
+    const sourceId = parseInt(sourceNodeId, 10);
+    const $source = this.getNodeById(sourceId) as any;
+    if (!$source) return;
+    // The event carries cursor offsets from the source pin in SVG space.
+    const px = ($source.x + ($source.width ?? 12)) * this.gridSize + x;
+    const py = $source.y * this.gridSize + sourceY + y;
+    const rect = this.$grid.getBoundingClientRect();
+    const result = await PgOverlayContextMenu.open({
+      source: this.$items,
+      x: rect.left + px - this.$grid.scrollLeft,
+      y: rect.top + py - this.$grid.scrollTop,
+      items: this.#nodeTypeMenuItems(),
+      filter: true,
+    });
+    if (!result) return;
+    // Offset one cell up so the new node's input pin lines up with the cursor.
+    const item = this.#createNode(
+      result.value,
+      Math.round(px / this.gridSize),
+      Math.round(py / this.gridSize) - 1
+    );
+    if (!item) return;
+    const source = this.items.find((i: any) => i.id === sourceId);
+    if (!source) return; // source deleted while the menu was open
+    const nodes = source.nodes ?? (source.nodes = {});
+    const targets = Array.isArray(nodes[sourceKey])
+      ? nodes[sourceKey]
+      : (nodes[sourceKey] = []);
+    if (!targets.includes(item.id)) {
+      targets.push(item.id);
+    }
+    // The reconnect pass scheduled by the new node's connect callback draws it.
   }
 
   #registerNodeOutput(e: any) {
@@ -420,15 +540,25 @@ export default class PgNodes extends HTMLElement {
     this.#connector?.setOutputPin(String(node), key, offset);
   }
 
-  #shiftOrCtrl: boolean = false;
   #handleSelect(e: any) {
     const nodeId = e.detail.nodeId as number;
-    if (!this.#shiftOrCtrl) {
-      this.#selected.forEach((value) => {
-        this.getNodeById(value).deselect();
-      });
-      this.#selected.clear();
+    if (e.detail.addToSelection) {
+      // Shift/Ctrl click toggles membership without touching the rest.
+      if (this.#selected.has(nodeId)) {
+        this.#selected.delete(nodeId);
+        (e.target as any).deselect();
+      } else {
+        this.#selected.add(nodeId);
+        e.target.select();
+      }
+      return;
     }
+    this.#selected.forEach((value) => {
+      if (value !== nodeId) {
+        this.getNodeById(value)?.deselect();
+      }
+    });
+    this.#selected.clear();
     this.#selected.add(nodeId);
     e.target.select();
   }
@@ -441,83 +571,87 @@ export default class PgNodes extends HTMLElement {
       const nodeId = (e.target as any).itemId as number;
       const before = this.#nodeStates.get(nodeId) ?? { x, y, width, height };
 
-      if (this.#selected.has(nodeId) && this.#selected.size > 1) {
-        const dx = x - before.x;
-        const dy = y - before.y;
-        const last = this.#undo.at(-1);
-        // A final transform is a completed drag: always its own undo entry.
-        if (!final && last?.type === 'multi-transform' && last.primaryNodeId === nodeId) {
-          for (const t of last.transforms) {
-            const cur = this.#nodeStates.get(t.nodeId) ?? t.after;
-            const newAfter: NodeState = t.nodeId === nodeId
-              ? { x, y, width, height }
-              : { x: cur.x + dx, y: cur.y + dy, width: cur.width, height: cur.height };
-            t.after = newAfter;
-            if (t.nodeId !== nodeId) {
-              const other = this.getNodeById(t.nodeId) as any;
-              if (other) { other.x = newAfter.x; other.y = newAfter.y; }
-            }
-            this.#nodeStates.set(t.nodeId, newAfter);
-            this.#updatePins(t.nodeId);
-            const tItem = this.items.find((i: any) => i.id === t.nodeId);
-            if (tItem) { tItem.x = newAfter.x; tItem.y = newAfter.y; }
-          }
-        } else {
-          const transforms = Array.from(this.#selected).map((id) => {
-            const state = this.#nodeStates.get(id) ?? { x: 0, y: 0, width: 12, height: 4 };
-            const after: NodeState = id === nodeId
-              ? { x, y, width, height }
-              : { x: state.x + dx, y: state.y + dy, width: state.width, height: state.height };
-            if (id !== nodeId) {
-              const other = this.getNodeById(id) as any;
-              if (other) { other.x = after.x; other.y = after.y; }
-            }
-            this.#nodeStates.set(id, after);
-            this.#updatePins(id);
-            const tItem = this.items.find((i: any) => i.id === id);
-            if (tItem) { tItem.x = after.x; tItem.y = after.y; }
-            return { nodeId: id, before: { ...state }, after };
-          });
-          this.#undo.push({ type: 'multi-transform', primaryNodeId: nodeId, transforms });
+      // A change that keeps the size is a move; moving one node of a
+      // multi-selection moves the whole group. Resizes always apply to the
+      // changed node alone.
+      const isMove = width === before.width && height === before.height;
+      if (isMove && this.#selected.has(nodeId) && this.#selected.size > 1) {
+        const ids = Array.from(this.#selected);
+        const states = new Map<number, NodeState>(ids.map((id) => [
+          id,
+          this.#nodeStates.get(id) ?? { x: 0, y: 0, width: 12, height: 4 },
+        ]));
+        let dx = x - before.x;
+        let dy = y - before.y;
+        // Clamp the group delta so no node ends up off-canvas (unreachable).
+        states.forEach((state) => {
+          dx = Math.max(dx, -state.x);
+          dy = Math.max(dy, -state.y);
+        });
+        const transforms = ids.map((id) => {
+          const state = states.get(id)!;
+          const after: NodeState = { x: state.x + dx, y: state.y + dy, width: state.width, height: state.height };
+          const $node = this.getNodeById(id) as any;
+          if ($node) { $node.x = after.x; $node.y = after.y; }
+          this.#nodeStates.set(id, after);
+          this.#updatePins(id);
+          const tItem = this.items.find((i: any) => i.id === id);
+          if (tItem) { tItem.x = after.x; tItem.y = after.y; }
+          return { nodeId: id, before: { ...state }, after };
+        });
+        if (dx !== 0 || dy !== 0) {
+          this.#undo.push({ type: 'multi-transform', transforms });
           this.#redo = [];
         }
-        const primaryItem = this.items.find((i: any) => i.id === nodeId);
-        if (primaryItem) {
-          const primaryNode = this.getNodeById(nodeId) as any;
-          if (primaryNode) {
-            if (width === primaryNode.getMinWidth()) {
-              delete primaryItem.width;
-            } else {
-              primaryItem.width = width;
-            }
-            if (height === primaryNode.getMinHeight()) {
-              delete primaryItem.height;
-            } else {
-              primaryItem.height = height;
-            }
-          }
-        }
         this.#updateScrollExtent();
+        this.dispatchEvent(new CustomEvent('change', { detail: { ...e.detail, id: nodeId } }));
         return;
       }
 
-      this.#pushTransform(nodeId, before, { x, y, width, height }, !final);
+      const node = this.getNodeById(nodeId) as any;
+      // Clamp to the canvas. A clamped resize (no `final`) keeps the far edge
+      // in place by giving back the overshoot; a clamped move keeps its size.
+      let cx = x;
+      let cy = y;
+      let cw = width;
+      let ch = height;
+      if (cx < 0) {
+        if (!final && node) cw = Math.max(cw + cx, node.getMinWidth());
+        cx = 0;
+      }
+      if (cy < 0) {
+        if (!final && node) ch = Math.max(ch + cy, node.getMinHeight());
+        cy = 0;
+      }
+      if (node && (cx !== x || cy !== y || cw !== width || ch !== height)) {
+        node.x = cx;
+        node.y = cy;
+        node.width = cw;
+        node.height = ch;
+      }
+
+      this.#pushTransform(nodeId, before, { x: cx, y: cy, width: cw, height: ch }, !final);
       this.#updatePins(nodeId);
       this.#updateScrollExtent();
       const item = this.items.find((i: any) => i.id === nodeId);
       if (item) {
-        item.x = x;
-        item.y = y;
-        const node = this.getNodeById(nodeId) as any;
+        item.x = cx;
+        item.y = cy;
         if (node) {
-          if (width === node.getMinWidth()) { delete item.width; } else { item.width = width; }
-          if (height === node.getMinHeight()) { delete item.height; } else { item.height = height; }
+          if (cw === node.getMinWidth()) { delete item.width; } else { item.width = cw; }
+          if (ch === node.getMinHeight()) { delete item.height; } else { item.height = ch; }
         }
       }
+      this.dispatchEvent(new CustomEvent('change', {
+        detail: { ...e.detail, id: nodeId, x: cx, y: cy, width: cw, height: ch },
+      }));
     } else if (type === 'arg') {
       const { id, key, value } = e.detail;
-      const item = this.items.find(x => x.id === id);
-      item.args[key] = value;
+      const item = this.items.find((x: any) => x.id === id);
+      if (!item) return;
+      const args = item.args ?? (item.args = {});
+      args[key] = value;
+      this.dispatchEvent(new CustomEvent('change', { detail: e.detail }));
     }
   }
 
@@ -527,6 +661,7 @@ export default class PgNodes extends HTMLElement {
   // single transform update.
   #handleNodeDragStart(e: any) {
     const nodeId = e.detail.nodeId as number;
+    this.#nodeDragging = true;
     // Dragging an unselected node makes it the selection, like clicking it.
     if (!this.#selected.has(nodeId)) {
       this.clearSelection();
@@ -553,6 +688,7 @@ export default class PgNodes extends HTMLElement {
   }
 
   #handleNodeDragEnd() {
+    this.#nodeDragging = false;
     this.$dragPreview.classList.remove('active');
     this.$dragPreview.replaceChildren();
   }
@@ -563,9 +699,27 @@ export default class PgNodes extends HTMLElement {
     const byId = new Map<number, any>();
     Array.from(this.$items.children).forEach((child: any) => byId.set(child.itemId, child));
 
-    const transforms = Array.from(this.#selected).map((id) => {
+    // Prune ids whose nodes no longer exist before touching anything.
+    Array.from(this.#selected).forEach((id) => {
+      if (!byId.has(id)) this.#selected.delete(id);
+    });
+    const ids = Array.from(this.#selected);
+    if (ids.length === 0) return;
+
+    const befores = new Map<number, NodeState>(ids.map((id) => {
       const node = byId.get(id);
-      const before = this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width ?? 12, height: node.height ?? 3 };
+      return [id, this.#nodeStates.get(id) ?? { x: node.x, y: node.y, width: node.width ?? 12, height: node.height ?? 4 }];
+    }));
+    // Clamp the group delta so no node ends up off-canvas (unreachable).
+    befores.forEach((before) => {
+      dx = Math.max(dx, -before.x);
+      dy = Math.max(dy, -before.y);
+    });
+    if (dx === 0 && dy === 0) return;
+
+    const transforms = ids.map((id) => {
+      const node = byId.get(id);
+      const before = befores.get(id)!;
       const after: NodeState = { x: before.x + dx, y: before.y + dy, width: before.width, height: before.height };
       node.x = after.x;
       node.y = after.y;
@@ -579,20 +733,20 @@ export default class PgNodes extends HTMLElement {
     if (transforms.length === 1) {
       const { nodeId, before, after } = transforms[0];
       this.#pushTransform(nodeId, before, after);
-      return;
-    }
-
-    // Merge held arrow keys on the same selection into one undo entry.
-    const last = this.#undo.at(-1);
-    const afterById = new Map(transforms.map((t) => [t.nodeId, t.after]));
-    if (last?.type === 'multi-transform'
-      && last.transforms.length === transforms.length
-      && last.transforms.every((t) => afterById.has(t.nodeId))) {
-      last.transforms.forEach((t) => { t.after = afterById.get(t.nodeId)!; });
     } else {
-      this.#undo.push({ type: 'multi-transform', primaryNodeId: transforms[0].nodeId, transforms });
+      // Merge held arrow keys on the same selection into one undo entry.
+      const last = this.#undo.at(-1);
+      const afterById = new Map(transforms.map((t) => [t.nodeId, t.after]));
+      if (last?.type === 'multi-transform'
+        && last.transforms.length === transforms.length
+        && last.transforms.every((t) => afterById.has(t.nodeId))) {
+        last.transforms.forEach((t) => { t.after = afterById.get(t.nodeId)!; });
+      } else {
+        this.#undo.push({ type: 'multi-transform', transforms });
+      }
+      this.#redo = [];
     }
-    this.#redo = [];
+    this.#updateScrollExtent();
   }
 
   // Every connector.setNode triggers a full path redraw, so coalesce updates
@@ -612,12 +766,19 @@ export default class PgNodes extends HTMLElement {
   }
 
   #copySelected() {
-    if (this.#selected.size === 0) return;
-    this.#clipboard = Array.from(this.#selected).map((id) => {
-      const item = this.items.find((x: any) => x.id === id);
-      const state = this.#nodeStates.get(id) ?? { x: item.x, y: item.y, width: item.width ?? 12, height: item.height ?? 4 };
-      return { item: JSON.parse(JSON.stringify(item)), state: { ...state } };
-    });
+    // The entry node is excluded: a script has exactly one entry point.
+    const entries = Array.from(this.#selected)
+      .map((id) => this.items.find((x: any) => x.id === id))
+      .filter((item: any) => item && item.node)
+      .map((item: any) => {
+        const state = this.#nodeStates.get(item.id)
+          ?? { x: item.x, y: item.y, width: item.width ?? 12, height: item.height ?? 4 };
+        const { editors, ...rest } = item;
+        return { item: JSON.parse(JSON.stringify(rest)), state: { ...state } };
+      });
+    if (entries.length === 0) return;
+    this.#clipboard = entries;
+    this.#pasteCount = 0;
   }
 
   #pasteClipboard() {
@@ -631,18 +792,23 @@ export default class PgNodes extends HTMLElement {
 
     this.clearSelection();
 
+    // Cascade repeated pastes of the same clipboard instead of stacking them.
+    this.#pasteCount += 1;
+    const offset = 2 * this.#pasteCount;
+
     const newItems = this.#clipboard.map(({ item, state }) => {
       const newId = idMap.get(item.id)!;
       const newNodes: Record<string, number[]> = {};
       if (item.nodes && typeof item.nodes === 'object') {
         Object.entries(item.nodes as Record<string, number[]>).forEach(([key, targets]) => {
+          if (!Array.isArray(targets)) return;
           const remapped = (targets as number[])
             .filter((t) => copiedIds.has(t))
             .map((t) => idMap.get(t)!);
           if (remapped.length > 0) newNodes[key] = remapped;
         });
       }
-      return { ...JSON.parse(JSON.stringify(item)), id: newId, x: state.x + 2, y: state.y + 2, nodes: newNodes };
+      return { ...JSON.parse(JSON.stringify(item)), id: newId, x: state.x + offset, y: state.y + offset, nodes: newNodes };
     });
 
     newItems.forEach((item) => this.items.push(item));
@@ -684,42 +850,42 @@ export default class PgNodes extends HTMLElement {
   #applyItem(item: UndoItem, direction: 'undo' | 'redo') {
     switch (item.type) {
       case 'transform': {
-        const state = direction === 'undo' ? item.before : item.after;
-        const node = this.getNodeById(item.nodeId) as any;
-        if (!node) return;
-        node.x = state.x;
-        node.y = state.y;
-        node.width = state.width;
-        node.height = state.height;
-        this.#nodeStates.set(item.nodeId, state);
-        this.#updatePins(item.nodeId);
+        this.#applyNodeState(item.nodeId, direction === 'undo' ? item.before : item.after);
         break;
       }
       case 'multi-transform': {
         for (const t of item.transforms) {
-          const state = direction === 'undo' ? t.before : t.after;
-          const node = this.getNodeById(t.nodeId) as any;
-          if (!node) continue;
-          node.x = state.x;
-          node.y = state.y;
-          node.width = state.width;
-          node.height = state.height;
-          this.#nodeStates.set(t.nodeId, state);
-          this.#updatePins(t.nodeId);
+          this.#applyNodeState(t.nodeId, direction === 'undo' ? t.before : t.after);
         }
         break;
       }
       case 'delete': {
         if (direction === 'undo') {
-          this.items.splice(item.index, 0, item.item);
-          this.#nodeStates.set(item.item.id, {
-            x: item.item.x,
-            y: item.item.y,
-            width: item.item.width ?? 12,
-            height: item.item.height ?? 4,
+          // Restore in reverse deletion order so the recorded indexes hold.
+          for (let i = item.entries.length - 1; i >= 0; i--) {
+            const entry = item.entries[i];
+            this.items.splice(entry.index, 0, entry.item);
+            this.#nodeStates.set(entry.item.id, {
+              x: entry.item.x,
+              y: entry.item.y,
+              width: entry.item.width ?? 12,
+              height: entry.item.height ?? 4,
+            });
+          }
+          // With every node back, restore the connections that pointed at them.
+          item.entries.forEach((entry) => {
+            entry.incoming.forEach(({ id, key, index }) => {
+              const source = this.items.find((x: any) => x.id === id);
+              if (!source) return;
+              const nodes = source.nodes ?? (source.nodes = {});
+              const targets = Array.isArray(nodes[key]) ? nodes[key] : (nodes[key] = []);
+              if (!targets.includes(entry.item.id)) {
+                targets.splice(Math.min(index, targets.length), 0, entry.item.id);
+              }
+            });
           });
         } else {
-          this.#deleteNode(item.item.id);
+          item.entries.forEach((entry) => this.#deleteNode(entry.item.id));
         }
         break;
       }
@@ -727,8 +893,32 @@ export default class PgNodes extends HTMLElement {
     this.#updateScrollExtent();
   }
 
+  // Applies a recorded state to the element, the connector, and the data
+  // model; the items array must stay in sync or saving after undo would
+  // persist stale geometry.
+  #applyNodeState(nodeId: number, state: NodeState) {
+    const node = this.getNodeById(nodeId) as any;
+    const item = this.items.find((i: any) => i.id === nodeId);
+    if (!node && !item) return;
+    if (node) {
+      node.x = state.x;
+      node.y = state.y;
+      node.width = state.width;
+      node.height = state.height;
+    }
+    if (item) {
+      item.x = state.x;
+      item.y = state.y;
+      item.width = state.width;
+      item.height = state.height;
+    }
+    this.#nodeStates.set(nodeId, state);
+    this.#updatePins(nodeId);
+  }
+
   #deleteNode(nodeId: number) {
     const index = this.items.findIndex((x: any) => x.id === nodeId);
+    // Index 0 is the entry node, which cannot be deleted.
     if (index > 0) {
       this.items.splice(index, 1);
       this.#nodeStates.delete(nodeId);
@@ -736,19 +926,38 @@ export default class PgNodes extends HTMLElement {
     }
   }
 
-  #deleteNodeWithUndo(nodeId: number) {
-    const index = this.items.findIndex((x: any) => x.id === nodeId);
-    if (index <= 0) return;
-    const node = this.getNodeById(nodeId) as any;
-    const item = {
-      ...this.items[index],
-      x: node.x,
-      y: node.y,
-      width: node.width,
-      height: node.height,
-    };
-    this.#deleteNode(nodeId);
-    this.#undo.push({ type: 'delete', item, index });
+  // Connections from surviving nodes into nodeId; recorded before deletion so
+  // undo can put them back after the connector strips them from the model.
+  #collectIncoming(nodeId: number): Array<{ id: number; key: string; index: number }> {
+    const incoming: Array<{ id: number; key: string; index: number }> = [];
+    this.items.forEach((item: any) => {
+      if (item.id === nodeId || !item.nodes || typeof item.nodes !== 'object') return;
+      Object.entries(item.nodes as Record<string, number[]>).forEach(([key, targets]) => {
+        if (!Array.isArray(targets)) return;
+        const index = targets.indexOf(nodeId);
+        if (index > -1) incoming.push({ id: item.id, key, index });
+      });
+    });
+    return incoming;
+  }
+
+  // Deletes the given nodes as one undoable operation.
+  #deleteNodesWithUndo(nodeIds: number[]) {
+    const entries: DeleteEntry[] = [];
+    nodeIds.forEach((nodeId) => {
+      const index = this.items.findIndex((x: any) => x.id === nodeId);
+      if (index <= 0) return;
+      const node = this.getNodeById(nodeId) as any;
+      const item = {
+        ...this.items[index],
+        ...(node ? { x: node.x, y: node.y, width: node.width, height: node.height } : {}),
+      };
+      const incoming = this.#collectIncoming(nodeId);
+      this.#deleteNode(nodeId);
+      entries.push({ item, index, incoming });
+    });
+    if (entries.length === 0) return;
+    this.#undo.push({ type: 'delete', entries });
     this.#redo = [];
   }
 
@@ -799,16 +1008,32 @@ export default class PgNodes extends HTMLElement {
 
     let nextIds: number[] = [];
     if (!item.node) {
-      nextIds = item.nodes?.then ?? [];
+      const thenTargets = item.nodes?.then;
+      nextIds = Array.isArray(thenTargets)
+        ? thenTargets.filter((id: any) => typeof id === 'number')
+        : [];
     } else {
       const nodeType = this.nodes.find((x: any) => x.name === item.node);
       if (nodeType?.handler) {
         const params: any = { state: this.#state };
+        // Globals ([key, value] pairs) are exposed to handlers; the node's
+        // own args and slots take precedence over a colliding name.
+        this.globals.forEach((entry: any) => {
+          if (Array.isArray(entry)) {
+            params[entry[0]] = entry[1];
+          }
+        });
         if (item.args) {
           Object.keys(item.args).forEach((key) => {
             if (typeof item.args[key] === 'string') {
-              let fn = new Function('state', `return \`${item.args[key]}\`;`);
-              params[key] = fn(this.#state);
+              // String args are template literals; a malformed one (stray
+              // backtick / ${) must not abort the run.
+              try {
+                let fn = new Function('state', `return \`${item.args[key]}\`;`);
+                params[key] = fn(this.#state);
+              } catch (error) {
+                params[key] = item.args[key];
+              }
             } else {
               params[key] = item.args[key];
             }
@@ -816,13 +1041,24 @@ export default class PgNodes extends HTMLElement {
         }
         if (item.nodes) {
           // get the type to know known keys
-          nodeType.nodes.forEach(({ key }) => {
+          (nodeType.nodes ?? []).forEach(({ key }: any) => {
             params[key] = item.nodes[key] ?? [];
           });
         }
         params.node = this.#debugPrevious;
-        const result = await nodeType.handler(params);
-        nextIds = Array.isArray(result) ? result : [result];
+        let result;
+        try {
+          result = await nodeType.handler(params);
+        } catch (error) {
+          // Handlers throw to signal invalid scripts; surface it and stop.
+          this.#debug = [];
+          this.dispatchEvent(new CustomEvent('error', {
+            detail: { nodeId: currentId, error },
+          }));
+          return;
+        }
+        nextIds = (Array.isArray(result) ? result : [result])
+          .filter((id: any) => typeof id === 'number');
         this.#debugPrevious = currentId;
         this.dispatchEvent(new CustomEvent('debug', {
           detail: {
@@ -839,9 +1075,23 @@ export default class PgNodes extends HTMLElement {
     }
   }
 
+  #playing = false;
   async play() {
-    while (this.#debug.length > 0) {
-      await this.debugNext();
+    if (this.#playing) return;
+    this.#playing = true;
+    let steps = 0;
+    try {
+      while (this.#debug.length > 0) {
+        if (++steps > 10000) {
+          this.dispatchEvent(new CustomEvent('error', {
+            detail: { error: new Error('play() stopped after 10000 steps (cyclic script?)') },
+          }));
+          break;
+        }
+        await this.debugNext();
+      }
+    } finally {
+      this.#playing = false;
     }
   }
 
@@ -862,10 +1112,26 @@ export default class PgNodes extends HTMLElement {
     );
   }
   set json(value: string) {
-    this.items = JSON.parse(value);
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) {
+      throw new TypeError('<pg-nodes> json must be a JSON array of node items.');
+    }
+    // Undo history, selection, and cached geometry all reference the previous
+    // items; carrying them across a load corrupts the new script. The
+    // clipboard survives intentionally (ids are remapped on paste).
+    this.#selected.clear();
+    this.#undo = [];
+    this.#redo = [];
+    this.#nodeStates.clear();
+    this.#pinUpdateIds.clear();
+    this.#debug = [];
+    this.#debugPrevious = 0;
+    this.items = parsed;
     let nextNodeId = 0;
-    this.items.forEach((item) => {
-      nextNodeId = Math.max(nextNodeId, item.id);
+    this.items.forEach((item: any) => {
+      if (typeof item.id === 'number' && Number.isFinite(item.id)) {
+        nextNodeId = Math.max(nextNodeId, item.id);
+      }
     });
     this.#nextNodeId = nextNodeId + 1;
   }

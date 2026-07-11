@@ -1,5 +1,5 @@
 import { Component, Part } from '@pictogrammers/element';
-import PgNodeResize from '../nodeResize';
+import PgNodeResize from '../../nodeResize';
 
 import template from './basic.html';
 

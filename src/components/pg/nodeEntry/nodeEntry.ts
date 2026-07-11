@@ -25,7 +25,8 @@ export default class PgNodeEntry extends HTMLElement {
   @Part() $input: HTMLTextAreaElement;
 
   connectedCallback() {
-    this.height = this.getMinHeight();
+    // Keep a persisted height when it exceeds the minimum.
+    this.height = Math.max(this.height, this.getMinHeight());
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
     this.$input.addEventListener('input', () => {
       this.dispatchEvent(new CustomEvent('input', {
@@ -79,10 +80,11 @@ export default class PgNodeEntry extends HTMLElement {
     }
   }
 
-  #handleSelect(_e: any) {
+  #handleSelect(e: any) {
     this.dispatchEvent(new CustomEvent('select', {
       detail: {
         nodeId: this.itemId,
+        addToSelection: !!(e?.detail?.shiftKey || e?.detail?.ctrlKey),
       }
     }));
   }
@@ -114,7 +116,7 @@ export default class PgNodeEntry extends HTMLElement {
       ele.y = y;
       ele.width = width;
       ele.height = height;
-      this.dispatchEvent(new CustomEvent('change', { detail: { x, y, width, height } }));
+      this.dispatchEvent(new CustomEvent('change', { detail: { type: 'transform', x, y, width, height } }));
     });
     ele.addEventListener('dragstart', () => {
       this.dispatchEvent(new CustomEvent('nodedragstart', { detail: { nodeId: this.itemId } }));

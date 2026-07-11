@@ -124,10 +124,12 @@ export default class PgNodeResize extends HTMLElement {
         this.dispatchEvent(new CustomEvent('dragend', { detail: { dx, dy, complete } }));
       },
     });
-    this.$header.addEventListener('click', () => {
+    this.$header.addEventListener('click', (e: MouseEvent) => {
       // The click after a drag must not change the selection.
       if (didDrag) return;
-      this.dispatchEvent(new CustomEvent('select'));
+      this.dispatchEvent(new CustomEvent('select', {
+        detail: { shiftKey: e.shiftKey, ctrlKey: e.ctrlKey },
+      }));
     });
   }
 

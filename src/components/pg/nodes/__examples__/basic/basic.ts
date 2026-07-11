@@ -48,7 +48,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$script.nodes.push({
       name: 'stateGet',
       label: 'Get',
-      width: 8,
+      width: 6,
       args: [{
         key: 'key',
         label: 'Key',
@@ -90,7 +90,7 @@ export default class XPgNodesBasic extends HTMLElement {
     }, {
       name: 'stateSet',
       label: 'Set',
-      width: 10,
+      width: 6,
       args: [{
         key: 'value',
         label: 'Value',

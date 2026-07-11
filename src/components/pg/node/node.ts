@@ -30,6 +30,9 @@ export default class PgNode extends HTMLElement {
   @Part() $header: HTMLDivElement;
 
   connectedCallback() {
+    // The height synced from the item (a persisted resize) is recomputed
+    // below as the intrinsic minimum; keep the larger of the two.
+    const requestedHeight = this.height;
     this.height = 2;
     forEach({
       container: this.$items,
@@ -83,6 +86,9 @@ export default class PgNode extends HTMLElement {
         }));
       },
     });
+    if (requestedHeight > this.height) {
+      this.height = requestedHeight;
+    }
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
   }
 
@@ -124,10 +130,11 @@ export default class PgNode extends HTMLElement {
     }
   }
 
-  #handleSelect(_e: any) {
+  #handleSelect(e: any) {
     this.dispatchEvent(new CustomEvent('select', {
       detail: {
         nodeId: this.itemId,
+        addToSelection: !!(e?.detail?.shiftKey || e?.detail?.ctrlKey),
       }
     }));
   }
@@ -206,7 +213,7 @@ export default class PgNode extends HTMLElement {
   }
 
   getMinWidth() {
-    return 6;
+    return this.width || 6;
   }
 
   focus() {
