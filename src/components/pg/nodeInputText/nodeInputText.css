@@ -40,8 +40,8 @@
   z-index: 1;
 }
 
-[part=input]:hover + button,
-[part=input]:focus + button {
+[part=input]:hover + button:not(.hide),
+[part=input]:focus + button:not(.hide) {
   display: flex;
 }
 
@@ -49,12 +49,12 @@
   display: none;
 }
 
-[part=input]:has(+ button:active) {
+[part=input]:has(+ button:not(.hide):active) {
   outline-color: #cd2626;
   border-radius: 0.125rem;
 }
 
-[part=input] + [part=remove]:active {
+[part=input] + [part=remove]:not(.hide):active {
   color: #cd2626;
 }
 
