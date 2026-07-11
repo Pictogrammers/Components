@@ -15,3 +15,15 @@
   margin: var(--pg-overlay-menu-_y, 0) 0 0 var(--pg-overlay-menu-_x, 0);
   position-visibility: always;
 }
+
+[part="filter"] {
+  display: none;
+}
+
+[part="overlay"].filter [part="filter"] {
+  display: block;
+  margin-bottom: 0.25rem;
+  border-radius: 0.125rem;
+  background-color: var(--pg-menu-background-color, #FFFFFF);
+  box-shadow: var(--pg-menu-box-shadow, none);
+}

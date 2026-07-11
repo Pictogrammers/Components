@@ -1,5 +1,6 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
 
+import PgInputText from '../inputText/inputText';
 import PgMenu from '../menu/menu';
 import PgOverlay from '../overlay/overlay';
 
@@ -17,6 +18,7 @@ const stack2: PgOverlayContextMenu[] = [];
 })
 export default class PgOverlayContextMenu extends PgOverlay {
   @Part() $overlay: HTMLDivElement;
+  @Part() $filter: PgInputText;
   @Part() $menu: PgMenu;
 
   @Prop() source: HTMLElement | null = null;
@@ -25,6 +27,7 @@ export default class PgOverlayContextMenu extends PgOverlay {
   @Prop() default: any = null;
   @Prop() items: any[] = [];
   @Prop() value: any = null;
+  @Prop() filter: boolean = false;
 
   render(changes) {
     if (changes.items) {
@@ -34,6 +37,9 @@ export default class PgOverlayContextMenu extends PgOverlay {
       //}
       this.$menu.items = this.items;
     }
+    if (changes.filter) {
+      this.$overlay.classList.toggle('filter', this.filter);
+    }
   }
 
   connectedCallback() {
@@ -42,6 +48,8 @@ export default class PgOverlayContextMenu extends PgOverlay {
     stack2.push(this);
     this.$menu.addEventListener('select', this.#handleSelect.bind(this));
     this.$menu.addEventListener('close', this.#handleClose.bind(this));
+    this.$filter.addEventListener('input', this.#handleFilterInput.bind(this));
+    this.$filter.addEventListener('keydown', this.#handleFilterKeyDown.bind(this));
     this.$overlay.popover = 'auto';
     if (this.source !== null) {
       // @ts-ignore
@@ -63,8 +71,26 @@ export default class PgOverlayContextMenu extends PgOverlay {
     // Rendering children is after parent's connectedCallback
     queueMicrotask(() => {
       // Focus
-      this.$menu.focus(0);
+      if (this.filter) {
+        this.$filter.focus();
+      } else {
+        this.$menu.focus(0);
+      }
     });
+  }
+
+  #handleFilterInput(e: any) {
+    const text = e.detail.value.trim().toLowerCase();
+    this.$menu.items = text === ''
+      ? this.items
+      : this.items.filter(item => item.label?.toLowerCase().includes(text));
+  }
+
+  #handleFilterKeyDown(e: KeyboardEvent) {
+    if (e.key === 'ArrowDown') {
+      this.$menu.focus(0);
+      e.preventDefault();
+    }
   }
 
   #ignore = false;

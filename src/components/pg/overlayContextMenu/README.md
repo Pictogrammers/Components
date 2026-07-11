@@ -33,3 +33,17 @@ handleSourceClick(e: MouseEvent) {
   console.log(result);
 }
 ```
+
+## Filter
+
+Set `filter: true` to render an input above the menu that filters the root items by label. The input receives focus when the menu opens; press <kbd>ArrowDown</kbd> to move focus into the menu.
+
+```typescript
+const result = await PgOverlayContextMenu.open({
+  source: this.$element,
+  x: e.clientX,
+  y: e.clientY,
+  filter: true,
+  items
+});
+```
