@@ -8,6 +8,7 @@ import PgMenuItem from '../menuItem/menuItem';
 
 import template from './nodes.html';
 import style from './nodes.css';
+import PgMenuDivider from '../menuDivider/menuDivider';
 
 type NodeState = { x: number; y: number; width: number; height: number };
 type UndoTransform = { type: 'transform'; nodeId: number; before: NodeState; after: NodeState };
@@ -254,6 +255,9 @@ export default class PgNodes extends HTMLElement {
           y: e.clientY,
           items: [
             { label: 'Copy', value: 'copyNode', type: PgMenuItem },
+            { type: PgMenuDivider },
+            { label: 'Enable Breakpoint', value: 'breakpoint', type: PgMenuItem },
+            { type: PgMenuDivider },
             { label: 'Delete Node', value: 'deleteNode', type: PgMenuItem },
           ],
         });
@@ -291,8 +295,9 @@ export default class PgNodes extends HTMLElement {
           const nodeType = this.nodes.find((n: any) => n.name === item.node);
           if (nodeType) {
             $item.label = nodeType.label;
+            $item.minWidth = nodeType.width ?? 6;
             if (!item.width) {
-              $item.width = nodeType.width ?? $item.getMinWidth();
+              $item.width = $item.getMinWidth();
             }
             if (nodeType.args) {
               $item.fields = nodeType.args.map((arg: any) => ({
@@ -637,9 +642,14 @@ export default class PgNodes extends HTMLElement {
       if (item) {
         item.x = cx;
         item.y = cy;
+        // Sizes matching the type default (minWidth) / content height stay
+        // implicit so nodes follow the registry on reload.
         if (node) {
           if (cw === node.getMinWidth()) { delete item.width; } else { item.width = cw; }
           if (ch === node.getMinHeight()) { delete item.height; } else { item.height = ch; }
+        } else {
+          item.width = cw;
+          item.height = ch;
         }
       }
       this.dispatchEvent(new CustomEvent('change', {
@@ -651,6 +661,18 @@ export default class PgNodes extends HTMLElement {
       if (!item) return;
       const args = item.args ?? (item.args = {});
       args[key] = value;
+      // Editors can change the node's height on value changes (TextArray
+      // rows); pg-node reflows before dispatching, so sync the cached state
+      // and the connector's box to the element here.
+      const node = this.getNodeById(id) as any;
+      if (node) {
+        const state = this.#nodeStates.get(id);
+        if (state && (state.width !== node.width || state.height !== node.height)) {
+          this.#nodeStates.set(id, { ...state, width: node.width, height: node.height });
+          this.#updatePins(id);
+          this.#updateScrollExtent();
+        }
+      }
       this.dispatchEvent(new CustomEvent('change', { detail: e.detail }));
     }
   }

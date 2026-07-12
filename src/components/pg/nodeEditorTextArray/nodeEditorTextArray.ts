@@ -110,6 +110,12 @@ export default class PgNodeEditorTextArray extends HTMLElement {
             key: uuid(),
             value: '',
           });
+          // Emit updated array
+          this.dispatchEvent(new CustomEvent('change', {
+            detail: {
+              value: this.#inputs.map(x => x.value),
+            },
+          }));
         });
         $item.addEventListener('remove', (e: any) => {
           const { index } = e.detail;
@@ -138,9 +144,12 @@ export default class PgNodeEditorTextArray extends HTMLElement {
         key: uuid(),
         value: '',
       });
-      // Emit updated array
+      // Emit updated array (#inputs is the live list; this.value is only the
+      // initial prop and goes stale after the first edit)
       this.dispatchEvent(new CustomEvent('change', {
-        detail: { value: [...this.value, ''] },
+        detail: {
+          value: this.#inputs.map(x => x.value),
+        },
       }));
     });
   }

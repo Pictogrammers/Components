@@ -17,6 +17,8 @@ export default class PgNode extends HTMLElement {
   @Prop() y: number = 0;
   @Prop() width: number = 12;
   @Prop() height: number = 3;
+  // The node type's declared width; nodes cannot be resized below it.
+  @Prop() minWidth: number = 6;
   @Prop() itemId: number = 0;
   @Prop() label: string = '';
   @Prop() fields: any = [];
@@ -42,42 +44,15 @@ export default class PgNode extends HTMLElement {
       },
       create: ($item: any, item) => {
         this.height += $item.height;
+        this.#fieldHeights.set(item.itemKey, $item.height);
         $item.addEventListener('input', (e: any) => {
-          this.dispatchEvent(new CustomEvent('input', {
-            detail: {
-              type: 'arg',
-              id: this.itemId,
-              key: item.itemKey,
-              value: e.detail.value,
-            }
-          }));
+          this.#dispatchArg('input', item.itemKey, e.detail.value);
         });
         $item.addEventListener('change', (e: any) => {
-          this.dispatchEvent(new CustomEvent('change', {
-            detail: {
-              type: 'arg',
-              id: this.itemId,
-              key: item.itemKey,
-              value: e.detail.value,
-            }
-          }));
-          // todo: cache height by key and only trigger when height changes
-          // as this is currently bad for performance.
-          if (Array.isArray(e.detail.value)) {
-            const $outputs = this.$outputs.children;
-            this.outputs.forEach((output, outputIndex) => {
-              const $output = $outputs[outputIndex];
-              const top = this.$node.getBoundingClientRect().top;
-              this.dispatchEvent(new CustomEvent('registernodeoutput', {
-                detail: {
-                  node: this.itemId,
-                  key: output.key,
-                  label: output.label,
-                  offset: $output.getBoundingClientRect().top - top + 9,
-                },
-              }));
-            });
-          }
+          // Editors can grow or shrink on change (e.g. TextArray rows);
+          // reflow first so change listeners see the final geometry.
+          this.#syncFieldHeight(item.itemKey, $item);
+          this.#dispatchArg('change', item.itemKey, e.detail.value);
         });
       },
     });
@@ -92,21 +67,69 @@ export default class PgNode extends HTMLElement {
         this.height += $item.height;
       },
       connect: ($item: any, item) => {
+        // Measured mid-setup, before render() applies the host styles, so
+        // the adjust constant differs from the post-layout one below.
         const top = this.$node.getBoundingClientRect().top;
-        this.dispatchEvent(new CustomEvent('registernodeoutput', {
-          detail: {
-            node: this.itemId,
-            key: item.key,
-            label: item.label,
-            offset: $item.getBoundingClientRect().top - top + 31,
-          }
-        }));
+        this.#registerOutputPin(item.key, item.label, $item.getBoundingClientRect().top - top + 31);
       },
     });
+    this.#intrinsicHeight = this.height;
     if (requestedHeight > this.height) {
       this.height = requestedHeight;
     }
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
+  }
+
+  // Editor heights are cached by field key so a change event only triggers a
+  // reflow (node height + output pin offsets) when a height actually changed.
+  #fieldHeights = new Map<string, number>();
+  #intrinsicHeight = 2;
+  #syncFieldHeight(key: string, $item: any) {
+    const previous = this.#fieldHeights.get(key) ?? 0;
+    if ($item.height === previous) return;
+    this.#fieldHeights.set(key, $item.height);
+    // Auto-sized nodes track their content; manually resized nodes only grow
+    // when the content no longer fits.
+    const wasAuto = this.height === this.#intrinsicHeight;
+    this.#intrinsicHeight += $item.height - previous;
+    this.height = wasAuto ? this.#intrinsicHeight : Math.max(this.height, this.#intrinsicHeight);
+    this.#registerOutputPins();
+  }
+
+  #dispatchArg(type: 'input' | 'change', key: string, value: any) {
+    this.dispatchEvent(new CustomEvent(type, {
+      detail: {
+        type: 'arg',
+        id: this.itemId,
+        key,
+        value,
+      }
+    }));
+  }
+
+  #registerOutputPin(key: string, label: string, offset: number) {
+    this.dispatchEvent(new CustomEvent('registernodeoutput', {
+      detail: {
+        node: this.itemId,
+        key,
+        label,
+        offset,
+      }
+    }));
+  }
+
+  // Re-measures every rendered output row. 'then' outputs render no row
+  // (their pin stays on the header line), so the DOM index advances only
+  // for outputs that produced an element.
+  #registerOutputPins() {
+    const top = this.$node.getBoundingClientRect().top;
+    let domIndex = 0;
+    this.outputs.forEach((output: any) => {
+      if (output.key === 'then') return;
+      const $output = this.$outputs.children[domIndex++];
+      if (!$output) return;
+      this.#registerOutputPin(output.key, output.label, $output.getBoundingClientRect().top - top + 9);
+    });
   }
 
   render(changes: any) {
@@ -230,7 +253,7 @@ export default class PgNode extends HTMLElement {
   }
 
   getMinWidth() {
-    return this.width || 6;
+    return this.minWidth;
   }
 
   focus() {
