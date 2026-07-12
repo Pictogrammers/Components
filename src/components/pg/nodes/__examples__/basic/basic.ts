@@ -27,6 +27,7 @@ export default class XPgNodesBasic extends HTMLElement {
   @Part() $debugNext: HTMLButtonElement;
   @Part() $play: HTMLButtonElement;
   @Part() $restart: HTMLButtonElement;
+  @Part() $fullscreen: HTMLButtonElement;
 
   @Local('nodes.basic') store = new Map<string, any>([
     ['list', []]
@@ -563,6 +564,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$open.addEventListener('click', this.#handleOpen.bind(this));
     this.$new.addEventListener('click', this.#handleNew.bind(this));
     this.$files.addEventListener('change', this.#handleFilesChange.bind(this));
+    this.$fullscreen.addEventListener('click', this.#handleFullscreen.bind(this));
     this.#initFiles();
   }
 
@@ -649,5 +651,28 @@ export default class XPgNodesBasic extends HTMLElement {
 
   #handleFilesChange(e: CustomEvent) {
     this.$files.value = e.detail.value;
+  }
+
+  #handleFullscreen() {
+
+    const handler = () => {
+      if (document.fullscreenElement) {
+        this.$script.style.setProperty('position', 'fixed');
+        this.$script.style.setProperty('top', '0');
+        this.$script.style.setProperty('bottom', '0');
+        this.$script.style.setProperty('left', '0');
+        this.$script.style.setProperty('right', '0');
+      } else {
+        this.$script.style.removeProperty('position');
+        this.$script.style.removeProperty('top');
+        this.$script.style.removeProperty('bottom');
+        this.$script.style.removeProperty('left');
+        this.$script.style.removeProperty('right');
+        document.body.removeEventListener("fullscreenchange", handler);
+      }
+    }
+    document.body.addEventListener("fullscreenchange", handler);
+
+    document.body.requestFullscreen();
   }
 }
