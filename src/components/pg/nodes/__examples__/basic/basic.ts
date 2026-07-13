@@ -65,6 +65,26 @@ export default class XPgNodesBasic extends HTMLElement {
         return then;
       },
     }, {
+      name: 'stateHas',
+      label: 'Has',
+      width: 6,
+      args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }],
+      nodes: [{
+        key: 't',
+        label: 'True',
+      }, {
+        key: 'f',
+        label: 'False',
+      }],
+      handler: ({ state, key, t, f }: any) => {
+        return state.has(key) ? t : f;
+      },
+    }, {
       name: 'stateAdd',
       label: 'Add',
       width: 6,
@@ -440,28 +460,23 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'options',
         label: 'Options',
       }],
-      handler: ({ state, options }: any) => {
+      handler: ({ nodeId, state, options }: any) => {
         if (!state.has('$dialog')) {
           state.set('$dialog', []);
-          return options;
+          return [...options, nodeId];
         }
         const values = state.get('$dialog');
         if (values.length !== options.length) {
           return [];
         }
-        function weightedRandom<T extends { weight: string, then: number[] }>(items: T[]): T {
-          const totalWeight = items.reduce((sum, item) => sum + Number(item.weight), 0);
-          let random = Math.random() * totalWeight;
-
-          for (const item of items) {
-            random -= Number(item.weight);
-            if (random <= 0) return item;
-          }
-
-          return items[items.length - 1]; // fallback
-        }
         state.delete('$dialog');
-        return weightedRandom(values).then;
+        return new Promise((resolve) => {
+          const items = values.filter(x => x !== null);
+          const message = items.map((v, i) => `${i}. ${v.message}`).join('\n');
+          const result = window.prompt(message);
+          const value = items[parseInt(result || '0', 10)];
+          resolve(value.then);
+        });
       },
     }, {
       name: 'dialogOption',
@@ -477,16 +492,30 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'then',
         label: 'Then',
       }],
-      handler: ({ state, then, node, weight, options }: any) => {
+      handler: ({ state, then, message }: any) => {
         if (!state.has('$dialog')) {
           throw new Error('invalid node');
         }
         const values = state.get('$dialog');
         values.push({
-          weight: weight ?? 0,
+          message: message ?? '',
           then,
         });
-        return [node];
+        return [];
+      },
+    }, {
+      name: 'dialogSkip',
+      label: 'Dialog Skip',
+      width: 6,
+      args: [],
+      nodes: [],
+      handler: ({ state, then, node, message }: any) => {
+        if (!state.has('$dialog')) {
+          throw new Error('invalid node');
+        }
+        const values = state.get('$dialog');
+        values.push(null);
+        return [];
       },
     });
     // Items

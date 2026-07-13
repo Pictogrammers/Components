@@ -71,6 +71,7 @@ this.$script.nodes.push({
 }, {
   name: 'equals',
   label: 'State Equals',
+  width: 8,
   args: [{
     key: 'key',
     label: 'Key',
@@ -97,6 +98,7 @@ this.$script.nodes.push({
 }, {
   name: 'log',
   label: 'Log',
+  width: 12,
   args: [{
     key: 'message',
     label: 'Message',

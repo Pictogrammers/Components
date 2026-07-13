@@ -1067,6 +1067,7 @@ export default class PgNodes extends HTMLElement {
             params[key] = item.nodes[key] ?? [];
           });
         }
+        params.nodeId = item.id;
         params.node = this.#debugPrevious;
         let result;
         try {

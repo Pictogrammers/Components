@@ -261,4 +261,10 @@ export default class PgNode extends HTMLElement {
       (this.$items.children[0] as any).focus();
     }
   }
+
+  pulse() {
+    // todo: add css class to create a blue animated pulse.
+    // it should also focus the node into view as it may be scrolled out of view.
+    // it should only pulse 3 times.
+  }
 }
