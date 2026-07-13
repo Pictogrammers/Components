@@ -473,10 +473,13 @@ export default class XPgNodesBasic extends HTMLElement {
         value: 'Hello',
       }],
       nodes: [{
+        key: 'then',
+        label: 'Then',
+      }, {
         key: 'options',
         label: 'Options',
       }],
-      handler: ({ nodeId, state, options }: any) => {
+      handler: ({ nodeId, state, message, options }: any) => {
         if (!state.has('$dialog')) {
           state.set('$dialog', []);
           return [...options, nodeId];
@@ -484,8 +487,8 @@ export default class XPgNodesBasic extends HTMLElement {
         const values = state.get('$dialog');
         state.delete('$dialog');
         return new Promise((resolve) => {
-          const message = values.map((v, i) => `${i}. ${v.message}`).join('\n');
-          const result = window.prompt(message);
+          const options = values.map((v, i) => `${i}. ${v.message}`).join('\n');
+          const result = window.prompt(`${message}\n${options}`);
           const value = values[parseInt(result || '0', 10)];
           resolve(value.then);
         });
