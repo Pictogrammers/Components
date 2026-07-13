@@ -482,15 +482,11 @@ export default class XPgNodesBasic extends HTMLElement {
           return [...options, nodeId];
         }
         const values = state.get('$dialog');
-        if (values.length !== options.length) {
-          return [];
-        }
         state.delete('$dialog');
         return new Promise((resolve) => {
-          const items = values.filter(x => x !== null);
-          const message = items.map((v, i) => `${i}. ${v.message}`).join('\n');
+          const message = values.map((v, i) => `${i}. ${v.message}`).join('\n');
           const result = window.prompt(message);
-          const value = items[parseInt(result || '0', 10)];
+          const value = values[parseInt(result || '0', 10)];
           resolve(value.then);
         });
       },
@@ -525,12 +521,10 @@ export default class XPgNodesBasic extends HTMLElement {
       width: 6,
       args: [],
       nodes: [],
-      handler: ({ state, then, node, message }: any) => {
+      handler: ({ state }: any) => {
         if (!state.has('$dialog')) {
           throw new Error('invalid node');
         }
-        const values = state.get('$dialog');
-        values.push(null);
         return [];
       },
     });
