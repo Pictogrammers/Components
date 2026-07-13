@@ -7,6 +7,7 @@ import PgNodeEditorRange from 'components/pg/nodeEditorRange/nodeEditorRange';
 import PgNodeEditorNumber from 'components/pg/nodeEditorNumber/nodeEditorNumber';
 import PgInputSelect from 'components/pg/inputSelect/inputSelect';
 import PgNodeEditorTextArray from 'components/pg/nodeEditorTextArray/nodeEditorTextArray';
+import PgNodeEditorLink from 'components/pg/nodeEditorLink/nodeEditorLink';
 
 @Component({
   selector: 'x-pg-nodes-basic',
@@ -45,6 +46,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$script.editors.push(PgNodeEditorNumber);
     this.$script.editors.push(PgNodeEditorRange);
     this.$script.editors.push(PgNodeEditorTextArray);
+    this.$script.editors.push(PgNodeEditorLink);
     // Node type registry
     this.$script.nodes.push({
       name: 'stateGet',
@@ -107,6 +109,20 @@ export default class XPgNodesBasic extends HTMLElement {
         state.set(key, current + value);
         state.delete('$state');
         return then;
+      },
+    }, {
+      name: 'link',
+      label: 'Link',
+      width: 6,
+      args: [{
+        key: 'link',
+        label: 'Link',
+        editor: 'Link',
+        value: 0,
+      }],
+      nodes: [],
+      handler: ({ state, link }: any) => {
+        return link;
       },
     }, {
       name: 'stateSet',

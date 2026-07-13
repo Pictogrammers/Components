@@ -28,6 +28,11 @@ export default class PgNodeEntry extends HTMLElement {
     // Keep a persisted height when it exceeds the minimum.
     this.height = Math.max(this.height, this.getMinHeight());
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
+    this.$node.addEventListener('animationend', (e: AnimationEvent) => {
+      if (e.animationName === 'pg-node-pulse') {
+        this.$node.classList.remove('pulse');
+      }
+    });
     this.$input.addEventListener('input', () => {
       this.dispatchEvent(new CustomEvent('input', {
         detail: {
@@ -162,5 +167,14 @@ export default class PgNodeEntry extends HTMLElement {
 
   getMinWidth() {
     return 6;
+  }
+
+  // Blue attention pulse (3 flashes). The host is display: contents, so the
+  // positioned $node is what scrolls into view.
+  pulse() {
+    this.$node.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    this.$node.classList.remove('pulse');
+    void this.$node.offsetWidth;
+    this.$node.classList.add('pulse');
   }
 }

@@ -1,0 +1,69 @@
+:host {
+  display: block;
+  font-family: var(--pg-font-family, system-ui);
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  padding-inline: 0.25rem;
+}
+
+[part=label] {
+  font-size: 0.625rem;
+  line-height: 1rem;
+  padding-inline: 0.25rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+[part=link] {
+  flex: 1;
+  border: 0;
+  background: none;
+  text-align: start;
+  padding-block: 0;
+  padding-inline: 0.25rem;
+  font-family: var(--pg-font-family, system-ui);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgb(79, 143, 249);
+  text-decoration: underline;
+  cursor: pointer;
+  border-radius: 0.125rem;
+  outline: none;
+}
+
+[part=link]:hover {
+  color: rgb(127, 173, 255);
+}
+
+[part=link]:focus-visible {
+  outline: 1px solid rgb(79, 143, 249, 0.75);
+}
+
+[part=select] {
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  line-height: 0;
+  padding-block: 0.125rem;
+  padding-inline: 0.125rem;
+  border-radius: 0.125rem;
+  outline: none;
+}
+
+[part=select]:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[part=select]:focus-visible {
+  outline: 1px solid rgb(79, 143, 249, 0.75);
+}

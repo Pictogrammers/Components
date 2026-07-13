@@ -54,6 +54,14 @@ export default class PgNode extends HTMLElement {
           this.#syncFieldHeight(item.itemKey, $item);
           this.#dispatchArg('change', item.itemKey, e.detail.value);
         });
+        // Editor events don't compose past this shadow root; proxy the
+        // Link editor's events up for pg-nodes.
+        $item.addEventListener('nodepulse', (e: any) => {
+          this.dispatchEvent(new CustomEvent('nodepulse', { detail: e.detail }));
+        });
+        $item.addEventListener('nodeselection', (e: any) => {
+          this.dispatchEvent(new CustomEvent('nodeselection', { detail: e.detail }));
+        });
       },
     });
 
@@ -78,6 +86,11 @@ export default class PgNode extends HTMLElement {
       this.height = requestedHeight;
     }
     this.$node.addEventListener('pointerover', this.#handlePointerOver.bind(this));
+    this.$node.addEventListener('animationend', (e: AnimationEvent) => {
+      if (e.animationName === 'pg-node-pulse') {
+        this.$node.classList.remove('pulse');
+      }
+    });
   }
 
   // Editor heights are cached by field key so a change event only triggers a
@@ -262,9 +275,13 @@ export default class PgNode extends HTMLElement {
     }
   }
 
+  // Blue attention pulse (3 flashes); the animationend listener added in
+  // connectedCallback clears the class so it can run again later.
   pulse() {
-    // todo: add css class to create a blue animated pulse.
-    // it should also focus the node into view as it may be scrolled out of view.
-    // it should only pulse 3 times.
+    this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    // Restart the animation when a pulse is already running.
+    this.$node.classList.remove('pulse');
+    void this.$node.offsetWidth;
+    this.$node.classList.add('pulse');
   }
 }

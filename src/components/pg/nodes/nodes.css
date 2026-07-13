@@ -87,3 +87,48 @@
   background: rgba(36, 139, 229, 0.15);
   box-sizing: border-box;
 }
+
+/* Node selection mode: clickable rectangles over every node while the
+   nodes themselves ignore the pointer. */
+[part=selectMode] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 2;
+}
+
+[part=selectMode].active {
+  display: block;
+}
+
+[part=selectMode] button {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0;
+  cursor: pointer;
+}
+
+[part=selectMode] button:hover,
+[part=selectMode] button:focus-visible {
+  border-color: #248BE5;
+  outline: none;
+}
+
+/* The node the editor currently links to. */
+[part=selectMode] button.current {
+  border-color: #248BE5;
+  background: rgba(36, 139, 229, 0.25);
+}
+
+[part=grid].selectMode [part=items] {
+  pointer-events: none;
+}
+
+[part=grid].selectMode [part=svg] path,
+[part=grid].selectMode [part=svg] circle {
+  pointer-events: none;
+}

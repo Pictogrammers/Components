@@ -41,6 +41,7 @@ export default class PgNodes extends HTMLElement {
   @Part() $forceScroll: HTMLDivElement;
   @Part() $selection: HTMLDivElement;
   @Part() $dragPreview: HTMLDivElement;
+  @Part() $selectMode: HTMLDivElement;
 
   #nextNodeId: number = 0;
   #focusNext: boolean = false;
@@ -61,6 +62,9 @@ export default class PgNodes extends HTMLElement {
   #isDragging: boolean = false;
   #wasSelectionDrag: boolean = false;
   #nodeDragging: boolean = false;
+
+  // Node selection mode (Link editor): non-null while the overlay is up.
+  #selectionCallback: ((nodeId: number) => void) | null = null;
 
   // connectedCallback runs again if the element is reparented; listeners on
   // document must follow the connected state while everything else (connector,
@@ -103,6 +107,7 @@ export default class PgNodes extends HTMLElement {
     });
 
     this.$grid.addEventListener('click', (e: any) => {
+      if (this.#selectionCallback) return;
       if (this.#wasSelectionDrag) {
         this.#wasSelectionDrag = false;
         return;
@@ -114,6 +119,8 @@ export default class PgNodes extends HTMLElement {
 
     this.$grid.addEventListener('pointerdown', (e: PointerEvent) => {
       if (!e.isPrimary) return;
+      // Node selection mode is modal; no marquee while it is up.
+      if (this.#selectionCallback) return;
       const ele = e.target as HTMLElement;
       if (!ele.part?.contains('grid')) return;
 
@@ -214,6 +221,8 @@ export default class PgNodes extends HTMLElement {
 
     this.$grid.addEventListener('contextmenu', async (e: MouseEvent) => {
       e.preventDefault();
+      // Node selection mode is modal; no context menus while it is up.
+      if (this.#selectionCallback) return;
       const ele = e.target as HTMLDivElement;
       if (ele.part?.contains('grid')) {
         const rect = this.$grid.getBoundingClientRect();
@@ -321,6 +330,8 @@ export default class PgNodes extends HTMLElement {
         }
 
         $item.addEventListener('registernodeoutput', this.#registerNodeOutput.bind(this));
+        $item.addEventListener('nodepulse', this.#handleNodePulse.bind(this));
+        $item.addEventListener('nodeselection', this.#handleNodeSelection.bind(this));
         $item.addEventListener('select', this.#handleSelect.bind(this));
         $item.addEventListener('change', this.#handleChange.bind(this));
         $item.addEventListener('nodedragstart', this.#handleNodeDragStart.bind(this));
@@ -400,6 +411,16 @@ export default class PgNodes extends HTMLElement {
   render(_changes: any) {}
 
   #handleKeyDown(e: KeyboardEvent) {
+    // Node selection mode is modal: Escape cancels it and every other
+    // canvas shortcut is inert until it closes.
+    if (this.#selectionCallback) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        this.#exitSelectionMode();
+      }
+      return;
+    }
+
     // Never hijack keys while the user is typing in a field (the editors live
     // in nested shadow roots, so composedPath is needed to see the real target).
     const target = e.composedPath()[0];
@@ -543,6 +564,56 @@ export default class PgNodes extends HTMLElement {
   #registerNodeOutput(e: any) {
     const { node, key, offset } = e.detail;
     this.#connector?.setOutputPin(String(node), key, offset);
+  }
+
+  #handleNodePulse(e: any) {
+    const id = Number(e.detail.id);
+    const node = this.getNodeById(id) as any;
+    if (!node) {
+      throw new Error(`<pg-nodes> nodepulse: node ${e.detail.id} does not exist.`);
+    }
+    node.pulse();
+  }
+
+  #handleNodeSelection(e: any) {
+    const { value, callback } = e.detail;
+    if (typeof callback !== 'function') return;
+    this.#enterSelectionMode(Number(value), callback);
+  }
+
+  // Modal node picker for the Link editor: clickable rectangles cover every
+  // node while the nodes themselves ignore the pointer; Escape cancels.
+  #enterSelectionMode(currentId: number, callback: (nodeId: number) => void) {
+    this.#exitSelectionMode();
+    this.#selectionCallback = callback;
+    this.$grid.classList.add('selectMode');
+    this.$selectMode.replaceChildren();
+    Array.from(this.$items.children).forEach((child: any) => {
+      const $button = document.createElement('button');
+      $button.type = 'button';
+      $button.style.left = `${child.x}rem`;
+      $button.style.top = `${child.y}rem`;
+      $button.style.width = `${child.width ?? 12}rem`;
+      $button.style.height = `${child.height ?? 3}rem`;
+      if (child.itemId === currentId) {
+        $button.classList.add('current');
+      }
+      $button.addEventListener('click', () => {
+        const selected = this.#selectionCallback;
+        this.#exitSelectionMode();
+        selected?.(child.itemId);
+      });
+      this.$selectMode.appendChild($button);
+    });
+    this.$selectMode.classList.add('active');
+  }
+
+  #exitSelectionMode() {
+    if (!this.#selectionCallback) return;
+    this.#selectionCallback = null;
+    this.$selectMode.classList.remove('active');
+    this.$selectMode.replaceChildren();
+    this.$grid.classList.remove('selectMode');
   }
 
   #handleSelect(e: any) {
@@ -1142,6 +1213,7 @@ export default class PgNodes extends HTMLElement {
     // Undo history, selection, and cached geometry all reference the previous
     // items; carrying them across a load corrupts the new script. The
     // clipboard survives intentionally (ids are remapped on paste).
+    this.#exitSelectionMode();
     this.#selected.clear();
     this.#undo = [];
     this.#redo = [];
