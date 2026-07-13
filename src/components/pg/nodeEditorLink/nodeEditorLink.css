@@ -54,8 +54,8 @@
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   line-height: 0;
-  padding-block: 0.125rem;
-  padding-inline: 0.125rem;
+  padding-block: 0.0625rem;
+  padding-inline: 0.0625rem;
   border-radius: 0.125rem;
   outline: none;
 }
