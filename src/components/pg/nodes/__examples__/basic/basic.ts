@@ -8,6 +8,7 @@ import PgNodeEditorNumber from 'components/pg/nodeEditorNumber/nodeEditorNumber'
 import PgInputSelect from 'components/pg/inputSelect/inputSelect';
 import PgNodeEditorTextArray from 'components/pg/nodeEditorTextArray/nodeEditorTextArray';
 import PgNodeEditorLink from 'components/pg/nodeEditorLink/nodeEditorLink';
+import { KeyStore } from './keystore';
 
 @Component({
   selector: 'x-pg-nodes-basic',
@@ -34,7 +35,10 @@ export default class XPgNodesBasic extends HTMLElement {
     ['list', []]
   ]);
 
+  #state = new KeyStore();
+
   connectedCallback() {
+    this.$script.state = this.#state;
     this.$script.globals.push([
       'trace',
       (message) => {
@@ -479,18 +483,23 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'options',
         label: 'Options',
       }],
-      handler: ({ nodeId, state, message, options }: any) => {
+      handler: ({ nodeId, state, message, then, options }: any) => {
         if (!state.has('$dialog')) {
           state.set('$dialog', []);
-          return [...options, nodeId];
+          return [...options, nodeId, ...then];
         }
         const values = state.get('$dialog');
         state.delete('$dialog');
         return new Promise((resolve) => {
-          const options = values.map((v, i) => `${i}. ${v.message}`).join('\n');
-          const result = window.prompt(`${message}\n${options}`);
-          const value = values[parseInt(result || '0', 10)];
-          resolve(value.then);
+          if (values.length) {
+            const options = values.map((v, i) => `${i}. ${v.message}`).join('\n');
+            const result = window.prompt(`${message}\n${options}`);
+            const value = values[parseInt(result || '0', 10)];
+            resolve(value.then);
+          } else {
+            window.alert(message);
+            resolve([]);
+          }
         });
       },
     }, {

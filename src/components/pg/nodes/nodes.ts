@@ -1198,6 +1198,9 @@ export default class PgNodes extends HTMLElement {
   get state() {
     return this.#state;
   }
+  set state(value: any) {
+    this.#state = value;
+  }
 
   get json() {
     const normalize = JSON.parse(JSON.stringify(this.items));
