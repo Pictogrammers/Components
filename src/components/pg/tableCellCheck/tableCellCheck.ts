@@ -17,7 +17,12 @@ export default class PgTableCellCheck extends HTMLElement {
 
   @Part() $input: PgInputCheck;
 
+  #initialized: boolean = false;
+
   connectedCallback() {
+    // Reconnects re-invoke connectedCallback; guard against duplicate listeners.
+    if (this.#initialized) return;
+    this.#initialized = true;
     this.$input.addEventListener('change', this.handleChange.bind(this));
   }
 

@@ -26,22 +26,33 @@ export default class PgTableRow extends HTMLElement {
 
   @Part() $cells: HTMLDivElement;
 
+  #initialized: boolean = false;
+
   connectedCallback() {
+    // Reconnects (e.g. rows moved during a data reorder) re-invoke
+    // connectedCallback; running forEach again would duplicate cells.
+    if (this.#initialized) return;
+    this.#initialized = true;
     forEach({
       container: this.$cells,
       items: this.items,
       type: (item) => {
-        return item.type
-          ? item.type
-          : types.get(typeof item.value);
+        const type = item.type ?? types.get(typeof item.value);
+        if (!type) {
+          throw new Error(`no cell component for key '${item.key}'; use a string, number, or boolean value, or set an explicit 'type'`);
+        }
+        return type;
       },
       create: ($item: any, item) => {
-        const { editable, maxWidth } = this.columns.find(i => i.key === item.key) ?? {};
+        const { editable, maxWidth, options } = this.columns.find(i => i.key === item.key) ?? {};
         if (editable) {
           $item.editable = editable;
         }
         if (maxWidth) {
           $item.maxWidth = maxWidth;
+        }
+        if (options) {
+          $item.options = options;
         }
         $item.addEventListener('action', (e: any) => {
           e.stopPropagation();
@@ -62,7 +73,7 @@ export default class PgTableRow extends HTMLElement {
                   };
                 });
               },
-              getRow() {
+              getRow: () => {
                 return this.items;
               },
               getColumn: (key: string) => {

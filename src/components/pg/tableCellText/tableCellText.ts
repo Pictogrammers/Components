@@ -18,7 +18,12 @@ export default class PgTableCellText extends HTMLElement {
 
   @Part() $input: PgInputText;
 
+  #initialized: boolean = false;
+
   connectedCallback() {
+    // Reconnects re-invoke connectedCallback; guard against duplicate listeners.
+    if (this.#initialized) return;
+    this.#initialized = true;
     this.$input.addEventListener('input', (e: any) => {
       this.dispatchEvent(
         new CustomEvent('action', {

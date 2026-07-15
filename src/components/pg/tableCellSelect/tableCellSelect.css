@@ -1,0 +1,12 @@
+:host {
+  display: contents;
+}
+
+[part=cell] {
+  display: table-cell;
+  background-color: var(--pg-table-row-background-color);
+  --pg-input-select-padding: 0.125rem 0.25rem;
+  --pg-input-select-font-size: inherit;
+  --pg-input-select-border-color: rgb(69, 60, 79, 0.5);
+  vertical-align: middle;
+}

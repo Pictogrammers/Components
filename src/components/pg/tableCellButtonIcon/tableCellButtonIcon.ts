@@ -18,7 +18,12 @@ export default class PgTableCellButtonIcon extends HTMLElement {
   @Part() $button: PgButton;
   @Part() $icon: PgIcon;
 
+  #initialized: boolean = false;
+
   connectedCallback() {
+    // Reconnects re-invoke connectedCallback; guard against duplicate listeners.
+    if (this.#initialized) return;
+    this.#initialized = true;
     this.$button.addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('action', {
         detail: {},

@@ -19,6 +19,7 @@ export default class PgInputSelect extends HTMLElement {
   @Prop() value: string = '';
   @Prop() name: string = '';
   @Prop() default: any = null;
+  @Prop() readOnly: boolean = false;
 
   @Part() $button: HTMLButtonElement;
   @Part() $label: HTMLSpanElement;
@@ -29,6 +30,9 @@ export default class PgInputSelect extends HTMLElement {
   }
 
   render(changes) {
+    if (changes.readOnly) {
+      this.$button.classList.toggle('readonly', this.readOnly);
+    }
     if (changes.value || changes.default) {
       this.$label.textContent = this.value
         ? (this.options.find(x => x.value === this.value) ?? { label: this.value }).label
@@ -40,6 +44,10 @@ export default class PgInputSelect extends HTMLElement {
 
   #menuOpen = false;
   async #handleClick() {
+    // CSS pointer-events only blocks the mouse; also ignore keyboard activation
+    if (this.readOnly) {
+      return;
+    }
     if (this.options.length === 0) {
       // No options
       return;
@@ -64,6 +72,9 @@ export default class PgInputSelect extends HTMLElement {
   }
 
   #handleKeyPress(e: KeyboardEvent) {
+    if (this.readOnly) {
+      return;
+    }
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();

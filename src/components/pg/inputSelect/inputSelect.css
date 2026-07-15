@@ -28,6 +28,14 @@
   font-size: var(--pg-input-select-font-size, 1rem);
 }
 
+[part=button].readonly {
+  pointer-events: none;
+}
+
+[part=button].readonly [part=chevron] {
+  visibility: hidden;
+}
+
 [part=chevron] {
   grid-row: 1;
   grid-column: 2;

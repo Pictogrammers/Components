@@ -17,9 +17,13 @@ import { PgInputSelect } '@pictogrammers/components/pgInputSelect';
 | ---------- | -------- | ----------- |
 | options    |          | `[{ label: 'hello', value: 'world' }]` |
 | value      |          | `world` |
+| default    |          | Item shown when `value` is empty, e.g. `{ label: 'None', value: '' }` |
+| readOnly   |          | Prevents opening the menu and keyboard selection. |
 
 ## Events
 
 | Event     | Tested   | Detail |
 | --------- | -------- | ----------- |
-| change    |          | `{ label: 'hello', value: 'world' }` |
+| change    |          | `{ value: 'world' }` |
+
+The component does not update its own `value` on selection; assign `value` back in the `change` handler to commit it.

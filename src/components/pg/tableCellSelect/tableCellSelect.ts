@@ -1,21 +1,22 @@
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import PgInputText from '../inputText/inputText';
+import PgInputSelect from '../inputSelect/inputSelect';
 
-import template from './tableCellNumber.html';
-import style from './tableCellNumber.css';
+import template from './tableCellSelect.html';
+import style from './tableCellSelect.css';
 
 @Component({
-  selector: 'pg-table-cell-number',
+  selector: 'pg-table-cell-select',
   style,
   template
 })
-export default class PgTableCellNumber extends HTMLElement {
-  @Prop() value: number = 0;
+export default class PgTableCellSelect extends HTMLElement {
+  @Prop() value: string = '';
   @Prop() key: string = '';
   @Prop() editable: boolean = false;
+  @Prop() options: any[] = [];
 
-  @Part() $input: PgInputText;
+  @Part() $input: PgInputSelect;
 
   #initialized: boolean = false;
 
@@ -27,9 +28,7 @@ export default class PgTableCellNumber extends HTMLElement {
       this.dispatchEvent(
         new CustomEvent('action', {
           detail: {
-            // input yields a string; dispatch a number so it can be
-            // written back to the number typed item value
-            value: Number(e.detail.value),
+            value: e.detail.value,
             event: 'change',
           }
         })
@@ -38,8 +37,12 @@ export default class PgTableCellNumber extends HTMLElement {
   }
 
   render(changes) {
+    // options before value; the label is resolved from options when value is set
+    if (changes.options) {
+      this.$input.options = this.options;
+    }
     if (changes.value) {
-      this.$input.value = `${this.value}`;
+      this.$input.value = this.value;
     }
     if (changes.editable) {
       this.$input.readOnly = !this.editable;

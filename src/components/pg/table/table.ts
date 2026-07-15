@@ -19,8 +19,8 @@ export function createTableItem(obj: object) {
   keys.forEach((key) => {
     if (typeof obj[key] === 'object' && obj[key] !== null) {
       items.push({
-        key,
         ...obj[key],
+        key,
       });
     } else {
       items.push({
@@ -30,6 +30,14 @@ export function createTableItem(obj: object) {
     }
   });
   return { items };
+}
+
+function escapeCSV(value: any) {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  const text = `${value}`;
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
 @Component({
@@ -44,13 +52,17 @@ export default class PgTable extends HTMLElement {
   @Part() $columns: HTMLDivElement;
   @Part() $rows: HTMLDivElement;
 
-  trackedData = [];
+  #initialized: boolean = false;
 
   connectedCallback() {
+    // Reconnects re-invoke connectedCallback; running forEach again
+    // would duplicate columns, rows, and listeners.
+    if (this.#initialized) return;
+    this.#initialized = true;
     forEach({
       container: this.$columns,
       items: this.columns,
-      type: () => PgTableColumn,
+      type: (column) => column.type ?? PgTableColumn,
     });
     forEach({
       container: this.$rows,
@@ -58,7 +70,7 @@ export default class PgTable extends HTMLElement {
       type: () => PgTableRow,
       create: ($item: PgTableRow, item) => {
         if (this.columns.length === 0) {
-          throw 'columns must be set before data';
+          throw new Error('columns must be set before data');
         }
         $item.columns = this.columns;
         $item.addEventListener('action', (e: any) => {
@@ -73,12 +85,12 @@ export default class PgTable extends HTMLElement {
 
   getCSV() {
     let text = this.columns.map((column) => {
-      return column.label;
+      return escapeCSV(column.label);
     }).join(',');
     text += '\n';
     text += this.data.map(({ items }) => {
       return items.map((item) => {
-        return item.value;
+        return escapeCSV(item.value);
       }).join(',')
     }).join('\n');
     return text;

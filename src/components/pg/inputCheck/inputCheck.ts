@@ -24,6 +24,10 @@ export default class PgInputCheck extends HTMLElement {
   }
 
   handleClick() {
+    // CSS pointer-events only blocks the mouse; also ignore keyboard activation
+    if (this.readOnly) {
+      return;
+    }
     const value = [true, 'true'].includes(this.value);
     this.value = !value;
     this.dispatchEvent(new CustomEvent('change'));
