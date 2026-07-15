@@ -19,7 +19,12 @@ export default class PgInputCheck extends HTMLElement {
   @Part() $button: HTMLButtonElement;
   @Part() $path: SVGPathElement;
 
+  #initialized: boolean = false;
+
   connectedCallback() {
+    // Reconnects re-invoke connectedCallback; guard against duplicate listeners.
+    if (this.#initialized) return;
+    this.#initialized = true;
     this.$button.addEventListener('click', this.handleClick.bind(this));
   }
 

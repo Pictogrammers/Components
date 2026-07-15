@@ -1,0 +1,11 @@
+:host {
+  display: contents;
+}
+
+[part=cell] {
+  display: table-cell;
+  padding: 0.125rem;
+  background-color: var(--pg-table-row-background-color);
+  vertical-align: middle;
+  --pg-button-padding: 0.125rem 0.5rem;
+}

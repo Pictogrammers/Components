@@ -15,7 +15,12 @@ export default class PgInputFileLocal extends HTMLElement {
 
   @Part() $file: HTMLInputElement;
 
+  #initialized: boolean = false;
+
   connectedCallback() {
+    // Reconnects re-invoke connectedCallback; guard against duplicate listeners.
+    if (this.#initialized) return;
+    this.#initialized = true;
     this.$file.addEventListener('change', () => {
       if (this.$file.files === null || this.$file.files.length === 0) {
         alert('Error : No file selected');

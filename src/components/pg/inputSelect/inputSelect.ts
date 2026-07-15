@@ -24,7 +24,12 @@ export default class PgInputSelect extends HTMLElement {
   @Part() $button: HTMLButtonElement;
   @Part() $label: HTMLSpanElement;
 
+  #initialized: boolean = false;
+
   connectedCallback() {
+    // Reconnects re-invoke connectedCallback; guard against duplicate listeners.
+    if (this.#initialized) return;
+    this.#initialized = true;
     this.$button.addEventListener('click', this.#handleClick.bind(this));
     this.$button.addEventListener('keydown', this.#handleKeyPress.bind(this));
   }

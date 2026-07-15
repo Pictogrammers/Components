@@ -8,4 +8,4 @@ Renders a cell per item, picking the component from the item `type` or defaultin
 | ---------- | -------- | ------- | ----------- |
 | index      |          |         | Row index; managed by `PgTable`. |
 | items      |          | `[]`    | Cell items (`{ key, value, ... }`). |
-| columns    |          | `[]`    | Column definitions; `editable`, `maxWidth`, and `options` are forwarded to cells. |
+| columns    |          | `[]`    | Column definitions; `editable`, `maxWidth`, `options`, and `acceptsFileType` are forwarded to cells. |

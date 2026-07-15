@@ -44,7 +44,7 @@ export default class PgTableRow extends HTMLElement {
         return type;
       },
       create: ($item: any, item) => {
-        const { editable, maxWidth, options } = this.columns.find(i => i.key === item.key) ?? {};
+        const { editable, maxWidth, options, acceptsFileType } = this.columns.find(i => i.key === item.key) ?? {};
         if (editable) {
           $item.editable = editable;
         }
@@ -53,6 +53,9 @@ export default class PgTableRow extends HTMLElement {
         }
         if (options) {
           $item.options = options;
+        }
+        if (acceptsFileType) {
+          $item.acceptsFileType = acceptsFileType;
         }
         $item.addEventListener('action', (e: any) => {
           e.stopPropagation();

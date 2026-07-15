@@ -16,7 +16,12 @@ export default class PgInputText extends HTMLElement {
 
   @Part() $input: HTMLInputElement;
 
+  #initialized: boolean = false;
+
   connectedCallback() {
+    // Reconnects re-invoke connectedCallback; guard against duplicate listeners.
+    if (this.#initialized) return;
+    this.#initialized = true;
     this.$input.addEventListener('input', this.handleInput.bind(this));
     this.$input.addEventListener('change', this.handleChange.bind(this));
   }

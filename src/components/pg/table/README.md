@@ -8,6 +8,7 @@ The `pg-table` component allows a standard way to create static tables. While it
 - `PgTableCellCheck` - default `boolean` cell type
 - `PgTableCellSelect` - explicit `type` cell; select from column `options`
 - `PgTableCellButtonIcon` - explicit `type` cell
+- `PgTableCellFileLocal` - explicit `type` cell; local file upload
 
 ```typescript
 import '@pictogrammers/components/pg/table';
@@ -44,6 +45,7 @@ Columns must be assigned before `data` (rows throw otherwise). Each column suppo
 | `editable`  | Passed to the cell in this column; editable cells dispatch `action` events (see Events below). |
 | `maxWidth`  | Passed to the cell in this column (`PgTableCellText` only); number of pixels or any CSS length string. |
 | `options`   | Passed to the cell in this column (`PgTableCellSelect`); `[{ label, value }]`. |
+| `acceptsFileType` | Passed to the cell in this column (`PgTableCellFileLocal`); allowed file extensions, e.g. `json,txt`. |
 | `type`      | Optional custom header component; defaults to `PgTableColumn`. |
 
 ```typescript
@@ -105,8 +107,8 @@ All events dispatched will be the same `action` name. Rows re-dispatch cell even
 
 | Detail      | Description |
 | ----------- | ----------- |
-| `value`     | The new value from the cell, when it has one. `PgTableCellText` and `PgTableCellSelect` dispatch strings, `PgTableCellNumber` numbers (`NaN` when unparseable — validate before writing back), `PgTableCellCheck` booleans. |
-| `event`     | `'input'` or `'change'` for text cells; `'change'` for number and select cells. |
+| `value`     | The new value from the cell, when it has one. `PgTableCellText` and `PgTableCellSelect` dispatch strings, `PgTableCellNumber` numbers (`NaN` when unparseable — validate before writing back), `PgTableCellCheck` booleans, `PgTableCellFileLocal` the file text (with the file `name` alongside). |
+| `event`     | `'input'` or `'change'` for text cells; `'change'` for number, select, and file cells. |
 | `index`     | Row index. |
 | `key`       | Column key of the cell that dispatched. |
 | `getColumn(key)` | Returns the item of this row for `key`; assign to it to update the cell. |
