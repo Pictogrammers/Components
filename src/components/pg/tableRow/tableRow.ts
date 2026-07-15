@@ -37,7 +37,12 @@ export default class PgTableRow extends HTMLElement {
       container: this.$cells,
       items: this.items,
       type: (item) => {
-        const type = item.type ?? types.get(typeof item.value);
+        let type = item.type;
+        if (typeof type === 'function' && !(type.prototype instanceof HTMLElement)) {
+          // factory form: (item) => cell component class
+          type = type(item);
+        }
+        type ??= types.get(typeof item.value);
         if (!type) {
           throw new Error(`no cell component for key '${item.key}'; use a string, number, or boolean value, or set an explicit 'type'`);
         }

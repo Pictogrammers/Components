@@ -75,6 +75,7 @@ The `createTableItem` unrolls the `{ key: value }` shorthand to `items: [{ key, 
 
 - Primitive values pick the default cell by type: `string`, `number`, or `boolean`.
 - Object values are spread onto the cell as props and must include a `type` cell component (e.g. `{ type, icon, value }`). A `key` field inside the object is ignored; the shorthand key wins.
+- `type` may also be a factory `(item) => CellComponent` that picks the cell editor from the item's data (e.g. `{ type: (item) => item.value < 0 ? PgTableCellText : PgTableCellNumber, value: 42 }`). Returning `null`/`undefined` falls back to the default cell for the value type.
 - `null`/`undefined` values have no default cell and throw; use an object value with an explicit `type`.
 
 ```typescript
