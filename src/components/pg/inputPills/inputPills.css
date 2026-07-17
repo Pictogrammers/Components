@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  font-family: var(--pg-font-family, system-ui);
+}
+
+[part=items] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pg-input-pills-gap, 0.25rem);
+  border: 1px solid var(--pg-input-pills-border-color, #453C4F);
+  border-radius: var(--pg-input-border-radius, 0.125rem);
+  padding-inline-start: var(--pg-input-pills-padding-inline-start, var(--pg-input-pills-padding-inline, 0.5rem));
+  padding-inline-end: var(--pg-input-pills-padding-inline-end, var(--pg-input-pills-padding-inline, 0.5rem));
+  padding-block-start: var(--pg-input-pills-padding-block-start, var(--pg-input-pills-padding-block, 0.25rem));
+  padding-block-end: var(--pg-input-pills-padding-block-end, var(--pg-input-pills-padding-block, 0.25rem));
+  min-height: 1.5rem;
+  background-color: #FFF;
+}

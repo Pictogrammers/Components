@@ -1,0 +1,45 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--pg-font-family, system-ui);
+  font-size: 0.875rem;
+  background-color: var(--pg-input-pill-background-color, #EDEAF1);
+  color: var(--pg-input-pill-color, #453C4F);
+  border-radius: var(--pg-input-pill-border-radius, 1rem);
+  padding-inline-start: var(--pg-input-pill-padding-inline-start, 0.5rem);
+  padding-inline-end: var(--pg-input-pill-padding-inline-end, 0.25rem);
+  padding-block: var(--pg-input-pill-padding-block, 0.125rem);
+}
+
+[part=label] {
+  white-space: nowrap;
+}
+
+[part=remove] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  margin: 0;
+  padding: 0.125rem;
+  background: transparent;
+  color: inherit;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+[part=remove]:hover {
+  background-color: var(--pg-input-pill-remove-hover-background-color, #453C4F);
+  color: var(--pg-input-pill-remove-hover-color, #FFF);
+}
+
+[part=remove]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--pg-input-pill-focus-glow, rgb(79, 143, 249, 0.5));
+}
+
+[part=removeIcon] {
+  width: var(--pg-input-pill-remove-icon-size, 0.875rem);
+  height: var(--pg-input-pill-remove-icon-size, 0.875rem);
+}
