@@ -15,4 +15,5 @@
   margin: var(--pg-overlay-menu-_y, 0) 0 0 var(--pg-overlay-menu-_x, 0);
   overflow: visible;
   position-visibility: always;
+  position-anchor: auto;
 }

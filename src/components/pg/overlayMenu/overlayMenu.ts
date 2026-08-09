@@ -33,7 +33,7 @@ export default class PgOverlayMenu extends PgOverlay {
     if (this.source !== null) {
       // @ts-ignore
       this.$overlay.showPopover({
-        source: this.source
+        source: this.source,
       });
     }
     this.$overlay.addEventListener('toggle', this.#toggle.bind(this));
