@@ -1562,7 +1562,7 @@ export default class PgInputPixelEditor extends HTMLElement {
               path: bitmaskToPath(this.#data[layerIndex], {
                 scale: 1,
                 include: [[color]]
-              }),
+              })[0],
             };
           });
         case 'reference':
