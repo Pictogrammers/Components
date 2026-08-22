@@ -5,6 +5,10 @@ import style from './modalAlert.css';
 
 import PgOverlay from '../overlay/overlay';
 import PgButton from '../button/button';
+import PgModalHeader from '../modalHeader/modalHeader';
+
+import '../modalBody/modalBody';
+import '../modalFooter/modalFooter';
 
 @Component({
   selector: 'pg-modal-alert',
@@ -15,7 +19,7 @@ export default class PgModalAlert extends PgOverlay {
   @Prop() header: string = 'Are you sure?';
   @Prop() message: string = 'Are you sure?';
 
-  @Part() $header: HTMLDivElement;
+  @Part() $header: PgModalHeader;
   @Part() $headerText: HTMLHeadingElement;
   @Part() $message: HTMLDivElement;
   @Part() $okay: PgButton;

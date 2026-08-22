@@ -8,13 +8,15 @@
       <h2 id="dialog_label"
         class="dialog_label"
         part="headerText">
-        Alert
+        Prompt
       </h2>
     </pg-modal-header>
     <pg-modal-body>
       <p part="message"></p>
+      <pg-input-text part="input"></pg-input-text>
     </pg-modal-body>
     <pg-modal-footer>
+      <pg-button part="cancel">Cancel</pg-button>
       <pg-button part="okay" variant="brand">Okay</pg-button>
     </pg-modal-footer>
   </div>
