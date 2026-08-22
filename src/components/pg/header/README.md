@@ -9,7 +9,7 @@ import '@pictogrammers/components/pgHeader.js';
 ```html
 <pg-header
   logo="...svg path..."
-  name="Material Design Icons"></pg-nav>
+  name="Material Design Icons"></pg-header>
 ```
 
 | Slots      | Tested   | Description |

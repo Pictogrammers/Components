@@ -38,6 +38,9 @@ export default class XPgNodesBasic extends HTMLElement {
   #state = new KeyStore();
 
   connectedCallback() {
+    // State
+    this.#state.add({ name: '' });
+    // Wire up script
     this.$script.state = this.#state;
     this.$script.globals.push([
       'trace',
@@ -53,24 +56,6 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$script.editors.push(PgNodeEditorLink);
     // Node type registry
     this.$script.nodes.push({
-      name: 'stateGet',
-      label: 'Get',
-      width: 6,
-      args: [{
-        key: 'key',
-        label: 'Key',
-        editor: 'Text',
-        value: '',
-      }],
-      nodes: [{
-        key: 'then',
-        label: 'Then',
-      }],
-      handler: ({ state, then, key }: any) => {
-        state.set('$state', key);
-        return then;
-      },
-    }, {
       name: 'stateHas',
       label: 'Has',
       width: 6,
@@ -95,6 +80,11 @@ export default class XPgNodesBasic extends HTMLElement {
       label: 'Add',
       width: 6,
       args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }, {
         key: 'value',
         label: 'Value',
         editor: 'Number',
@@ -104,11 +94,7 @@ export default class XPgNodesBasic extends HTMLElement {
         key: 'then',
         label: 'Then',
       }],
-      handler: ({ state, node, then, value }: any) => {
-        if (!state.has('$state')) {
-          throw new Error('Invalid state');
-        }
-        const key = state.get('$state');
+      handler: ({ state, key, node, then, value }: any) => {
         const current = parseFloat(state.get(key) ?? 0);
         state.set(key, current + value);
         state.delete('$state');
@@ -702,6 +688,7 @@ export default class XPgNodesBasic extends HTMLElement {
 
   #handleFilesChange(e: CustomEvent) {
     this.$files.value = e.detail.value;
+    this.$script.json = e.detail.value;
   }
 
   #handleFullscreen() {

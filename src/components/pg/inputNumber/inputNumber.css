@@ -14,11 +14,17 @@
   font-size: 1rem;
   outline: none;
   field-sizing: content;
-  min-width: calc(
-    100%
-    - var(--pg-input-number-padding-inline-start, var(--pg-input-number-padding-inline, 0.5rem))
-    - var(--pg-input-number-padding-inline-end, var(--pg-input-number-padding-inline, 0.5rem))
-    - 2px
+  min-width: max(
+    1rem,
+    var(
+      --pg-input-number-min-width,
+      calc(
+        100%
+        - var(--pg-input-number-padding-inline-start, var(--pg-input-number-padding-inline, 0.5rem))
+        - var(--pg-input-number-padding-inline-end, var(--pg-input-number-padding-inline, 0.5rem))
+        - 2px
+      )
+    )
   );
   max-width: calc(
     var(--pg-input-number-max-width, 100%)

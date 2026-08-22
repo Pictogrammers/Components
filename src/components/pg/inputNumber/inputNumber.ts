@@ -12,8 +12,8 @@ import PgButtonIncrement from '../buttonIncrement/buttonIncrement';
 export default class PgInputNumber extends HTMLElement {
   @Prop() name: string = '';
   @Prop(normalizeFloat) value: number = 0;
-  @Prop(normalizeFloat) min: number = 0;
-  @Prop(normalizeFloat) max: number = 100;
+  @Prop(normalizeFloat) min: number = -1 * Number.MAX_SAFE_INTEGER;
+  @Prop(normalizeFloat) max: number = Number.MAX_SAFE_INTEGER;
   @Prop(normalizeFloat) step: number = 1;
   @Prop() placeholder: string = '';
   @Prop() readOnly: boolean = false;
