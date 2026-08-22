@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+[part="footer"] {
+  display: flex;
+  flex-direction: row;
+  padding: var(--pg-modal-footer-padding, 0.75rem 1rem);
+  border-top: 1px solid var(--pg-modal-footer-border-color, #ccc);
+  background: var(--pg-modal-footer-background, #f1f1f1);
+  justify-content: var(--pg-modal-footer-justify-content, flex-end);
+  gap: var(--pg-modal-footer-gap, 0.5rem);
+}

@@ -10,13 +10,19 @@ import PgModal from '@pictogrammers/components/pgModal';
 ```typescript
 import { Component, Prop, Part } from '@pictogrammers/element';
 
-import template from './modal.html';
-import style from './modal.css';
+import '@pictogrammers/components/pg/modalHeader';
+import '@pictogrammers/components/pg/modalBody';
+import '@pictogrammers/components/pg/modalFooter';
 
 @Component({
   selector: 'my-modal',
-  template,
-  style
+  template: `
+    <pg-modal-header>My Modal</pg-modal-header>
+    <pg-modal-body>Hello!</pg-modal-body>
+    <pg-modal-footer>
+      <button part="close">Close</button>
+    </pg-modal-footer>
+  `
 })
 export default class MyModal extends PgModal {
   @Part() $close: HTMLButtonElement;
@@ -27,3 +33,5 @@ export default class MyModal extends PgModal {
   }
 }
 ```
+
+Use `pg-modal-header`, `pg-modal-body`, and `pg-modal-footer` as purely presentational sections for the header, body, and footer of a modal.

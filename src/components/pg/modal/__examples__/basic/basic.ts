@@ -1,11 +1,21 @@
 import { Component, Part, Prop } from '@pictogrammers/element';
 import PgModal from '../../modal';
 
+import '../../../modalHeader/modalHeader';
+import '../../../modalBody/modalBody';
+import '../../../modalFooter/modalFooter';
+
 import template from './basic.html';
 
 @Component({
   selector: 'x-my-modal',
-  template: `<main>Hello! <button part="close">Close</button></main>`
+  template: `
+    <pg-modal-header>My Modal</pg-modal-header>
+    <pg-modal-body>Hello!</pg-modal-body>
+    <pg-modal-footer>
+      <button part="close">Close</button>
+    </pg-modal-footer>
+  `
 })
 export class XMyModal extends PgModal {
 

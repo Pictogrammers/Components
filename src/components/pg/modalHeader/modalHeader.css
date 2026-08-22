@@ -1,0 +1,9 @@
+:host {
+  display: block;
+}
+[part="header"] {
+  border-bottom: 1px solid var(--pg-modal-header-border-color, #ccc);
+  background: var(--pg-modal-header-background, #f1f1f1);
+  padding: var(--pg-modal-header-padding, 0.75rem 1rem);
+  font-size: 1.25rem;
+}

@@ -1,0 +1,6 @@
+:host {
+  display: block;
+}
+[part="body"] {
+  padding: var(--pg-modal-body-padding, 0.5rem 1rem);
+}
