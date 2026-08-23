@@ -22,6 +22,7 @@ Each item in the `items` array follows this structure:
 {
   label: string;
   icon: { path: string };
+  disableRename: boolean;
   isFolder: boolean;      // true enables the drop-onto zone and .items CSS class
   expanded?: boolean;     // folders only
   items?: any[];          // child items (folders only)

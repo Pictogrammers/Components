@@ -10,7 +10,7 @@ export default {
   }, {
     label: 'Modals',
     extends: ['PgModal'],
-    include: ['PgModal', 'PgModalAlert', 'PgModalConfirm'],
+    include: ['PgModal', 'PgModalAlert', 'PgModalConfirm', 'PgModalPrompt', 'PgModalHeader', 'PgModalBody', 'PgModalFooter'],
   }],
   themes: [{
     label: 'UI3',

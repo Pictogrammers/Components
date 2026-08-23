@@ -22,14 +22,15 @@ function createFolder(label, expanded = true, items: any[] = []) {
     isFolder: true,
     actions: [{
       type: PgTreeButtonIcon,
+      label: 'Show/Hide',
       icon:  IconEye,
       enabled: true
     },
     {
       type: PgTreeButtonIcon,
-      label: 'Delete',
+      label: 'Lock/Unlock',
       icon: IconUnlock,
-      enabled: false
+      enabled: true
     }],
     items
   };
@@ -43,12 +44,13 @@ function createItem(label) {
     label,
     actions: [{
       type: PgTreeButtonIcon,
+      label: 'Show/Hide',
       icon:  IconEye,
       enabled: true
     },
     {
       type: PgTreeButtonIcon,
-      label: 'Delete',
+      label: 'Lock/Unlock',
       icon: IconUnlock,
       enabled: false
     }]

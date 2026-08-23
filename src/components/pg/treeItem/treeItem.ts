@@ -19,6 +19,7 @@ export default class PgTreeItem extends HTMLElement {
   @Prop() label: string = '';
   @Prop() selected: boolean = false;
   @Prop() expanded: boolean = false;
+  @Prop() disableRename: boolean = false;
   @Prop() isFolder: boolean = false;
   @Prop() icon: { path: string } = { path: noIcon };
   @Prop() actions: any[] = [];
@@ -179,7 +180,7 @@ export default class PgTreeItem extends HTMLElement {
   }
 
   #handleKeyDownLabel(e: KeyboardEvent) {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !this.disableRename) {
       this.#enableRename();
       e.preventDefault();
     } else if (e.key === 'ArrowUp') {
@@ -270,6 +271,7 @@ export default class PgTreeItem extends HTMLElement {
   #ignoreNextClick = false;
   #handleDoubleClick(e: MouseEvent) {
     if (e.ctrlKey || e.shiftKey) return;
+    if (this.disableRename) return;
     this.#enableRename();
     e.preventDefault();
   }
