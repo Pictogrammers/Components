@@ -83,12 +83,8 @@ export default class PgNode extends HTMLElement {
         this.#fieldHeights.forEach((value) => {
           height += value;
         });
-        // Measured mid-setup, before render() applies the host styles, so
-        // the adjust constant differs from the post-layout one below.
-        const top = this.$node.getBoundingClientRect().top;
-        const itemTop = $item.getBoundingClientRect().top;
-        console.log(itemTop - top);
-        this.#registerOutputPin(item.key, item.label, (height * 16) + itemTop - top - 17);
+        const index = Array.from(this.$outputs.children).indexOf($item);
+        this.#registerOutputPin(item.key, item.label, ((height + index + 2) * 16) + 5);
       },
     });
     this.#intrinsicHeight = this.height;

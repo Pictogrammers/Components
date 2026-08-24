@@ -58,7 +58,7 @@ export default class XPgNodesBasic extends HTMLElement {
     this.$script.nodes.push({
       name: 'stateHas',
       label: 'Has',
-      width: 6,
+      width: 10,
       args: [{
         key: 'key',
         label: 'Key',
@@ -147,6 +147,11 @@ export default class XPgNodesBasic extends HTMLElement {
       label: 'Equals',
       width: 10,
       args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }, {
         key: 'value',
         label: 'Value',
         editor: 'Text',
@@ -208,6 +213,11 @@ export default class XPgNodesBasic extends HTMLElement {
       label: 'Less Than or Equal',
       width: 10,
       args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }, {
         key: 'value',
         label: 'Value',
         editor: 'Number',
@@ -236,6 +246,11 @@ export default class XPgNodesBasic extends HTMLElement {
       label: 'Greater Than',
       width: 10,
       args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }, {
         key: 'value',
         label: 'Value',
         editor: 'Number',
@@ -264,6 +279,11 @@ export default class XPgNodesBasic extends HTMLElement {
       label: 'Greater Than or Equal',
       width: 10,
       args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }, {
         key: 'value',
         label: 'Value',
         editor: 'Number',
