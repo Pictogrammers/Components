@@ -161,7 +161,7 @@ export default class PgNodeEditorTextArray extends HTMLElement {
   }
 
   get height() {
-    return this.#inputs.length + 1;
+    return (this.#inputs.length || 1) + 1;
   }
 
   focus() {
