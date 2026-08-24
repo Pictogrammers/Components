@@ -40,7 +40,11 @@ export default class PgNode extends HTMLElement {
       container: this.$items,
       items: this.fields,
       type: (item) => {
-        return this.editors.find(x => x.type === item.type);
+        const comp = this.editors.find(x => x.type === item.type);
+        if (!comp) {
+          throw new Error(`"${item.name}" missing in editors array.`);
+        }
+        return comp;
       },
       create: ($item: any, item) => {
         this.height += $item.height;
@@ -75,10 +79,16 @@ export default class PgNode extends HTMLElement {
         this.height += $item.height;
       },
       connect: ($item: any, item) => {
+        let height = 0;
+        this.#fieldHeights.forEach((value) => {
+          height += value;
+        });
         // Measured mid-setup, before render() applies the host styles, so
         // the adjust constant differs from the post-layout one below.
         const top = this.$node.getBoundingClientRect().top;
-        this.#registerOutputPin(item.key, item.label, $item.getBoundingClientRect().top - top + 31);
+        const itemTop = $item.getBoundingClientRect().top;
+        console.log(itemTop - top);
+        this.#registerOutputPin(item.key, item.label, (height * 16) + itemTop - top - 17);
       },
     });
     this.#intrinsicHeight = this.height;

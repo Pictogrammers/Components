@@ -117,8 +117,13 @@ export default class XPgNodesBasic extends HTMLElement {
     }, {
       name: 'stateSet',
       label: 'Set',
-      width: 6,
+      width: 10,
       args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }, {
         key: 'value',
         label: 'Value',
         editor: 'Text',
@@ -170,6 +175,11 @@ export default class XPgNodesBasic extends HTMLElement {
       label: 'Less Than',
       width: 10,
       args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }, {
         key: 'value',
         label: 'Value',
         editor: 'Number',
@@ -556,10 +566,11 @@ export default class XPgNodesBasic extends HTMLElement {
     });
     this.$script.items.push({
       id: 2,
-      x: 30,
+      x: 28,
       y: 2,
       node: 'stateSet',
       args: {
+        key: 'health',
         value: '10',
       },
       nodes: {
@@ -568,10 +579,11 @@ export default class XPgNodesBasic extends HTMLElement {
     });
     this.$script.items.push({
       id: 3,
-      x: 30,
+      x: 28,
       y: 10,
       node: 'stateSet',
       args: {
+        key: 'health',
         value: '20',
       },
       nodes: {
@@ -580,7 +592,7 @@ export default class XPgNodesBasic extends HTMLElement {
     });
     this.$script.items.push({
       id: 4,
-      x: 44,
+      x: 40,
       y: 8,
       node: 'log',
       args: {

@@ -2,6 +2,7 @@ import { Component, Part } from '@pictogrammers/element';
 import PgNode from '../../node';
 
 import template from './basic.html';
+import PgNodeEditorText from 'components/pg/nodeEditorText/nodeEditorText';
 
 @Component({
   selector: 'x-pg-node-basic',
@@ -12,11 +13,12 @@ export default class XPgNodeBasic extends HTMLElement {
   @Part() $node: PgNode;
 
   connectedCallback() {
+    this.$node.editors.push(PgNodeEditorText);
     this.$node.fields = [{
       label: 'Name',
       value: 'foo',
       name: 'name',
-      type: 'text',
+      type: 'Text',
     }];
     this.$node.addEventListener('change', this.#handleChange.bind(this));
     this.$node.addEventListener('input', this.#handleInput.bind(this));
