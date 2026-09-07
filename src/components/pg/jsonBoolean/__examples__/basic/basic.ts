@@ -5,7 +5,7 @@ import PgJson from '../../jsonBoolean';
 import template from './basic.html';
 
 @Component({
-  selector: 'x-pg-json-basic',
+  selector: 'x-pg-json-boolean-basic',
   template
 })
 export default class XPgJsonBasic extends HTMLElement {
