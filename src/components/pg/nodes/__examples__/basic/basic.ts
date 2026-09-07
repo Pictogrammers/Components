@@ -382,8 +382,13 @@ export default class XPgNodesBasic extends HTMLElement {
     }, {
       name: 'isTrue',
       label: 'Is True',
-      width: 4,
-      args: [],
+      width: 10,
+      args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }],
       nodes: [{
         key: 't',
         label: 'True',
@@ -405,8 +410,13 @@ export default class XPgNodesBasic extends HTMLElement {
     }, {
       name: 'isFalse',
       label: 'Is False',
-      width: 4,
-      args: [],
+      width: 10,
+      args: [{
+        key: 'key',
+        label: 'Key',
+        editor: 'Text',
+        value: '',
+      }],
       nodes: [{
         key: 't',
         label: 'True',

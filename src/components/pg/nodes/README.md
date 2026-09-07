@@ -39,6 +39,8 @@ import '@pictogrammers/components/pgNodes';
 
 ### Editors
 
+Nodes are made of input fields controlled by editor components. Each editor has a `static type = 'Text';` definition unique to the script.
+
 ```typescript
 this.$script.editors.push(PgNodeEditorText);
 ```

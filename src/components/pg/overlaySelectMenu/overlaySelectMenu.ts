@@ -77,6 +77,24 @@ export default class PgOverlaySelectMenu extends PgOverlay {
     this.$overlay.style.setProperty('--pg-overlay-menu-_y', `${y}px`);
     // Focus
     this.$menu.focus(index);
+    // Overlay
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        console.log(entry.intersectionRatio);
+        //this.$overlay.classList.toggle('no-offset', entry.intersectionRatio < 1);
+        // entry.isIntersecting will be false if it is entirely outside the viewport
+        if (!entry.isIntersecting) {
+          console.log('Element is completely outside the viewport');
+        } else {
+          console.log('Element is at least partially inside the viewport');
+        }
+      });
+    }, {
+      root: null,      // Defaults to the browser viewport
+      threshold: 1     // Triggers as soon as even 1 pixel enters or leaves
+    });
+
+    observer.observe(this.$overlay);
   }
 
   #toggle(e: ToggleEvent) {

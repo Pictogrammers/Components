@@ -15,4 +15,13 @@
   overflow: visible;
   position-visibility: always;
   position-anchor: auto;
+  position-try-fallbacks: --pg-menu-up, --pg-menu-over;
+}
+
+@position-try --pg-menu-up {
+  max-height: 10rem;
+}
+
+@position-try --pg-menu-over {
+  max-height: 5rem;
 }

@@ -12,6 +12,8 @@
   border-radius: 0.5rem;
   background-color: var(--pg-menu-background-color, #FFFFFF);
   box-shadow: var(--pg-menu-box-shadow, none);
+  max-height: var(--pg-menu-max-height);
+  overflow: var(--pg-menu-overflow);
 }
 
 [part=items].check {

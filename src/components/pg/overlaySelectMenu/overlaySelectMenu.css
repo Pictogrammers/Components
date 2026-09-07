@@ -2,7 +2,7 @@
   display: contents;
 }
 
-[part="overlay"] {
+[part=overlay] {
   margin: 0;
   padding: 0;
   border: 0;
@@ -16,4 +16,8 @@
   overflow: visible;
   position-visibility: always;
   position-anchor: auto;
+}
+
+[part=overlay].no-offset {
+  margin: 0;
 }

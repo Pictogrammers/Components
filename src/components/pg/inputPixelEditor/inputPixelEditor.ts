@@ -304,7 +304,39 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#updateGrid();
   }
 
+  /**
+   * Clip a cached grid so its dimensions never exceed the current
+   * width/height. Used when the canvas is made smaller.
+   * @param grid 2d grid to clip in place
+   */
+  #clipGrid(grid: number[][]) {
+    if (grid.length > this.height) {
+      grid.length = this.height;
+    }
+    for (let y = 0; y < grid.length; y++) {
+      if (grid[y].length > this.width) {
+        grid[y].length = this.width;
+      }
+    }
+  }
+
   #redraw() {
+    // When the canvas shrinks, clip the cached grids so stale rows/columns
+    // outside the new bounds are dropped (the grow case is handled below).
+    this.#clipGrid(this.#export);
+    this.#clipGrid(this.#selection);
+    this.#clipGrid(this.#selectionPreview);
+    // Drop selection pixels that now fall outside the canvas so the
+    // selection map stays in sync with the clipped #selection grid.
+    this.#selectionPixels.forEach(([x, y], key) => {
+      if (x >= this.width || y >= this.height) {
+        this.#selectionPixels.delete(key);
+      }
+    });
+    if (this.#selectionPixels.size === 0) {
+      this.$selectionPath.classList.toggle('hide', true);
+    }
+
     // Render individual pixels
     const data = this.#data.toReversed();
     const layerCount = data.length;

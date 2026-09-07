@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  font-family: var(--pg-font-family, system-ui);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  padding-inline: 0.25rem;
+}
+
+[part=label] {
+  font-size: 0.625rem;
+  line-height: 1rem;
+  padding-inline: 0.25rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[part=input] {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin: 0;
+  margin-inline-start: 0.25rem;
+  accent-color: rgb(79, 143, 249, 0.75);
+}
