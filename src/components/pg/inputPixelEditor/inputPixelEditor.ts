@@ -305,29 +305,46 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   /**
-   * Clip a cached grid so its dimensions never exceed the current
-   * width/height. Used when the canvas is made smaller.
-   * @param grid 2d grid to clip in place
+   * Grow or clip a cached grid in place so it is exactly width x height.
+   * New rows/cells are filled with 0. Each grid is resized independently
+   * so multi-layer grids never drift out of sync with each other (a prior
+   * version resized `#export`/`#selection`/`#selectionPreview` once per
+   * layer instead of once per grid, and used a single layer's length to
+   * decide whether other layers needed growing, which could leave a layer
+   * short and let #redraw read past its real length).
+   * @param grid 2d grid to resize in place
+   * @param width target width
+   * @param height target height
    */
-  #clipGrid(grid: number[][]) {
-    if (grid.length > this.height) {
-      grid.length = this.height;
+  #resizeGrid(grid: number[][], width: number, height: number) {
+    if (grid.length > height) {
+      grid.length = height;
     }
-    for (let y = 0; y < grid.length; y++) {
-      if (grid[y].length > this.width) {
-        grid[y].length = this.width;
+    for (let y = 0; y < height; y++) {
+      if (!grid[y]) {
+        grid[y] = new Array(width).fill(0);
+        continue;
+      }
+      if (grid[y].length > width) {
+        grid[y].length = width;
+      } else {
+        for (let x = grid[y].length; x < width; x++) {
+          grid[y].push(0);
+        }
       }
     }
   }
 
   #redraw() {
-    // When the canvas shrinks, clip the cached grids so stale rows/columns
-    // outside the new bounds are dropped (the grow case is handled below).
-    this.#clipGrid(this.#export);
-    this.#clipGrid(this.#selection);
-    this.#clipGrid(this.#selectionPreview);
+    // Resize every cached grid to the current width/height so stale
+    // rows/columns are dropped when shrinking and missing rows/columns are
+    // backfilled with 0 when growing, before anything reads from them.
+    this.#data.forEach((layer) => this.#resizeGrid(layer, this.width, this.height));
+    this.#resizeGrid(this.#export, this.width, this.height);
+    this.#resizeGrid(this.#selection, this.width, this.height);
+    this.#resizeGrid(this.#selectionPreview, this.width, this.height);
     // Drop selection pixels that now fall outside the canvas so the
-    // selection map stays in sync with the clipped #selection grid.
+    // selection map stays in sync with the resized #selection grid.
     this.#selectionPixels.forEach(([x, y], key) => {
       if (x >= this.width || y >= this.height) {
         this.#selectionPixels.delete(key);
@@ -337,30 +354,12 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.$selectionPath.classList.toggle('hide', true);
     }
 
-    // Render individual pixels
-    const data = this.#data.toReversed();
-    const layerCount = data.length;
+    // Render individual pixels, topmost non-transparent layer wins
     for (let y = 0; y < this.height; y++) {
-      if (y >= data[0].length) {
-        for (let l = 0; l < layerCount; l++) {
-          data[l].push(new Array(this.width).fill(0));
-          this.#export.push(new Array(this.width).fill(0));
-          this.#selection.push(new Array(this.width).fill(0));
-          this.#selectionPreview.push(new Array(this.width).fill(0));
-        }
-      }
       for (let x = 0; x < this.width; x++) {
-        if (x >= data[0][y].length) {
-          for (let l = 0; l < layerCount; l++) {
-            data[l][y].push(0);
-            this.#export[y].push(0);
-            this.#selection[y].push(0);
-            this.#selectionPreview[y].push(0);
-          }
-        }
-        for (let l = 0; l < layerCount; l++) {
-          if (data[l][y][x] !== 0) {
-            this.#setPixel(x, y, data[l][y][x]);
+        for (let l = this.#data.length - 1; l >= 0; l--) {
+          if (this.#data[l][y][x] !== 0) {
+            this.#setPixel(x, y, this.#data[l][y][x], [l]);
             break;
           }
         }
