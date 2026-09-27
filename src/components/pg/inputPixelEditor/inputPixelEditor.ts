@@ -173,7 +173,6 @@ export default class PgInputPixelEditor extends HTMLElement {
   #colors: Color[] = [
     [0, 0, 0, 0],
     [0, 0, 0, 1],
-    [255, 0, 255, 1]
   ];
   #baseLayer: HTMLCanvasElement;
   #baseLayerContext: CanvasRenderingContext2D;
@@ -1223,7 +1222,7 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   invert() {
     // Only works with 2 colors
-    if (this.#colors.length > 2) {
+    if (this.getActiveColors().length > 2) {
       return;
     }
     iterateGrid(this.#data[this.#layer[0]], (x, y) => {
@@ -1453,6 +1452,22 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   getColorAt(x: number, y: number) {
     return this.#export[y][x];
+  }
+
+  /**
+   * Instead of returning all colors only include
+   * the currently used colors.
+   */
+  getActiveColors(): Color[] {
+    // Index 0 is the empty pixel and is never included
+    const used = new Set<number>();
+    for (const layer of this.#data) {
+      getGridColorIndexes(layer).forEach((index) => used.add(index));
+    }
+    return [...used]
+      .sort((a, b) => a - b)
+      .filter((index) => index < this.#colors.length)
+      .map((index) => this.#colors[index]);
   }
 
   /**
