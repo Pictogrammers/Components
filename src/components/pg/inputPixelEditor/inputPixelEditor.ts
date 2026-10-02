@@ -353,14 +353,25 @@ export default class PgInputPixelEditor extends HTMLElement {
       this.$selectionPath.classList.toggle('hide', true);
     }
 
-    // Render individual pixels, topmost non-transparent layer wins
+    // Render individual pixels, topmost non-transparent layer wins. A cell
+    // with no color on any layer still needs #setPixel if #export disagrees,
+    // so it actually clears to background — e.g. after removeColor/moveColor
+    // zero out cells that used to hold paint. Skipping that check (instead
+    // of just unconditionally calling #setPixel for every blank cell) keeps
+    // the common case — most cells are already blank on both sides — as
+    // cheap as it was before, since #setPixel does real canvas work per call.
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
+        let painted = false;
         for (let l = this.#data.length - 1; l >= 0; l--) {
           if (this.#data[l][y][x] !== 0) {
             this.#setPixel(x, y, this.#data[l][y][x], [l]);
+            painted = true;
             break;
           }
+        }
+        if (!painted && this.#export[y][x] !== 0) {
+          this.#setPixel(x, y, 0, [this.#layer[0]]);
         }
       }
     }
@@ -1430,24 +1441,107 @@ export default class PgInputPixelEditor extends HTMLElement {
     return this.#colors;
   }
 
-  addColor(r: number, g: number, b: number, a: number) {
-    this.#colors.push([r, g, b, a]);
+  /**
+   * Replace the full palette, e.g. to sync an externally-managed palette
+   * (a file-level color list) onto this editor. Does not remap existing
+   * pixel data; callers are responsible for the new colors lining up with
+   * indexes already painted on this editor.
+   *
+   * Clones `colors` (and each entry) so this editor's palette stays its
+   * own array — callers commonly push the same list onto several editors
+   * to keep them in sync, and sharing the array by reference would make
+   * every one of those editors mutate the same underlying palette.
+   * @param colors New palette
+   */
+  setColors(colors: Color[]) {
+    this.#colors = colors.map((color) => [...color] as Color);
+    this.#redraw();
+    this.#handleColorsChange();
   }
 
-  removeColor(index) {
+  addColor(r: number, g: number, b: number, a: number) {
+    this.#colors.push([r, g, b, a]);
+    this.#handleColorsChange();
+  }
+
+  /**
+   * Remove a color from the palette. Index 0 (the background/empty color)
+   * can't be removed. Pixels painted with the removed color become empty
+   * (0); pixels painted with a later color shift down to match the new
+   * palette indexes.
+   * @param index Color index to remove
+   */
+  removeColor(index: number) {
+    if (index <= 0 || index >= this.#colors.length) { return; }
     this.#colors.splice(index, 1);
+    this.#data.forEach((layer) => {
+      for (let y = 0; y < layer.length; y++) {
+        for (let x = 0; x < layer[y].length; x++) {
+          const value = layer[y][x];
+          if (value === index) {
+            layer[y][x] = 0;
+          } else if (value > index) {
+            layer[y][x] = value - 1;
+          }
+        }
+      }
+    });
+    if (this.#color === index) {
+      this.#color = 0;
+    } else if (this.#color > index) {
+      this.#color -= 1;
+    }
+    this.#redraw();
+    this.#handleColorsChange();
   }
 
   getColor(index) {
     return this.#colors[index];
   }
 
-  setColor(index, r, g, b, a) {
+  setColor(index: number, r: number, g: number, b: number, a: number) {
     this.#colors[index] = [r, g, b, a];
+    this.#redraw();
+    this.#handleColorsChange();
   }
 
-  moveColor(startIndex, endIndex) {
+  /**
+   * Reorder a color within the palette. Index 0 (the background/empty
+   * color) can't be moved, and nothing can move into index 0. Repaints
+   * pixels so they keep showing the same color at its new index.
+   * @param startIndex Current color index
+   * @param endIndex Target color index
+   */
+  moveColor(startIndex: number, endIndex: number) {
+    if (startIndex === endIndex) { return; }
+    if (startIndex <= 0 || endIndex <= 0
+      || startIndex >= this.#colors.length || endIndex >= this.#colors.length) {
+      return;
+    }
+    const [moved] = this.#colors.splice(startIndex, 1);
+    this.#colors.splice(endIndex, 0, moved);
+    const mapIndex = (value: number) => {
+      if (value === startIndex) { return endIndex; }
+      if (startIndex < endIndex && value > startIndex && value <= endIndex) { return value - 1; }
+      if (startIndex > endIndex && value >= endIndex && value < startIndex) { return value + 1; }
+      return value;
+    };
+    this.#data.forEach((layer) => {
+      for (let y = 0; y < layer.length; y++) {
+        for (let x = 0; x < layer[y].length; x++) {
+          layer[y][x] = mapIndex(layer[y][x]);
+        }
+      }
+    });
+    this.#color = mapIndex(this.#color);
+    this.#redraw();
+    this.#handleColorsChange();
+  }
 
+  #handleColorsChange() {
+    this.dispatchEvent(new CustomEvent('colorschange', {
+      detail: { colors: this.#colors }
+    }));
   }
 
   getColorAt(x: number, y: number) {
