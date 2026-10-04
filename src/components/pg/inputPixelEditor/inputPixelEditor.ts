@@ -281,16 +281,14 @@ export default class PgInputPixelEditor extends HTMLElement {
     }
     this.$selection.setAttribute('viewBox', `0 0 ${this.width * this.size} ${this.height * this.size}`);
     if (this.#reset) {
+      // No default layer: callers (e.g. addLayer()) are expected to build
+      // up #layers/#data explicitly. A seeded "Layer 1" here used to sit
+      // at index 0 unknown to callers that always addLayer() their own
+      // first layer too, leaving a phantom extra layer that (combined with
+      // setData's indexing) silently absorbed every layer's paint.
       this.#layer = [0];
-      this.#layers = [{
-        name: 'Layer 1',
-        type: 'pixel',
-        export: true,
-        locked: false,
-        visible: true,
-        opacity: 1
-      }];
-      this.#data = [fillGrid(this.width, this.height)];
+      this.#layers = [];
+      this.#data = [];
       this.#export = fillGrid(this.width, this.height);
       this.#selectionPreview = fillGrid(this.width, this.height);
       this.#selection = fillGrid(this.width, this.height);
@@ -1592,14 +1590,43 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#layers.push({
       name,
       type,
-      export: optional.exclude ?? true,
+      // `exclude` means "exclude from export"; invert it, don't pass it
+      // straight through, or every layer a caller explicitly includes
+      // (exclude: false) ends up marked excluded.
+      export: !(optional.exclude ?? false),
       locked: optional.locked ?? false,
       visible: optional.hidden ?? true,
       opacity: optional.opacity ?? 1,
     });
-    // short hand for initial data
+    // short hand for initial data: `data` is this new layer's own color
+    // group list (getData()'s per-layer shape), applied at its real index
+    // — not routed through setData(), whose indexing is relative to the
+    // layers passed in that call, not this layer's actual position.
     if (optional.data) {
-      this.setData(optional.data);
+      this.#setLayerData(this.#layers.length - 1, optional.data);
+    }
+  }
+
+  #setLayerData(layerIndex: number, layerColorGroups: { color: number; path: string }[]) {
+    const { type } = this.#layers[layerIndex];
+    switch (type) {
+      case 'pixel':
+        layerColorGroups.forEach(({ color, path }) => {
+          const temp = maskToBitmap(path, this.width, this.height);
+          temp.forEach((tempY, y) => {
+            tempY.forEach((tempX, x) => {
+              if (tempX !== 0) {
+                this.#setPixel(x, y, color, [layerIndex]);
+              }
+            });
+          });
+        });
+        break;
+      case 'reference':
+        console.log('reference', layerColorGroups);
+        break;
+      default:
+        throw new Error(`unknown type ${type}`);
     }
   }
 
@@ -1714,30 +1741,17 @@ export default class PgInputPixelEditor extends HTMLElement {
   }
 
   /**
-   * Set data
+   * Set data. Mirrors getData()'s shape exactly: `data[layerIndex]` is the
+   * full list of color groups for that layer (one entry per distinct color
+   * used on it), not a single {color, path}. A layer can use more than one
+   * color, and treating `data[i]` as "the i-th layer's one color" instead
+   * of "layer i's color list" misreads every color past the first as
+   * belonging to a different layer — silently painting it onto whichever
+   * other layer happens to sit at that index, or throwing if none does.
    */
   setData(data: any[]) {
-    data.forEach((layerData, layerIndex) => {
-      const { type } = this.#layers[layerIndex];
-      switch(type) {
-        case 'pixel':
-          const { color, path } = layerData;
-          const temp = maskToBitmap(path, this.width, this.height);
-          temp.forEach((tempY, y) => {
-            tempY.forEach((tempX, x) => {
-              if (tempX !== 0) {
-                //this.#data[layerIndex][y][x] = color;
-                this.#setPixel(x, y, color, [layerIndex]);
-              }
-            });
-          });
-          break;
-        case 'reference':
-          console.log('reference', layerData);
-          break;
-        default:
-          throw new Error(`unknown type ${type}`);
-      }
+    data.forEach((layerColorGroups, layerIndex) => {
+      this.#setLayerData(layerIndex, layerColorGroups);
     });
   }
 
