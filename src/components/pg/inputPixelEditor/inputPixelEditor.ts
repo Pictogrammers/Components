@@ -555,15 +555,18 @@ export default class PgInputPixelEditor extends HTMLElement {
     );
     // preview layer
     this.#previewLayerContext.clearRect(0, 0, actualWidth, actualHeight);
+    const center = this.size / 2;
+    const outerRadius = Math.max(1, this.size * 0.3);
+    const innerRadius = Math.max(0.5, outerRadius - 1);
     pixels.forEach(({ x, y }) => {
       this.#previewLayerContext.fillStyle = WHITE;
       this.#previewLayerContext.beginPath();
-      this.#previewLayerContext.arc(x * totalSize + 5, y * totalSize + 5, 3, 0, 2 * Math.PI);
+      this.#previewLayerContext.arc(x * totalSize + center, y * totalSize + center, outerRadius, 0, 2 * Math.PI);
       this.#previewLayerContext.closePath();
       this.#previewLayerContext.fill();
       this.#previewLayerContext.fillStyle = '#1B79C8';
       this.#previewLayerContext.beginPath();
-      this.#previewLayerContext.arc(x * totalSize + 5, y * totalSize + 5, 2, 0, 2 * Math.PI);
+      this.#previewLayerContext.arc(x * totalSize + center, y * totalSize + center, innerRadius, 0, 2 * Math.PI);
       this.#previewLayerContext.closePath();
       this.#previewLayerContext.fill();
     });

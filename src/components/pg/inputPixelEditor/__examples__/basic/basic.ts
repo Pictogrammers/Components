@@ -184,6 +184,9 @@ export default class XPgInputPixelEditorBasic extends HTMLElement {
       }
     });
     // Layers
+    // The input no longer seeds a default layer; create the one shown
+    // as already-selected in the layers table below.
+    this.$input.addLayer({ name: 'Layer 1', type: 'pixel' });
     this.$layers.columns = [{
       label: 'Name',
       key: 'name',
