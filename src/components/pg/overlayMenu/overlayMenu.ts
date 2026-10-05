@@ -63,7 +63,9 @@ export default class PgOverlayMenu extends PgOverlay {
         }
       });
     }, {
+      // @ts-ignore
       trackVisibility: true,
+      delay: 100,
       root: null,      // Defaults to the browser viewport
       threshold: 0     // Triggers as soon as even 1 pixel enters or leaves
     });
