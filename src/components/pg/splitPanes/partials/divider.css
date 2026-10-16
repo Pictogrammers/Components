@@ -1,0 +1,54 @@
+:host {
+  display: flex;
+  flex: 0 0 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+[part=divider] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  padding: 0 0.5rem;
+  background-color: transparent;
+  cursor: row-resize;
+  touch-action: none;
+  outline: none;
+}
+
+:host(.horizontal) [part=divider] {
+  cursor: col-resize;
+  padding: 0.5rem 0;
+}
+
+[part=divider]:hover,
+:host(.dragging) [part=divider] {
+  background-color: var(--pg-focus-color, rgba(79, 143, 249, 0.5));
+}
+
+[part=divider]:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--pg-focus-color, rgba(79, 143, 249, 0.5));
+}
+
+[part=label] {
+  overflow: hidden;
+  font-family: var(--pg-font-family, system-ui);
+  font-size: 0.75rem;
+  color: var(--pg-split-panes-label-color, #453C4F);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+:host(.horizontal) [part=label] {
+  writing-mode: vertical-rl;
+}
+
+[part=label].hide {
+  display: none;
+}

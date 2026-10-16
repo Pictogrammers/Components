@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.example {
+  height: 24rem;
+  border: 0.0625rem solid #ddd;
+}
+
+pg-split-panes {
+  font-family: system-ui;
+}
+
+pg-pane {
+  padding: 0.5rem;
+  box-sizing: border-box;
+}

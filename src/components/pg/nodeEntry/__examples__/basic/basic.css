@@ -1,0 +1,7 @@
+[part=node] {
+  position: absolute;
+}
+
+.container {
+  position: relative;
+}

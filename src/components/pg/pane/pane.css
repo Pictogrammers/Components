@@ -1,0 +1,20 @@
+:host {
+  display: block;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  flex: 1 1 0%;
+  min-width: var(--pg-pane-min-size, 0);
+  min-height: var(--pg-pane-min-size, 0);
+}
+
+:host(.fixed) {
+  flex: 0 0 var(--pg-pane-size, auto);
+}
+
+[part=content] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}

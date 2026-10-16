@@ -822,7 +822,8 @@ export default class PgInputPixelEditor extends HTMLElement {
     this.#startClientY = event.clientY;
     this.#x = newX;
     this.#y = newY;
-    const color = event.buttons === 32 ? 0 : this.#color;
+    // Is Eraser (either the dedicated Erase tool, or a stylus's physical eraser tip)
+    const color = this.#inputMode === InputMode.Erase || event.buttons === 32 ? 0 : this.#color;
     switch (this.#inputMode) {
       case InputMode.Cursor:
         const currentColor = this.getColorAt(newX, newY);
@@ -840,6 +841,7 @@ export default class PgInputPixelEditor extends HTMLElement {
         this.#lassoOutlineList = [];
         break;
       case InputMode.Pixel:
+      case InputMode.Erase:
         this.#setPixel(newX, newY, color);
         break;
       case InputMode.Stamp:
@@ -878,6 +880,8 @@ export default class PgInputPixelEditor extends HTMLElement {
     const isDragSelect = this.#inputMode === InputMode.SelectRectangle
       || this.#inputMode === InputMode.SelectEllipse
       || this.#inputMode === InputMode.SelectLasso;
+    // Is Eraser (either the dedicated Erase tool, or a stylus's physical eraser tip)
+    const activeColor = this.#inputMode === InputMode.Erase || event.buttons === 32 ? 0 : this.#color;
     // Select tools moving less than 3px act as a click to deselect,
     // shift keeps the current selection
     if (isDragSelect
@@ -957,27 +961,27 @@ export default class PgInputPixelEditor extends HTMLElement {
           break;
         case InputMode.Line:
           getLinePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
-            this.#setPixel(x, y, 1);
+            this.#setPixel(x, y, activeColor);
           });
           break;
         case InputMode.Rectangle:
           getRectanglePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
-            this.#setPixel(x, y, 1);
+            this.#setPixel(x, y, activeColor);
           });
           break;
         case InputMode.RectangleOutline:
           getRectangleOutlinePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
-            this.#setPixel(x, y, 1);
+            this.#setPixel(x, y, activeColor);
           });
           break;
         case InputMode.Ellipse:
           getEllipsePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
-            this.#setPixel(x, y, 1);
+            this.#setPixel(x, y, activeColor);
           });
           break;
         case InputMode.EllipseOutline:
           getEllipseOutlinePixels(this.#startX, this.#startY, newX, newY).forEach(({ x, y }) => {
-            this.#setPixel(x, y, 1);
+            this.#setPixel(x, y, activeColor);
           });
           break;
       }
@@ -1027,8 +1031,8 @@ export default class PgInputPixelEditor extends HTMLElement {
         if (newX === x && newY === y) { return; }
         points.push([newX, newY]);
       }
-      // Is Eraser
-      const color = event.buttons === 32 ? 0 : this.#color;
+      // Is Eraser (either the dedicated Erase tool, or a stylus's physical eraser tip)
+      const color = this.#inputMode === InputMode.Erase || event.buttons === 32 ? 0 : this.#color;
       // Shape tools only care about the last point
       if (points.length === 0) { return; }
       const [lastX, lastY] = points.at(-1) as [number, number];
@@ -1064,6 +1068,7 @@ export default class PgInputPixelEditor extends HTMLElement {
           break;
         }
         case InputMode.Pixel:
+        case InputMode.Erase:
           for (var point of points) {
             this.#setPixel(point[0], point[1], color);
           }
@@ -1352,6 +1357,10 @@ export default class PgInputPixelEditor extends HTMLElement {
 
   inputModePixel() {
     this.#inputMode = InputMode.Pixel;
+  }
+
+  inputModeErase() {
+    this.#inputMode = InputMode.Erase;
   }
 
   inputModeLine() {

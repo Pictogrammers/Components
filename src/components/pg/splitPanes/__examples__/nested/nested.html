@@ -1,0 +1,21 @@
+<div class="example">
+  <pg-split-panes direction="horizontal">
+    <pg-pane label="Explorer" default-size="12" min-size="8">
+      Explorer
+    </pg-pane>
+    <pg-pane label="Workspace">
+      <pg-split-panes>
+        <pg-pane label="Editor">
+          <p>Editor content.</p>
+          <p>The outer split is horizontal (side by side) while this inner split is vertical (stacked).</p>
+        </pg-pane>
+        <pg-pane label="Terminal" default-size="8" min-size="4">
+          Terminal
+        </pg-pane>
+      </pg-split-panes>
+    </pg-pane>
+    <pg-pane label="Outline" default-size="10" min-size="6">
+      Outline
+    </pg-pane>
+  </pg-split-panes>
+</div>
