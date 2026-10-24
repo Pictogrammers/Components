@@ -17,18 +17,6 @@ export default class PgPane extends HTMLElement {
 
   #lastSize: number = 0;
 
-  // Multi-word dash attributes (e.g. "min-size") set in markup are not picked
-  // up by @pictogrammers/element's attributeChangedCallback until an instance
-  // of this constructor has already been created once, so read them directly.
-  connectedCallback() {
-    if (this.hasAttribute('min-size')) {
-      this.minSize = normalizeFloat(this.getAttribute('min-size'));
-    }
-    if (this.hasAttribute('default-size')) {
-      this.defaultSize = normalizeFloat(this.getAttribute('default-size'));
-    }
-  }
-
   render(changes: any) {
     if (changes.size || changes.defaultSize || changes.minSize) {
       const effectiveSize = this.size > 0 ? this.size : this.defaultSize;
