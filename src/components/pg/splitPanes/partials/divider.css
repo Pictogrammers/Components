@@ -14,21 +14,36 @@
   height: 100%;
   margin: 0;
   border: 0;
-  padding: 0 0.5rem;
   background-color: transparent;
   cursor: row-resize;
   touch-action: none;
   outline: none;
 }
 
+[part=divider][aria-orientation=horizontal] {
+  border-top: 1px solid #453C4F;
+  border-bottom: 1px solid #453C4F;
+  padding-block: 0.25rem;
+}
+
+[part=divider][aria-orientation=vertical] {
+  border-left: 1px solid #453C4F;
+  border-right: 1px solid #453C4F;
+  padding-inline: 0.25rem;
+}
+
 :host(.horizontal) [part=divider] {
   cursor: col-resize;
-  padding: 0.5rem 0;
 }
 
 [part=divider]:hover,
 :host(.dragging) [part=divider] {
   background-color: var(--pg-focus-color, rgba(79, 143, 249, 0.5));
+}
+
+:host(.dragging) [part=divider] {
+  outline: 1px solid #FFF;
+  outline-offset: -2px;
 }
 
 [part=divider]:focus-visible {
@@ -43,6 +58,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   pointer-events: none;
+  text-box: trim-both cap alphabetic;
 }
 
 :host(.horizontal) [part=label] {

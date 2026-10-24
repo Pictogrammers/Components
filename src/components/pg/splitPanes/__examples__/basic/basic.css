@@ -14,14 +14,8 @@
   min-height: 0;
 }
 
-pg-pane {
-  padding: 0.5rem;
-  font-family: system-ui;
-}
-
 .log {
   flex: 0 0 auto;
   border-top: 0.0625rem solid #ddd;
-  padding: 0.5rem;
-  font-family: system-ui;
+
 }
